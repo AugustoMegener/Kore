@@ -65,7 +65,7 @@ dependencies {
     implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
 
     implementation(project(":"))
-    ksp(project(":"))
+    ksp(project(":ksp"))
 }
 
 tasks.withType<ProcessResources>().configureEach {

@@ -65,14 +65,16 @@ configurations {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+
     implementation("net.neoforged:neoforge:${project.findProperty("neo_version")}")
     implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
 
-    implementation("com.squareup:kotlinpoet:1.14.2")
+    /*implementation("com.squareup:kotlinpoet:1.14.2")
     implementation("com.google.dagger:dagger-compiler:2.51.1")
     ksp("com.google.dagger:dagger-compiler:2.51.1")
 
-    implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")*/
 }
 
 tasks.withType<ProcessResources>().configureEach {

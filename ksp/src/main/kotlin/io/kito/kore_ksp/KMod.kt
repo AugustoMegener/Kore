@@ -1,4 +1,4 @@
-package io.kito.kore.ksp
+package io.kito.kore_ksp
 
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAnnotationsByType
@@ -6,26 +6,33 @@ import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.squareup.kotlinpoet.*
-import io.kito.kore.camelCased
+import io.kito.kore.KMod
+import io.kito.kore.common.event.Subscribe
+import io.kito.kore.common.event.SubscriptionsDist
+import io.kito.kore.common.registry.Register
+import io.kito.kore.pascalCased
 import net.neoforged.fml.common.Mod
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+
+
+const val MODS_TOML = "META-INF/neoforge.mods.toml"
+
+private val loader = Unit::class.java.classLoader
 
 private val kmod = KMod::class
-
-
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
-annotation class KMod(val id: String = "")
+private val register = Register::class
+private val event = Subscribe::class
+private val subscribeEvent = SubscriptionsDist::class
 
 class KModProcessor(private val logger: KSPLogger, private val codeGenerator: CodeGenerator) : SymbolProcessor {
 
-    private var runned = false
+    private var ran = false
 
     @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (runned) return emptyList()
-        runned = true
-
-        logger.warn("GROOO")
+        if (ran) return emptyList()
+        ran = true
 
         val fn = (resolver.getSymbolsWithAnnotation(kmod.qualifiedName!!).iterator()
             .takeIf {  it.hasNext() } ?: return emptyList())
@@ -33,21 +40,26 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
                 logger.error("KMod annotation only accepts functions inside class or in file root"); return emptyList()
             } } as KSFunctionDeclaration
 
-        generateModEntrypoint(
-            fn.getAnnotationsByType(kmod).first().id.takeIf { it.isNotEmpty() } ?: fn.packageName.getShortName(), fn
-        )
+        val modId = fn.getAnnotationsByType(kmod).first().id.takeIf { it.isNotEmpty() } ?: fn.packageName.getShortName()
+        val pack = fn.packageName.asString()
+
+        val reg = resolver.getSymbolsWithAnnotation(register.qualifiedName!!).map { it.getAnnotationsByType<Register>().first() }
+
+        generateModEntrypoint(modId, pack, fn)
 
         return listOf(fn)
     }
 
-    private fun generateModEntrypoint(modId: String, fn: KSFunctionDeclaration) {
-        val objName = modId.camelCased()
+    private fun generateModEntrypoint(modId: String, pack: String, fn: KSFunctionDeclaration) {
+        val objName = modId.pascalCased()
         val fileName = "${objName}Mod"
-        val pack = fn.packageName.asString()
+
+        val logger =  LogManager::class.java.run { ClassName(packageName, simpleName) }
 
         val fileSpec = FileSpec.builder(pack, fileName)
             .addAliasedImport(MemberName(pack, fn.simpleName.getShortName()), MOD_INIT)
             .addProperty(PropertySpec.builder(ID, String::class, KModifier.CONST).initializer("%S", modId).build())
+            .addProperty(PropertySpec.builder(LOGGER, Logger::class).initializer("%T.getLogger(%N)", logger, ID).build())
             .addType(TypeSpec.objectBuilder(objName)
                 .addAnnotation(AnnotationSpec.builder(Mod::class).addMember("%N", "ID").build())
                 .addInitializerBlock(CodeBlock.of("%N()\n", MOD_INIT)).build())
@@ -59,6 +71,7 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
 
     companion object {
         private const val ID = "ID"
+        private const val LOGGER = "logger"
         private const val MOD_INIT = "modInit"
     }
 }
