@@ -7,3 +7,6 @@ fun String.toLower() = replaceFirstChar { it.lowercase(Locale.getDefault()) }
 
 fun String.pascalCased() = split("_").joinToString("") { it.toTitle() }.toTitle()
 fun String.camelCased() = split("_").joinToString("") { it.toTitle() }.toLower()
+
+
+fun String.snakeCased() = replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase(Locale.getDefault())
