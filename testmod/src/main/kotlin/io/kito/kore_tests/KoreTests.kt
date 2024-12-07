@@ -3,8 +3,8 @@
 package io.kito.kore_tests
 
 import io.kito.kore.KMod
-import io.kito.kore.common.event.Subscribe
-import io.kito.kore.common.event.SubscriptionsDist
+import io.kito.kore.common.event.KSubscribe
+import io.kito.kore.common.event.KSubscriptionsOn
 import net.neoforged.api.distmarker.Dist.DEDICATED_SERVER
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 
@@ -13,10 +13,10 @@ fun init() {
 
 }
 
-@SubscriptionsDist(DEDICATED_SERVER)
+@KSubscriptionsOn(DEDICATED_SERVER)
 object Foo {
 
-    @Subscribe
+    @KSubscribe
     fun FMLCommonSetupEvent.onLoad() {
         logger.info("$ID loaded!")
     }

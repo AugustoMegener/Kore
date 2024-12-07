@@ -4,4 +4,4 @@ import net.neoforged.api.distmarker.Dist
 
 @Target(AnnotationTarget.FILE, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class SubscriptionsDist(val dist: Dist)
+annotation class KSubscriptionsOn(val dist: Dist)

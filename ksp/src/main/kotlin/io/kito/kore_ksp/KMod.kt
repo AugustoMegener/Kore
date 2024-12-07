@@ -4,12 +4,14 @@ import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.squareup.kotlinpoet.*
 import io.kito.kore.KMod
-import io.kito.kore.common.event.Subscribe
-import io.kito.kore.common.event.SubscriptionsDist
-import io.kito.kore.common.registry.Register
+import io.kito.kore.common.event.KSubscribe
+import io.kito.kore.common.event.KSubscriptionsOn
+import io.kito.kore.common.registry.AutoRegister
+import io.kito.kore.common.registry.KRegister
 import io.kito.kore.pascalCased
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
@@ -21,9 +23,9 @@ const val MODS_TOML = "META-INF/neoforge.mods.toml"
 private val loader = Unit::class.java.classLoader
 
 private val kmod = KMod::class
-private val register = Register::class
-private val event = Subscribe::class
-private val subscribeEvent = SubscriptionsDist::class
+private val register = KRegister::class
+private val event = KSubscribe::class
+private val subscribeEvent = KSubscriptionsOn::class
 
 class KModProcessor(private val logger: KSPLogger, private val codeGenerator: CodeGenerator) : SymbolProcessor {
 
@@ -35,7 +37,7 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
         ran = true
 
         val fn = (resolver.getSymbolsWithAnnotation(kmod.qualifiedName!!).iterator()
-            .takeIf {  it.hasNext() } ?: return emptyList())
+            .takeIf { it.hasNext() } ?: return emptyList())
             .let { it.next().takeIf { _ -> !it.hasNext() } ?: run {
                 logger.error("KMod annotation only accepts functions inside class or in file root"); return emptyList()
             } } as KSFunctionDeclaration
@@ -43,11 +45,31 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
         val modId = fn.getAnnotationsByType(kmod).first().id.takeIf { it.isNotEmpty() } ?: fn.packageName.getShortName()
         val pack = fn.packageName.asString()
 
-        val reg = resolver.getSymbolsWithAnnotation(register.qualifiedName!!).map { it.getAnnotationsByType<Register>().first() }
+        processRegistry(resolver.getSymbolsWithAnnotation(register.qualifiedName!!)
+            .map { it to it.getAnnotationsByType(register).first() })
 
         generateModEntrypoint(modId, pack, fn)
 
         return listOf(fn)
+    }
+
+    private fun processRegistry(entries: Sequence<Pair<KSAnnotated, KRegister>>) {
+        val foo = entries.groupBy { it.second.registry } .mapValues { it.value.map { v -> v.first to v.second.name } }
+            .forEach { (registryClass, registries) ->
+                val registry = registryClass.objectInstance as? AutoRegister<*> ?:
+                throw IllegalArgumentException("$register Class does not extend the ${AutoRegister::class} " +
+                        "class and cannot be used in this context")
+
+                val class
+
+                for (item in registries) {
+                    when (item.first) {
+                        is KSClassDeclaration
+                    }
+                }
+            }
+
+
     }
 
     private fun generateModEntrypoint(modId: String, pack: String, fn: KSFunctionDeclaration) {

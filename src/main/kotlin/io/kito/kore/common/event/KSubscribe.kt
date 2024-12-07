@@ -6,4 +6,4 @@ import net.neoforged.api.distmarker.Dist.DEDICATED_SERVER
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Subscribe(val dist: Array<Dist> = [CLIENT, DEDICATED_SERVER])
+annotation class KSubscribe(val dist: Array<Dist> = [CLIENT, DEDICATED_SERVER])

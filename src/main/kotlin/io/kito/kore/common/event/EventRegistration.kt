@@ -13,10 +13,10 @@ fun registerKoreEvents(scanData: ModFileScanData, modBus: IEventBus) {
 
     scanData.classes.map { Class.forName(it.clazz.className) }.forEach {
         val events =
-            it.methods.mapNotNull { m -> m.annotations.filterIsInstance<Subscribe>().firstOrNull()?.let { a -> m to a } }
+            it.methods.mapNotNull { m -> m.annotations.filterIsInstance<KSubscribe>().firstOrNull()?.let { a -> m to a } }
         if (events.isEmpty()) return@forEach
 
-        val config = it.annotations.filterIsInstance<SubscriptionsDist>().firstOrNull()
+        val config = it.annotations.filterIsInstance<KSubscriptionsOn>().firstOrNull()
 
         for (i in events) {
             if (DIST !in (config?.dist?.let { d -> arrayOf(d) } ?: i.second.dist)) continue
