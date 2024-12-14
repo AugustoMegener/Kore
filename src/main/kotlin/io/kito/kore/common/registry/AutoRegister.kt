@@ -1,18 +1,20 @@
 package io.kito.kore.common.registry
 
-import net.minecraft.core.Registry
+import io.kito.kore.reflect.ObjectScanner
 import net.neoforged.bus.api.IEventBus
-import net.neoforged.neoforge.registries.DeferredHolder
-import net.neoforged.neoforge.registries.DeferredRegister
+import net.neoforged.fml.ModContainer
+import net.neoforged.neoforgespi.language.IModInfo
 
-abstract class AutoRegister<T>(id: String, registry: Registry<T>) {
+interface AutoRegister {
 
-    internal open val register = DeferredRegister.create(registry, id)
+    val id: String
 
-    operator fun <O : T> String.invoke(supplier: () -> O): DeferredHolder<T, O> =
-        register.register(this, supplier)
+    fun register(bus: IEventBus)
 
-    fun <O : T> new(id: String, supplier: () -> O) = id(supplier)
-
-    fun register(bus: IEventBus) { register.register(bus) }
+    companion object {
+        @ObjectScanner(AutoRegister::class)
+        fun registerKoreAutoRegistries(info: IModInfo, container: ModContainer, data: AutoRegister) {
+            data.register(container.eventBus ?: return)
+        }
+    }
 }

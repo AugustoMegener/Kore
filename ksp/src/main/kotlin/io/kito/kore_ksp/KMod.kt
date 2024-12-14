@@ -1,18 +1,15 @@
 package io.kito.kore_ksp
 
 import com.google.devtools.ksp.KspExperimental
-import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.processing.*
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.squareup.kotlinpoet.*
 import io.kito.kore.KMod
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.event.KSubscriptionsOn
-import io.kito.kore.common.registry.AutoRegister
-import io.kito.kore.common.registry.KRegister
-import io.kito.kore.pascalCased
-import io.kito.kore.snakeCased
+import io.kito.kore.util.pascalCased
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -23,7 +20,6 @@ const val MODS_TOML = "META-INF/neoforge.mods.toml"
 private val loader = Unit::class.java.classLoader
 
 private val kmod = KMod::class
-private val register = KRegister::class
 private val event = KSubscribe::class
 private val subscribeEvent = KSubscriptionsOn::class
 
@@ -45,64 +41,9 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
         val modId = fn.getAnnotationsByType(kmod).first().id.takeIf { it.isNotEmpty() } ?: fn.packageName.getShortName()
         val pack = fn.packageName.asString()
 
-        /*processRegistry(modId, pack, resolver.getSymbolsWithAnnotation(register.qualifiedName!!)
-            .map { it to it.getAnnotationsByType(register).first() })*/
-
         generateModEntrypoint(modId, pack, fn)
 
         return listOf(fn)
-    }
-
-    private fun processRegistry(modId: String, pack: String, entries: Sequence<Pair<KSAnnotated, KRegister>>) {
-
-        val className = "${modId.pascalCased()}Registries"
-        val obj = TypeSpec.objectBuilder(className)
-
-        val src = mutableListOf<KSFile>()
-
-        entries.groupBy {
-            it.second
-                .registry
-            .takeIf { c -> c != Nothing::class } ?:
-                          it.second.registry.java.enclosingClass.kotlin }
-               .mapValues { it.value.map { v -> v.first to (v.second.name.takeIf { s -> s.isNotEmpty() } ?:
-                                                            v.first.origin.name.snakeCased()) } }
-               .forEach { (registryClass, registries) ->
-
-                   val registry = registryClass.objectInstance as? AutoRegister<*> ?:
-                        throw IllegalArgumentException("$register Class does not extend the ${AutoRegister::class} " +
-                                                   "class and cannot be used in this context")
-
-                   val valWise         = mutableListOf<Pair<KSPropertyDeclaration, String>>()
-                   val objectWise      = mutableListOf<Pair<KSClassDeclaration,    String>>()
-                   val constructorWise = mutableListOf<Pair<KSFunctionDeclaration, String>>()
-
-                   for ((item, id) in registries) {
-                        when (item) {
-                            is KSPropertyDeclaration ->
-                            { valWise += item to id; src += item.containingFile ?: item.parent?.containingFile!! }
-
-                            is KSClassDeclaration    ->
-                            { objectWise += item to id; src += item.containingFile ?: item.parent?.containingFile!! }
-
-                            is KSFunctionDeclaration ->
-                            { constructorWise += item to id; src += item.containingFile ?: item.parent?.containingFile!! }
-                        }
-                   }
-
-                   for ((prop, id) in valWise) {
-                       obj.addProperty(PropertySpec
-                           .builder("${prop.simpleName}Registry", prop.type.origin.declaringJavaClass.kotlin)
-                           .initializer("%T.new(%S) { %M }", registryClass, id, prop.simpleName,
-                               prop.run { MemberName(packageName.asString(), simpleName.asString()) }).build())
-
-                   }
-            }
-
-
-        codeGenerator.createNewFile(Dependencies(false, *src.toTypedArray()), pack, className).use {
-            it.bufferedWriter().use { w -> FileSpec.builder(pack, className).addType(obj.build()).build().writeTo(w) }
-        }
     }
 
     private fun generateModEntrypoint(modId: String, pack: String, fn: KSFunctionDeclaration) {
