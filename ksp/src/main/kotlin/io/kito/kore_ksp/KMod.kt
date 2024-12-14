@@ -15,13 +15,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 
-const val MODS_TOML = "META-INF/neoforge.mods.toml"
-
-private val loader = Unit::class.java.classLoader
-
 private val kmod = KMod::class
-private val event = KSubscribe::class
-private val subscribeEvent = KSubscriptionsOn::class
 
 class KModProcessor(private val logger: KSPLogger, private val codeGenerator: CodeGenerator) : SymbolProcessor {
 
@@ -76,4 +70,3 @@ class KModProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment) =
         KModProcessor(environment.logger, environment.codeGenerator)
 }
-

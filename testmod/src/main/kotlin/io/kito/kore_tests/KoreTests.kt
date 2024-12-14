@@ -16,7 +16,7 @@ fun FMLCommonSetupEvent.onLoad() {
     logger.info("$ID loaded!")
 }
 
-object Blocks : ItemRegister(ID) {
+object Items : ItemRegister(ID) {
 
-    val item = "item" { Item(it) } where {  }
+    val item by "item" of ::Item where isSimple()
 }
