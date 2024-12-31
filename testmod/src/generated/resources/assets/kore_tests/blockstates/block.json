@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "kore_tests:block/block_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "kore_tests:block/block"
+    },
+    "axis=z": {
+      "model": "kore_tests:block/block_horizontal",
+      "x": 90
+    }
+  }
+}

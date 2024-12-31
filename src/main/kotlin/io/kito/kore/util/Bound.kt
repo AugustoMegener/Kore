@@ -1,6 +1,7 @@
 package io.kito.kore.util
 
-import io.kito.kore.util.Bound.Type.*
+import io.kito.kore.util.Bound.Type.GLOBAL
+import io.kito.kore.util.Bound.Type.LOCAL
 
 sealed class Bound {
 

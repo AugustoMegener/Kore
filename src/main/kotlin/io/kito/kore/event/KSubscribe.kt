@@ -1,4 +1,4 @@
-package io.kito.kore.common.event
+package io.kito.kore.event
 
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.Dist.CLIENT

@@ -1,4 +1,4 @@
-package io.kito.kore.common.registry
+package io.kito.kore.registry
 
 import net.minecraft.core.Registry
 import net.neoforged.bus.api.IEventBus

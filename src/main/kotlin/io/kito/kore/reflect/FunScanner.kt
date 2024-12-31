@@ -1,9 +1,9 @@
 package io.kito.kore.reflect
 
 import io.kito.kore.util.Bound
+import io.kito.kore.util.UNCHECKED_CAST
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforgespi.language.IModInfo
-import org.jetbrains.annotations.ApiStatus.Internal
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -21,31 +21,32 @@ interface FunScanner<T : Any> {
 
     fun use(info: IModInfo, container: ModContainer, data: KFunction<T>)
 
+    @Scan
     companion object {
 
-        val localBound = { it: IModInfo, _ : ModContainer -> Bound.Local(it.modId) }
+        val  localBound = { it: IModInfo, _ : ModContainer -> Bound.Local(it.modId) }
+        val globalBound = {  _: IModInfo, _ : ModContainer -> Bound.Global          }
 
         private val scanners = arrayListOf<Pair<Bound, FunScanner<*>>>()
 
-        @Internal
         @ObjectScanner(FunScanner::class, 2)
         fun collectScanners(info: IModInfo, container: ModContainer, data: FunScanner<*>) {
             scanners += data.bound(info, container) to data
         }
 
-        @Internal
-        @Suppress("UNCHECKED_CAST")
+        @Suppress(UNCHECKED_CAST)
         @ClassScanner(Any::class, priority = 3)
         fun scanFuns(info: IModInfo, container: ModContainer, data: KClass<*>) {
             for ((bound, scanner) in scanners) {
                 if (!bound.isOnBound(info.modId)) continue
 
-                data.java.methods.mapNotNull { it.kotlinFunction }.forEach {
-                    if (!(it.annotations.firstOrNull { a -> a.annotationClass == scanner.annotation } != null &&
-                          scanner.validateParameters(it.parameters)                  &&
-                          it.returnType.jvmErasure.isSubclassOf(scanner.returnType)     )) return@forEach
+                data.java.methods.mapNotNull { it.kotlinFunction }.forEach { fn ->
 
-                    scanner.use(info, container, it as KFunction<Nothing>)
+                    if (!(fn.annotations.any { an -> an.annotationClass == scanner.annotation } &&
+                          scanner.validateParameters(fn.parameters) &&
+                          fn.returnType.jvmErasure.isSubclassOf(scanner.returnType))) return@forEach
+
+                    scanner.use(info, container, fn as KFunction<Nothing>)
                 }
             }
         }

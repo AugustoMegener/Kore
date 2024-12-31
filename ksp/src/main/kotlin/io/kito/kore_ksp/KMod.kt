@@ -7,8 +7,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.squareup.kotlinpoet.*
 import io.kito.kore.KMod
-import io.kito.kore.common.event.KSubscribe
-import io.kito.kore.common.event.KSubscriptionsOn
+import io.kito.kore.ModUtil
 import io.kito.kore.util.pascalCased
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
@@ -50,6 +49,7 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
             .addProperty(PropertySpec.builder(ID, String::class, KModifier.CONST).initializer("%S", modId).build())
             .addProperty(PropertySpec.builder(LOGGER, Logger::class).initializer("%T.getLogger(%N)", logger, ID).build())
             .addType(TypeSpec.objectBuilder(objName)
+                .superclass(ModUtil::class).addSuperclassConstructorParameter("%N", "ID")
                 .addAnnotation(AnnotationSpec.builder(Mod::class).addMember("%N", "ID").build())
                 .addInitializerBlock(CodeBlock.of("%M()\n", MemberName(fn.packageName.asString(),
                                                                        fn.simpleName.asString()))).build())

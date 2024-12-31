@@ -1,14 +1,20 @@
 package io.kito.kore.util
 
 import io.kito.kore.Kore.ID
+import net.neoforged.fml.ModContainer
 import net.neoforged.fml.ModList
+import net.neoforged.neoforgespi.language.IModInfo
 import net.neoforged.neoforgespi.locating.IModFile
 
 
+val modList: ModList get() = ModList.get()
 
-val modList get() = ModList.get()
+val IModFile.info: IModInfo get() = modInfos.first()
+val IModFile.modId: String  get() = modContainer.modId
 
-val IModFile.info get() = modInfos.first()
+fun forEachModContainer(action: ModContainer.(String) -> Unit) { modList.forEachModContainer { id, c -> action(c, id) } }
+
+fun forEachModFile(action: IModFile.() -> Unit) { modList.forEachModFile { it.apply(action) } }
 
 fun forEachKoreUserFile(action: IModFile.() -> Unit) {
     modList.forEachModFile { file ->
@@ -16,4 +22,4 @@ fun forEachKoreUserFile(action: IModFile.() -> Unit) {
     }
 }
 
-val IModFile.modContainer get() = modList.getModContainerById(info.modId).get()
+val IModFile.modContainer: ModContainer get() = modList.getModContainerById(info.modId).get()

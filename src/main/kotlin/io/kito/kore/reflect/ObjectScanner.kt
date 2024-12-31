@@ -13,6 +13,7 @@ import kotlin.reflect.jvm.kotlinFunction
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ObjectScanner(val clazz: KClass<*>, val priority: Int = 0) {
 
+    @Scan
     companion object {
 
         private val objectScanners = hashMapOf<Int, ArrayList<Pair<KClass<*>, KFunction<*>>>>()
@@ -28,16 +29,19 @@ annotation class ObjectScanner(val clazz: KClass<*>, val priority: Int = 0) {
 
         @ClassScanner(Any::class, priority = 1)
         fun scanObjects(info: IModInfo, container: ModContainer, data: KClass<out Any>) {
-            objectScanners.toList().sortedBy { it.first }.map { it.second }.forEach { actual ->
-                for ((cls, fn) in actual) {
-                    if (!data.isSubclassOf(cls))      continue
-                    val obj = data.objectInstance ?: continue
+            objectScanners.toList()
+                .sortedBy { it.first }
+                .map      { it.second }
+                .forEach  { actual ->
+                    for ((cls, fn) in actual) {
+                        if (!data.isSubclassOf(cls))     continue
+                        val obj = data.objectInstance ?: continue
 
-                    fn.javaMethod!!.declaringClass.kotlin.objectInstance
-                        ?.let { fn.call(it, info, container, obj) }
-                        ?:run { fn.call(    info, container, obj) }
+                        fn.javaMethod!!.declaringClass.kotlin.objectInstance
+                            ?.let { fn.call(it, info, container, obj) }
+                            ?:run { fn.call(    info, container, obj) }
+                    }
                 }
-            }
         }
     }
 }
