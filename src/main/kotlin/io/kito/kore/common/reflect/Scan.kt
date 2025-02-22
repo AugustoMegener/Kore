@@ -1,0 +1,36 @@
+package io.kito.kore.common.reflect
+
+import io.kito.kore.common.reflect.Scan.ScanType.CASCADING
+import io.kito.kore.common.reflect.Scan.ScanType.ISOLATED
+import io.kito.kore.util.forEachModFile
+import io.kito.kore.util.getAllNestedClasses
+import io.kito.kore.util.klass
+import io.kito.kore.util.modContainer
+import org.jetbrains.annotations.ApiStatus.Internal
+import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Scan(val type: ScanType = ISOLATED) {
+
+    enum class ScanType { CASCADING, ISOLATED }
+
+    @Internal
+    companion object {
+
+        val scaneables by lazy {
+            buildMap<String, List<KClass<*>>> {
+                forEachModFile {
+                    put(modContainer.modId, scanResult.annotations
+                        .filter { it.annotationType.klass == Scan::class }
+                        .mapNotNull { it.clazz.klass.findAnnotation<Scan>()?.let { annotation ->
+                            when (annotation.type) {
+                                ISOLATED  -> listOf(it.clazz.klass)
+                                CASCADING -> getAllNestedClasses(listOf(it.clazz.klass)) } } }
+                        .flatten())
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,9 @@
 package io.kito.kore.util
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.neoforged.neoforge.capabilities.ItemCapability
 import org.objectweb.asm.Type
 import java.util.*
 import kotlin.reflect.KClass
@@ -30,3 +33,5 @@ operator fun ResourceLocation.plus(loc: String): ResourceLocation = withSuffix(l
 
 inline infix fun <reified T>       T .`, `(other: T) = arrayOf(this,  other)
 inline infix fun <reified T> Array<T>.`, `(other: T) =         this + other
+
+inline fun <T, R> ctxLazy(ctx: T, crossinline supplier: T.() -> R) = lazy { supplier(ctx) }

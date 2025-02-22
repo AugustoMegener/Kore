@@ -1,7 +1,7 @@
 package io.kito.kore;
 
 import io.kito.kore.Kore.ID
-import io.kito.kore.reflect.ClassScanner.Companion.scanClasses
+import io.kito.kore.common.reflect.ClassScanner.Companion.scanClasses
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
 
@@ -17,5 +17,6 @@ object Kore {
 
     init {
         scanClasses()
+
     }
 }
