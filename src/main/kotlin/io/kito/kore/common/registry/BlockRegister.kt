@@ -1,6 +1,7 @@
 package io.kito.kore.common.registry
 
-import com.mojang.datafixers.types.Type
+import io.kito.kore.common.capabilities.BlockCapRegister
+import io.kito.kore.common.capabilities.BlockCapRegister.BlockCapRegistry
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.blockProp
@@ -18,7 +19,9 @@ import net.minecraft.world.item.Item.Properties as ItemProp
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties as BlockProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
 import net.minecraft.core.BlockPos
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
+import net.neoforged.neoforge.capabilities.BlockCapability
 
 open class BlockRegister(final override val id: String) : AutoRegister {
 
@@ -68,6 +71,8 @@ open class BlockRegister(final override val id: String) : AutoRegister {
 
         private val blockProp = blockProp()
 
+        private val blockCaps = BlockCaps()
+
         fun props(block: BlockProp.() -> Unit) = blockProp.apply(block)
 
 
@@ -87,10 +92,24 @@ open class BlockRegister(final override val id: String) : AutoRegister {
             blockEntityBuilder = builder as BETBuilder<BlockEntity>.() -> Unit
         }
 
+        fun caps(adder: BlockCaps.() -> Unit) = also { blockCaps.apply(adder) }
+
+        inner class BlockCaps {
+            val registries = arrayListOf<BlockCapRegistry<*, *, *>>()
+
+            operator fun <O, C> BlockCapability<O, C>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?, C?) -> O)
+            { registries += BlockCapRegistry(this, getter) }
+
+            operator fun <O   > BlockCapability<O, Void?>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?) -> O)
+            { registries += BlockCapRegistry(this) { lvl, pos, state, be, _ -> getter(lvl, pos, state, be) } }
+        }
+
         infix fun where(builder: BlockBuilder<B>.() -> Unit) : BlockRegistry<B> {
             apply(builder)
 
             val reg = register.register(blockName) { -> supplier(blockProp) }
+
+            BlockCapRegister.blockCaps += { reg.value() } to blockCaps.registries
 
             return BlockRegistry(
                 reg, blockItem { reg.value() } where blockItemBuilder,

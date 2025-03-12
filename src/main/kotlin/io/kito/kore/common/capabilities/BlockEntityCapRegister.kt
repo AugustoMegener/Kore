@@ -16,7 +16,7 @@ object BlockEntityCapRegister {
     val beCaps = arrayListOf<Pair<() -> BlockEntityType<*>, List<BECapRegistry<*, *, *, *>>>>()
 
     data class BECapRegistry<B : BlockEntity, O, C, T : BlockCapability<O, C>>(val cap         : T,
-                                                                               val capSupplier : ICapabilityProvider<O, C, B>)
+                                                                               val capSupplier : ICapabilityProvider<B, C, O>)
 
     @KSubscribe
     fun RegisterCapabilitiesEvent.onRegisterCaps() {

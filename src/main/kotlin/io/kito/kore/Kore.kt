@@ -17,6 +17,5 @@ object Kore {
 
     init {
         scanClasses()
-
     }
 }

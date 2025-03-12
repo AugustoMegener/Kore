@@ -4,6 +4,7 @@ package io.kito.kore.common.world.level.block.entity
 import io.kito.kore.common.data.nbt.KNBTSerializable
 import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.bet
 import io.kito.kore.util.set
+
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
@@ -44,8 +45,5 @@ abstract class KBlockEntity(pos: BlockPos, blockState: BlockState, type: BlockEn
 
     open fun tick() {}
 
-    class AutoDirt<T>(private var data: T) {
-        operator fun getValue(be: BlockEntity, prop: KProperty<*>) = data
-        operator fun setValue(be: BlockEntity, prop: KProperty<*>, new: T) { data = new; be.setChanged() }
-    }
+
 }

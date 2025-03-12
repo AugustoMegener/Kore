@@ -2,8 +2,11 @@ package io.kito.kore.common.registry
 
 import com.google.common.collect.ImmutableMap
 import com.mojang.datafixers.types.Type
+import io.kito.kore.client.renderer.RendererRegistry
 import io.kito.kore.common.capabilities.BlockEntityCapRegister.BECapRegistry
 import io.kito.kore.common.capabilities.BlockEntityCapRegister.beCaps
+import io.kito.kore.util.UNCHECKED_CAST
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries.BLOCK_ENTITY_TYPE
 import net.minecraft.world.level.block.Block
@@ -32,9 +35,15 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
         private var type: Type<*>? = null
         private val caps = BECaps()
 
+        private var renderer: BlockEntityRenderer<T>? = null
+
         infix fun onAll(blocks: () -> Array<out Block>): DeferredHolder<BlockEntityType<*>, BlockEntityType<T>> =
             registry.register(name) { -> BlockEntityType(supplier, blocks().toMutableSet(), type) }
-                .also { bets += blocks to it::get; beCaps += it::get to caps.registries }
+                .also {
+                    bets += blocks to it::get
+                    beCaps += it::get to caps.registries
+                    renderer?.let { r -> RendererRegistry.blockEntityRenderers += it::value to r }
+                }
 
 
         infix fun on(block: () -> Block) = onAll { arrayOf(block()) }
@@ -43,13 +52,15 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
 
         infix fun withCaps(adder: BECaps.() -> Unit) = also { caps.apply(adder) }
 
+        infix fun withRenderer(beRenderer: BlockEntityRenderer<T>) = also { renderer = beRenderer }
+
         inner class BECaps {
             val registries = arrayListOf<BECapRegistry<*, *, *, *>>()
 
-            infix fun <O, C> BlockCapability<O, C    >.on(getter: T.(C) -> O)
-                { registries += BECapRegistry(this) { x, y -> getter(x, y) } }
+            operator fun <O, C> BlockCapability<O, C    >.invoke(getter: T.(C) -> O)
+                { registries += BECapRegistry<T, O, C, BlockCapability<O, C>>(this) { x, y -> getter(x, y) } }
 
-            infix fun <O   > BlockCapability<O, Void?>.on(getter: T.() -> O)
+            operator fun <O   > BlockCapability<O, Void?>.invoke(getter: T.() -> O)
                 { registries += BECapRegistry(this) { b: T, _ -> getter(b) } }
         }
     }

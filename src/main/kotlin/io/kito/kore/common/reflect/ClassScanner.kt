@@ -2,7 +2,7 @@ package io.kito.kore.common.reflect
 
 import io.kito.kore.common.reflect.Scan.Companion.scaneables
 import io.kito.kore.util.Bound
-import io.kito.kore.util.forEachModContainer
+import io.kito.kore.util.neoforge.Mods.forEachModContainer
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforgespi.language.IModInfo
 import kotlin.reflect.KClass

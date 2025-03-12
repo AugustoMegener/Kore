@@ -1,3 +1,7 @@
+inline val String.prop get() = project.findProperty(this) as String
+
+val modId = "mod_id".prop
+
 plugins {
     `java-library`
     `maven-publish`
@@ -14,8 +18,8 @@ tasks.named<Wrapper>("wrapper") {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = project.findProperty("mod_version") as String
-group = project.findProperty("mod_group_id") as String
+version = "mod_version".prop
+group = "mod_group_id".prop
 
 repositories {
     mavenLocal()
@@ -26,7 +30,7 @@ repositories {
 }
 
 base {
-    archivesName = project.findProperty("mod_id") as String
+    archivesName = modId
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -39,23 +43,23 @@ runs {
     }
 
     create("client") {
-        systemProperty("forge.enabledGameTestNamespaces", project.findProperty("mod_id") as String)
+        systemProperty("forge.enabledGameTestNamespaces", modId)
     }
 
     create("server") {
-        systemProperty("forge.enabledGameTestNamespaces", project.findProperty("mod_id") as String)
+        systemProperty("forge.enabledGameTestNamespaces", modId)
         argument("--nogui")
     }
 
     create("gameTestServer") {
-        systemProperty("forge.enabledGameTestNamespaces", project.findProperty("mod_id") as String)
+        systemProperty("forge.enabledGameTestNamespaces", modId)
     }
 
     create("data") {
         arguments.addAll(
-                "--mod", project.findProperty("mod_id") as String,
-                "--all", "--output", file("src/generated/resources/").absolutePath,
-                "--existing", file("src/main/resources/").absolutePath
+            "--mod", modId,
+            "--all", "--output", file("src/generated/resources/").absolutePath,
+            "--existing", file("src/main/resources/").absolutePath
         )
     }
 }
@@ -69,24 +73,15 @@ configurations {
 dependencies {
     implementation(kotlin("reflect"))
 
-    implementation("net.neoforged:neoforge:${project.findProperty("neo_version")}")
+    implementation("net.neoforged:neoforge:${"neo_version".prop}")
     implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
 }
 
 tasks.withType<ProcessResources>().configureEach {
-    val replaceProperties = mapOf(
-            "minecraft_version" to project.findProperty("minecraft_version"),
-            "minecraft_version_range" to project.findProperty("minecraft_version_range"),
-            "neo_version" to project.findProperty("neo_version"),
-            "neo_version_range" to project.findProperty("neo_version_range"),
-            "loader_version_range" to project.findProperty("loader_version_range"),
-            "mod_id" to project.findProperty("mod_id"),
-            "mod_name" to project.findProperty("mod_name"),
-            "mod_license" to project.findProperty("mod_license"),
-            "mod_version" to project.findProperty("mod_version"),
-            "mod_authors" to project.findProperty("mod_authors"),
-            "mod_description" to project.findProperty("mod_description")
-    )
+    val replaceProperties = listOf("minecraft_version", "minecraft_version_range", "neo_version", "neo_version_range",
+                                   "loader_version_range", "mod_id", "mod_name", "mod_license", "mod_version",
+                                   "mod_authors", "mod_description").associateWith { it.prop }
+
     inputs.properties(replaceProperties)
 
     filesMatching("META-INF/neoforge.mods.toml") {
@@ -113,8 +108,5 @@ idea {
     module {
         isDownloadSources = true
         isDownloadJavadoc = true
-
-        /*sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin") // or tasks["kspKotlin"].destination
-        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")*/
     }
 }

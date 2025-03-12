@@ -2,6 +2,7 @@ package io.kito.kore.common.data
 
 import io.kito.kore.common.data.DecodeResult.Statefull
 import io.kito.kore.common.data.DecodeResult.Stateless
+import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.nbtOps
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.core.NonNullList
@@ -31,6 +32,7 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
         }
 
 
+    @Suppress(UNCHECKED_CAST)
     override fun <D : Any> decode(data: Tag, oldValue: D?, valueType: KType): DecodeResult<D> =
         when(oldValue) {
             is INBTSerializable<*> -> Statefull { (this as INBTSerializable<Tag>); deserializeNBT(provider, data) }

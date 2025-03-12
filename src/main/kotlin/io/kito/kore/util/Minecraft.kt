@@ -13,6 +13,7 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.resources.ResourceLocation.fromNamespaceAndPath
 import net.minecraft.resources.ResourceLocation.withDefaultNamespace
+import net.minecraft.resources.ResourceLocation.parse
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.level.block.state.BlockBehaviour
@@ -28,6 +29,8 @@ const val PT_BR = "pt_br"
 
 fun loc(name: String)             : ResourceLocation = withDefaultNamespace(    name)
 fun loc(id: String, name: String) : ResourceLocation = fromNamespaceAndPath(id, name)
+
+fun String.toLoc() = parse(this)
 
 fun itemProp() = Item.Properties()
 fun blockProp(): BlockBehaviour.Properties = BlockBehaviour.Properties.of()
@@ -63,7 +66,7 @@ inline val   nbtOps:  NbtOps get() =  NbtOps.INSTANCE
 inline val  jsonOps: JsonOps get() = JsonOps.INSTANCE
 inline val jsoncOps: JsonOps get() = JsonOps.COMPRESSED
 
-inline operator fun CompoundTag.set(name: String, tag: Tag) = put(name, tag)
+operator fun CompoundTag.set(name: String, tag: Tag) = put(name, tag)
 
 val minecraftClient: Minecraft get() = runForDist(
     { Minecraft.getInstance() },
