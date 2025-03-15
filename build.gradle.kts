@@ -84,9 +84,7 @@ tasks.withType<ProcessResources>().configureEach {
 
     inputs.properties(replaceProperties)
 
-    filesMatching("META-INF/neoforge.mods.toml") {
-        expand(replaceProperties)
-    }
+    filesMatching("META-INF/neoforge.mods.toml") { expand(replaceProperties) }
 }
 
 publishing {
@@ -95,6 +93,7 @@ publishing {
             from(components["java"])
         }
     }
+
     repositories {
         maven { url = uri("file://${project.projectDir}/repo") }
     }

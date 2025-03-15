@@ -12,6 +12,17 @@ interface AutoRegister {
 
     fun register(bus: IEventBus)
 
+    abstract class RegistryTemplate<I, T> {
+
+        private val entries = hashMapOf<I, () -> T>()
+
+        operator fun get(idx: I) = entries[idx]?.invoke()
+
+        fun register(vararg idxs: I) { entries += idxs.associateWith { newEntry(it) } }
+
+        abstract fun newEntry(idx: I): () -> T
+    }
+
     @Scan
     companion object {
         @ObjectScanner(AutoRegister::class)
