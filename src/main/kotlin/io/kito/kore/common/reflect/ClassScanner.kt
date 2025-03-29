@@ -33,7 +33,6 @@ annotation class ClassScanner(val clazz    : KClass<*>,
         fun scanClasses() {
             val scanners: HashMap<Int, ArrayList<ClassScannerData<*>>> = hashMapOf()
 
-
             for ((id, clss) in scaneables) {
                 clss.flatMap    { it.java.methods.toList() }
                     .mapNotNull { it.kotlinFunction }
@@ -48,8 +47,10 @@ annotation class ClassScanner(val clazz    : KClass<*>,
             scanners.toList().sortedBy { it.first }.forEach { (_, scanners) ->
                 scanners.forEach { data ->
                     forEachModContainer { id ->
-                        for (cls in scaneables[id] ?: return@forEachModContainer)
-                            { if (cls.isSubclassOf(data.target)) scan(data, cls, modInfo, this) }
+                        for (cls in scaneables[id] ?: return@forEachModContainer) {
+                            if (cls.isSubclassOf(data.target))
+                                scan(data, cls, modInfo, this)
+                        }
                     }
                 }
             }

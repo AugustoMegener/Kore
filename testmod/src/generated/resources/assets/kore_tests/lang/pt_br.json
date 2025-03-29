@@ -1,4 +1,12 @@
 {
   "block.kore_tests.block": "Bloco",
+  "block.kore_tests.cute_block": "Bloco Cute",
+  "block.kore_tests.fool_block": "Bloco Fool",
+  "block.kore_tests.nice_block": "Bloco Nice",
+  "block.kore_tests.weird_block": "Bloco Weird",
+  "item.kore_tests.cute_item": "Block Cute",
+  "item.kore_tests.fool_item": "Block Fool",
+  "item.kore_tests.nice_item": "Block Nice",
+  "item.kore_tests.weird_item": "Block Weird",
   "itemGroup.kore_tests.tab": "Minha Aba"
 }

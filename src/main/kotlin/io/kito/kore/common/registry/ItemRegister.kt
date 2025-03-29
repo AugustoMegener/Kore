@@ -2,7 +2,7 @@ package io.kito.kore.common.registry
 
 import io.kito.kore.common.capabilities.ItemCapRegister
 import io.kito.kore.common.capabilities.ItemCapRegister.ItemCapRegistry
-import io.kito.kore.util.itemProp
+import io.kito.kore.util.minecraft.itemProp
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.level.block.entity.BlockEntity

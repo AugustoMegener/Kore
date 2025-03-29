@@ -1,3 +1,7 @@
-// 1.21.1	2025-01-12T11:04:55.1496926	Block States: kore_tests
+// 1.21.1	2025-03-18T17:25:18.9535603	Block States: kore_tests
 09373e1f7af3ee4a36b1c319ca1959e50c152b11 assets/kore_tests/blockstates/block.json
+09373e1f7af3ee4a36b1c319ca1959e50c152b11 assets/kore_tests/blockstates/cute_block.json
+09373e1f7af3ee4a36b1c319ca1959e50c152b11 assets/kore_tests/blockstates/fool_block.json
+09373e1f7af3ee4a36b1c319ca1959e50c152b11 assets/kore_tests/blockstates/nice_block.json
+09373e1f7af3ee4a36b1c319ca1959e50c152b11 assets/kore_tests/blockstates/weird_block.json
 37657411b764a6d9b1fa6a8a58e1cf37dd18469d assets/kore_tests/models/block/block.json

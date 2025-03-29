@@ -4,7 +4,7 @@ import io.kito.kore.common.capabilities.BlockCapRegister
 import io.kito.kore.common.capabilities.BlockCapRegister.BlockCapRegistry
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.blockProp
+import io.kito.kore.util.minecraft.blockProp
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -18,6 +18,8 @@ import kotlin.reflect.jvm.isAccessible
 import net.minecraft.world.item.Item.Properties as ItemProp
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties as BlockProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
+import io.kito.kore.common.template.Template
+import io.kito.kore.util.Indexable
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
@@ -28,8 +30,6 @@ open class BlockRegister(final override val id: String) : AutoRegister {
     private val itemRegister =            ItemRegister(id)
     private val   beRegister = BlockEntityTypeRegister(id)
     private val     register = DeferredRegister.createBlocks(id)
-
-    private var registryFinalized = false
 
     infix fun <T : Block> String.of(supplier: (BlockProp) -> T) = BlockBuilder(this, supplier)
 
@@ -116,7 +116,33 @@ open class BlockRegister(final override val id: String) : AutoRegister {
                 blockEntitySupplier
                     ?.let { be -> with(beRegister) { (blockName of be).apply(blockEntityBuilder) on { reg.value() } } })
         }
+    }
 
+    fun <T, B : Block> blockTemplate(builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, BlockItem, Nothing>(builder)
+
+    fun <T, B : Block, I : BlockItem> blockTemplateWithItem(builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, I, Nothing>(builder)
+
+    fun <T, B : Block, E : BlockEntity> blockTemplateWithEntity(builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, BlockItem, E>(builder)
+
+    fun <T, B : Block, I : BlockItem, E : BlockEntity> blockTemplateFull(builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, I, E>(builder)
+
+    class BlockTemplate<T, B : Block, I : BlockItem, E : BlockEntity>(val builder: (T) -> BlockRegistry<B>) :
+        Template<T, B>
+    {
+        private val entries = hashMapOf<T, BlockRegistry<B>>()
+
+        override val allIdxs by lazy { entries.keys }
+
+        val item   = object : Indexable<T, I?> { override fun get(idx: T) = entries[idx]?.itemRegistry?.get() as I? }
+        val entity = object : Indexable<T, E?> { override fun get(idx: T) = entries[idx]?.beRegistry  ?.get() as E? }
+
+        override fun get(idx: T): B? = entries[idx]?.blockRegistry?.get()
+
+        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
     }
 
     inner class BlockRegistry<T : Block>(val blockRegistry : DeferredBlock<      T      >,

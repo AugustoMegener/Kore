@@ -3,7 +3,7 @@ package io.kito.kore.common.world.level.block.entity
 
 import io.kito.kore.common.data.nbt.KNBTSerializable
 import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.bet
-import io.kito.kore.util.set
+import io.kito.kore.util.minecraft.set
 
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup

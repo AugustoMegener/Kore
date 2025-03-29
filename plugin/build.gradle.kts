@@ -19,7 +19,7 @@ dependencies {
 
     implementation("org.json:json:20231013")
 
-    api("net.neoforged.gradle.userdev:7.0.170")
+    //api("net.neoforged.gradle.userdev:7.0.170")
 }
 
 gradlePlugin {

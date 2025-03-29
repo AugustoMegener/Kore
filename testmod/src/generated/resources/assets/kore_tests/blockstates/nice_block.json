@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "kore_tests:block/block"
+    }
+  }
+}

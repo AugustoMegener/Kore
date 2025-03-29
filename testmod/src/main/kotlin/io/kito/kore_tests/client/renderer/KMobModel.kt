@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.kito.kore.client.renderer.ModelLayer
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore_tests.KoreTests.local
-import io.kito.kore_tests.common.level.entity.KMob
+import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.client.model.EntityModel
 import net.minecraft.client.model.geom.ModelLayerLocation
 import net.minecraft.client.model.geom.ModelPart

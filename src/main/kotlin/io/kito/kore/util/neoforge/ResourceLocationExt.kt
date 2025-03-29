@@ -4,5 +4,9 @@ import net.minecraft.resources.ResourceLocation
 
 object ResourceLocationExt {
 
-    inline val ResourceLocation.entityTexture: ResourceLocation get() = withPrefix("textures/entity/")
+    inline val ResourceLocation.entity: ResourceLocation get() = withPrefix("entity/")
+
+    inline val ResourceLocation.item: ResourceLocation get() = withPrefix("item/")
+
+    inline val ResourceLocation.texture: ResourceLocation get() = withPrefix("textures/")
 }

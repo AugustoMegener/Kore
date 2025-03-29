@@ -3,6 +3,7 @@ package io.kito.kore.common.registry
 import net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB
 import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.CreativeModeTab.*
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ItemLike
 import net.neoforged.bus.api.IEventBus
@@ -16,12 +17,22 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
     infix fun String.where(builder: Builder.(String) -> Unit): DeferredHolder<CreativeModeTab, CreativeModeTab> =
         register.register(this, builder().apply { builder(this, this@where) } ::build)
 
-    fun Builder.items(builder: Output.(ItemDisplayParameters) -> Unit) =
+    fun Builder.display(builder: Output.(ItemDisplayParameters) -> Unit) =
         also { displayItems { p, o -> builder(o, p) } }
 
-    fun Builder.stacks(vararg stacks: () -> ItemStack) = items { acceptAll(stacks.asList().map { it() }) }
+    fun Output.stacks(vararg stacks: () -> ItemStack) = acceptAll(stacks.asList().map { it() })
 
-    fun Builder.items(vararg items: () -> ItemLike) = items { acceptAll(items.asList().map { it().asItem().defaultInstance }) }
+    fun Output.items(vararg items: () -> ItemLike) =
+        acceptAll(items.asList().map { it().asItem().defaultInstance })
+
+    fun <T> Output.templates(vararg templates: BlockRegister.BlockTemplate<T, *, *, *>) =
+        items(*templates.flatMap { it.allIdxs.map { i -> { it.item[i]!! } } }.toTypedArray())
+
+    fun <T> Output.templates(vararg templates: EntityTypeRegister.EntityTypeTemplate<T, *, *>) =
+        items(*templates.flatMap { it.allIdxs.map { i -> { it.egg[i]!! } } }.toTypedArray())
+
+    fun <T> Output.templates(vararg templates: RegistryTemplate<T, out Item>) =
+        items(*templates.flatMap { it.registereds }.toTypedArray())
 
     override fun register(bus: IEventBus) {
         register.register(bus)

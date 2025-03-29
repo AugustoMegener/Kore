@@ -5,7 +5,7 @@ import com.mojang.serialization.DynamicOps
 import io.kito.kore.common.data.Save
 import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.createDynamicCodec
+import io.kito.kore.util.minecraft.createDynamicCodec
 import io.kito.kore.util.snakeCased
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -25,12 +25,14 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<Any>
 
     val codec by lazy {
         @Suppress(UNCHECKED_CAST)
-        createDynamicCodec<T>(
-            fields.map { (it.first as Codec<Any>)
+        (createDynamicCodec<T>(
+        fields.map {
+            (it.first as Codec<Any>)
                 .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
-                      ?: it.second.name.snakeCased())
-                .forGetter { o -> it.second.get(o) } }, deserializer ?: ::decode
-        )
+                    ?: it.second.name.snakeCased())
+                .forGetter { o -> it.second.get(o) }
+        }, deserializer ?: ::decode
+    ))
     }
 
     @Suppress(UNCHECKED_CAST)
@@ -65,6 +67,4 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<Any>
     fun <E> safeDecode(ops: DynamicOps<E>, data: E) = codec.parse(ops, data).takeIf { it.isSuccess }?.orThrow
     fun <E> safeDecodePartial(ops: DynamicOps<E>, data: E) =
         codec.parse(ops, data).takeIf { it.hasResultOrPartial() }?.partialOrThrow
-
-
 }

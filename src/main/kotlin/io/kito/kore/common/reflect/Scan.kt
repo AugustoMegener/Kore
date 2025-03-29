@@ -26,10 +26,10 @@ annotation class Scan(val type: ScanType = ISOLATED) {
                 forEachModFile {
                     put(modContainer.modId, scanResult.annotations
                         .filter { it.annotationType.klass.hasAnnotation<Scan>() }
-                        .mapNotNull { it.clazz.klass.findAnnotation<Scan>()?.let { annotation ->
+                        .map { it.clazz.klass.findAnnotation<Scan>()?.let { annotation ->
                             when (annotation.type) {
                                 ISOLATED  -> listOf(it.clazz.klass)
-                                CASCADING -> getAllNestedClasses(listOf(it.clazz.klass)) } } }
+                                CASCADING -> getAllNestedClasses(listOf(it.clazz.klass)) } } ?: listOf(it.clazz.klass) }
                         .flatten())
                 }
             }

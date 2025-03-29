@@ -69,6 +69,7 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
 
     companion object {
         private val bets = arrayListOf<Pair<() -> Array<out Block>, () -> BlockEntityType<*>>>()
+
         val blockEntityTypes: ImmutableMap<KClass<out Block>, () -> BlockEntityType<*>> by lazy {
             ImmutableMap.copyOf(bets.flatMap { (bks, bet) -> bks().map { it::class to bet } }. toMap())
         }

@@ -5,9 +5,11 @@ import io.kito.kore.common.capabilities.EntityCapRegister
 import io.kito.kore.common.capabilities.EntityCapRegister.EntityCapRegistry
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
-import io.kito.kore.util.ItemProp
+import io.kito.kore.common.template.Template
+import io.kito.kore.util.Indexable
+import io.kito.kore.util.minecraft.ItemProp
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.loc
+import io.kito.kore.util.minecraft.loc
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
@@ -159,6 +161,27 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
         operator fun getValue(obj: Nothing, property: KProperty<*>) : EntityType<T> = entityRegistry.value()
 
         val key get() = entityRegistry.key
+    }
+
+    fun <T, E : Entity> entityTypeTemplate(builder: (T) -> EntityRegistry<E>) =
+        EntityTypeTemplate<T, E, Nothing>(builder)
+
+    fun <T, E : LivingEntity, I : SpawnEggItem> entityTypeTemplateWithEgg(builder: (T) -> EntityRegistry<E>) =
+        EntityTypeTemplate<T, E, I>(builder)
+
+    class EntityTypeTemplate<T, E : Entity, I : SpawnEggItem>(val builder: (T) -> EntityRegistry<E>) :
+        Template<T, EntityType<E>>
+    {
+        private val entries = hashMapOf<T, EntityRegistry<E>>()
+
+        override val allIdxs by lazy { entries.keys }
+
+        val egg = object : Indexable<T, I?> { override fun get(idx: T) = entries[idx]?.spawnEggRegistry?.get() as I? }
+
+        override fun get(idx: T): EntityType<E>? = entries[idx]?.entityRegistry?.get()
+
+        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
+
     }
 
     override fun register(bus: IEventBus) {

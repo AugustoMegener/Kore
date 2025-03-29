@@ -39,9 +39,13 @@ annotation class CodecSource {
                                              else -> throw IllegalStateException("Invalid function parameters") }
         }
 
-        val KType.codecOrNull get() = sources[jvmErasure]?.let { it(this) }
+        val KType.codecOrNull
+            get() =
+                sources[jvmErasure]?.let { it(this) }
 
-        val KType.codec get() = codecOrNull ?: throw IllegalStateException("No serializer source for $jvmErasure")
+        val KType.codec
+            get() =
+                codecOrNull ?: throw IllegalStateException("No serializer source for $jvmErasure")
 
         @Suppress(UNCHECKED_CAST)
         fun <T> KType.codec() = codec as Codec<T>

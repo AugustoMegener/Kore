@@ -1,6 +1,7 @@
 package io.kito.kore.common.datagen
 
 import net.minecraft.data.PackOutput
+import net.minecraft.data.recipes.RecipeProvider
 import net.neoforged.neoforge.common.data.LanguageProvider
 
 class DynamicLanguageProvider(output              : PackOutput,
@@ -10,4 +11,6 @@ class DynamicLanguageProvider(output              : PackOutput,
     : LanguageProvider(output, modid, locale)
 {
     override fun addTranslations() { entries.forEach(::apply) }
+
+
 }

@@ -3,7 +3,7 @@ package io.kito.kore.common.data
 import io.kito.kore.common.data.DecodeResult.Statefull
 import io.kito.kore.common.data.DecodeResult.Stateless
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.nbtOps
+import io.kito.kore.util.minecraft.nbtOps
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.ListTag

@@ -4,7 +4,6 @@
   "package": "io.kito.kore.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "CodecSourceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

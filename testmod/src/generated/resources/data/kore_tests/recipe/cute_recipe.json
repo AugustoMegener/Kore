@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "kore_tests",
+  "key": {
+    "#": {
+      "item": "kore_tests:cute_item"
+    }
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "result": {
+    "count": 1,
+    "id": "kore_tests:cute_block"
+  }
+}
