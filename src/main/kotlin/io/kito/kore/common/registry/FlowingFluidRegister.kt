@@ -6,8 +6,10 @@ import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.FlowingFluidProp
 import net.minecraft.core.registries.BuiltInRegistries.FLUID
 import net.minecraft.world.level.block.LiquidBlock
+import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.material.FlowingFluid
 import net.minecraft.world.level.material.Fluid
+import net.minecraft.world.level.material.PushReaction
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.fluids.BaseFlowingFluid
 import net.neoforged.neoforge.fluids.BaseFlowingFluid.Flowing
@@ -25,7 +27,7 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
 
     infix fun String.from(type: () -> FluidType) = FlowingFluidBuilder(this, type)
 
-    inner class FlowingFluidBuilder(val id: String, val type: () -> FluidType) {
+    inner class FlowingFluidBuilder(val name: String, val type: () -> FluidType) {
         private val prop = { s: DeferredFluid<Source>, f: DeferredFluid<Flowing> ->
             BaseFlowingFluid.Properties(type, s, f).apply(propConfig)
         }
@@ -38,14 +40,24 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
         var makeLiquidBlock = true
 
         private var liquidBlockSupplier: (FlowingFluid, BlockProp) -> LiquidBlock = ::LiquidBlock
-        private var liquidBlockBuilder: BlockBuilder<out LiquidBlock>.() -> Unit = {}
+        private var liquidBlockBuilder: BlockBuilder<out LiquidBlock>.() -> Unit = {
+            props {
+                replaceable()
+                noCollission()
+                strength(100.0F)
+                pushReaction(PushReaction.DESTROY)
+                noLootTable()
+                liquid()
+                sound(SoundType.EMPTY)
+            }
+        }
 
         private val flowingRegistry: DeferredHolder<Fluid, Flowing> by lazy {
-            register.register("flowing_$id") { -> Flowing(prop(sourceRegistry, flowingRegistry).apply(flowingPropConfig)) }
+            register.register("flowing_$name") { -> Flowing(prop(sourceRegistry, flowingRegistry).apply(flowingPropConfig)) }
         }
 
         private val sourceRegistry: DeferredHolder<Fluid, Source> by lazy {
-            register.register("source_$id") { -> Source(prop(sourceRegistry, flowingRegistry).apply(sourcePropConfig)) }
+            register.register("source_$name") { -> Source(prop(sourceRegistry, flowingRegistry).apply(sourcePropConfig)) }
         }
 
         fun liquidBlock(builder: BlockBuilder<out LiquidBlock>.() -> Unit) { liquidBlockBuilder = builder }
@@ -69,7 +81,7 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
             return FlowingFluidRegistry(
                 source, flowingRegistry,
                 if (makeLiquidBlock)
-                    with(blockRegister) { id of { liquidBlockSupplier(source.get(), it) } where liquidBlockBuilder }
+                    with(blockRegister) { name of { liquidBlockSupplier(source.get(), it) } where liquidBlockBuilder }
                 else null
             )
         }

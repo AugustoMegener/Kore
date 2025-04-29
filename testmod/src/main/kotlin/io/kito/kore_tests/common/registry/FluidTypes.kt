@@ -1,7 +1,10 @@
 package io.kito.kore_tests.common.registry
 
+import io.kito.kore.client.renderer.ext.KSimpleClientFluidTypeExt.Companion.client
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.FluidTypeRegister
+import io.kito.kore.util.minecraft.loc
+import io.kito.kore.util.neoforge.ResourceLocationExt.block
 import io.kito.kore_tests.ID
 import net.neoforged.neoforge.fluids.FluidType
 
@@ -13,10 +16,10 @@ object FluidTypes : FluidTypeRegister(ID) {
             viscosity(5)
         }
 
-        /*client {
+        client {
             color = 0x7F745094
             stillTexturePath = loc("water_still").block
             flowingTexturePath = loc("water_flow").block
-        }*/
+        }
     }
 }

@@ -20,6 +20,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
     inner class FluidTypeBuilder<T: FluidType>(val name: String, val supplier: (FluidTypeProp) -> T) {
 
+        val fluidTypeRegistry by lazy { register.register(name) { -> supplier(prop) } }
+
         private val prop = FluidTypeProp.create()
 
         private var flowingFluidBuinder: FlowingFluidBuilder.() -> Unit = {}
@@ -28,15 +30,15 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
         fun props(block: FluidTypeProp.() -> Unit) { prop.apply(block) }
 
-        fun flowingFluid(block: FlowingFluidBuilder.() -> Unit) { flowingFluidBuinder =block }
+        fun flowingFluid(block: FlowingFluidBuilder.() -> Unit) { flowingFluidBuinder = block }
 
         infix fun where(action: FluidTypeBuilder<T>.() -> Unit) : FluidTypeRegistry<T> {
             apply(action)
-            val registry = register.register(name) { -> supplier(prop) }
+            val registry = fluidTypeRegistry
 
             return FluidTypeRegistry(
                 registry,
-                if (makeFlowingFluid) with(flowingRegister) { id from registry::get where flowingFluidBuinder }
+                if (makeFlowingFluid) with(flowingRegister) { name from registry::get where flowingFluidBuinder }
                 else null
             )
         }
@@ -49,5 +51,6 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
     override fun register(bus: IEventBus) {
         register.register(bus)
+        flowingRegister.register(bus)
     }
 }

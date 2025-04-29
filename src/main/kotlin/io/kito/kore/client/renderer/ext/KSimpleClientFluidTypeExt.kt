@@ -1,5 +1,6 @@
 package io.kito.kore.client.renderer.ext
 
+import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeBuilder
 import io.kito.kore.util.neoforge.Mods.forEachKoreUserFile
 import io.kito.kore.util.neoforge.Mods.modContainer
 import io.kito.kore.util.neoforge.Mods.modId
@@ -24,20 +25,20 @@ open class KSimpleClientFluidTypeExt : IClientFluidTypeExtensions {
 
         private val fluidTypeExts = hashMapOf<String, ArrayList<Pair<() -> Holder<FluidType>, IClientFluidTypeExtensions>>>()
 
-        /*fun FluidTypeBuilder.client(block: KSimpleClientFluidTypeExt.() -> Unit) {
-            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
-                { ftRegistry } to KSimpleClientFluidTypeExt().apply(block)
+        fun FluidTypeBuilder<*>.client(block: KSimpleClientFluidTypeExt.() -> Unit) {
+            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+                { fluidTypeRegistry } to KSimpleClientFluidTypeExt().apply(block)
         }
 
-        fun <T: IClientFluidTypeExtensions> FluidTypeBuilder.client(ext: T) {
-            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
-                { ftRegistry } to ext
+        fun <T: IClientFluidTypeExtensions> FluidTypeBuilder<*>.client(ext: T) {
+            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+                { fluidTypeRegistry } to ext
         }
 
-        fun <T: IClientFluidTypeExtensions> FluidTypeBuilder.client(ext: T, block: T.() -> Unit) {
-            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
-                { ftRegistry } to ext.apply(block)
-        }*/
+        fun <T: IClientFluidTypeExtensions> FluidTypeBuilder<*>.client(ext: T, block: T.() -> Unit) {
+            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+                { fluidTypeRegistry } to ext.apply(block)
+        }
 
         fun registerFluidTypeClientExts() {
             forEachKoreUserFile {
