@@ -8,5 +8,7 @@ object ResourceLocationExt {
 
     inline val ResourceLocation.item: ResourceLocation get() = withPrefix("item/")
 
+    inline val ResourceLocation.block: ResourceLocation get() = withPrefix("block/")
+
     inline val ResourceLocation.texture: ResourceLocation get() = withPrefix("textures/")
 }

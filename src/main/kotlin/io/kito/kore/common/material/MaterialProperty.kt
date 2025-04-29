@@ -5,7 +5,7 @@ import io.kito.kore.util.Grams
 sealed interface MaterialProperty {
 
     /**
-     * Mass of material in *g/ml*.
+     * Mass from material in *g/ml*.
      */
     val mass: Grams
     /**

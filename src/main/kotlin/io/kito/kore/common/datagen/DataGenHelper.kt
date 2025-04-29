@@ -67,6 +67,12 @@ abstract class DataGenHelper(private val modId: String) {
     fun ItemBuilder<*>.blockModel() { model { loc, _ -> simpleBlockItem(loc) } }
     fun ItemBuilder<*>.spawnEggModel() { model { loc, _ -> spawnEggItem(loc) } }
 
+    fun ItemBuilder<*>.bucketModel() { model { loc, _ ->
+        withExistingParent("$loc", mcLoc("item/generated"))
+            .texture("layer0", mcLoc("bucket"))
+            .texture("layer1", loc)
+    } }
+
     fun ItemBuilder<*>.named(vararg entries: Pair<String, String>)
         { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
             { add(ITEM[loc(modId, this@named.name)], it.second) } } }

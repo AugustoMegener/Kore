@@ -43,19 +43,19 @@ open class BlockRegister(final override val id: String) : AutoRegister {
 
     val KProperty0<Block>.blockItem get() =
         (also { isAccessible = true }.getDelegate() as? BlockRegistry<*>)?.itemRegistry
-        ?: throw IllegalStateException("Property does not have a delegation of type ${BlockRegistry::class}")
+        ?: throw IllegalStateException("Property does not have a delegation from type ${BlockRegistry::class}")
 
     @Suppress(UNCHECKED_CAST)
     fun <I : BlockItem> KProperty0<Block>.blockItem() = blockItem as? I
-        ?: throw IllegalStateException("Property does not provide an item of the specified type")
+        ?: throw IllegalStateException("Property does not provide an item from the specified type")
 
     val KProperty0<Block>.blockEntity get() =
         (also { isAccessible = true }.getDelegate() as? BlockRegistry<*>)?.beRegistry
-        ?: throw IllegalStateException("Property does not have a delegation of type ${BlockRegistry::class}")
+        ?: throw IllegalStateException("Property does not have a delegation from type ${BlockRegistry::class}")
 
     @Suppress(UNCHECKED_CAST)
     fun <B : BlockEntity> KProperty0<Block>.blockEntity() = blockEntity as? B
-        ?: throw IllegalStateException("Property does not provide a BE of the specified type")
+        ?: throw IllegalStateException("Property does not provide a BE from the specified type")
 
 
     inner class BlockBuilder<B : Block>(val blockName: String, private val supplier: (BlockProp) -> B)

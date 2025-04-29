@@ -47,11 +47,11 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
 
     val KProperty0<EntityType<*>>.spawnEgg get() =
         (also { isAccessible = true }.getDelegate() as? EntityRegistry<*>)?.spawnEggRegistry
-            ?: throw IllegalStateException("Property does not have a delegation of type ${EntityRegistry::class}")
+            ?: throw IllegalStateException("Property does not have a delegation from type ${EntityRegistry::class}")
 
     @Suppress(UNCHECKED_CAST)
     fun <I : SpawnEggItem> KProperty0<EntityType<*>>.spawnEgg() = spawnEgg as? I
-        ?: throw IllegalStateException("Property does not provide an item of the specified type")
+        ?: throw IllegalStateException("Property does not provide an item from the specified type")
 
     open inner class EntityTypeBuilder<T : Entity>(val name: String,
                                                    val supplier: EntityFactory<T>,
@@ -149,7 +149,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
         }
 
         override fun where(builder: EntityTypeBuilder<T>.() -> Unit): DeferredHolder<EntityType<*>, EntityType<T>> {
-            throw IllegalStateException("Please use `that` instead of `where` on MobTypeBuilder")
+            throw IllegalStateException("Please use `that` instead from `where` on MobTypeBuilder")
         }
     }
 

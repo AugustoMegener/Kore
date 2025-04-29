@@ -46,7 +46,7 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
                 new.forEachIndexed { i, result ->
                     when (result) {
                         is Statefull -> throw IllegalStateException(
-                            "it is not possible to deserialize a mutable list of statefull items, you should " +
+                            "it is not possible to deserialize a mutable list from statefull items, you should " +
                             "implement your own solution"
                         )
 

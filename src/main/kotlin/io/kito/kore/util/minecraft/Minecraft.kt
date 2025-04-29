@@ -21,13 +21,15 @@ import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.neoforged.api.distmarker.Dist
+import net.neoforged.neoforge.fluids.BaseFlowingFluid
 import net.neoforged.neoforge.fluids.FluidType
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
 import thedarkcolour.kotlinforforge.neoforge.forge.runWhenOn
 
 typealias BlockProp = BlockBehaviour.Properties
 typealias  ItemProp = Properties
-typealias FluidProp = FluidType.Properties
+typealias FluidTypeProp = FluidType.Properties
+typealias FlowingFluidProp = BaseFlowingFluid.Properties
 
 const val EN_US = "en_us"
 const val PT_BR = "pt_br"
@@ -62,7 +64,7 @@ fun <T> createDynamicCodec(fields: List<App<RecordCodecBuilder.Mu<T>, out Any>>,
             14 ->  group(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], fields[9], fields[10], fields[11], fields[12], fields[13]).apply(this) { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13 -> decoder(listOf(f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13)) }
             15 ->  group(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], fields[9], fields[10], fields[11], fields[12], fields[13], fields[14]).apply(this) { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14 -> decoder(listOf(f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14)) }
             16 ->  group(fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], fields[6], fields[7], fields[8], fields[9], fields[10], fields[11], fields[12], fields[13], fields[14], fields[15]).apply(this) { f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15 -> decoder(listOf(f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15)) }
-            else -> throw IllegalArgumentException("Unsupported number of fields: ${fields.size}")
+            else -> throw IllegalArgumentException("Unsupported number from fields: ${fields.size}")
         }
     }
 

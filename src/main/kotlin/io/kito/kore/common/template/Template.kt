@@ -1,11 +1,11 @@
 package io.kito.kore.common.template
 
-interface Template<I, T> {
+import io.kito.kore.util.Indexable
+
+interface Template<I, T> : Indexable<I, T?> {
 
     val allIdxs: Collection<I>
     val registereds: Collection<() -> T> get() = allIdxs.map { { get(it)!! } }
-
-    operator fun get(idx: I): T?
 
     operator fun contains(idx: I) = idx in allIdxs
 
