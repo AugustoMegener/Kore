@@ -26,17 +26,17 @@ open class KSimpleClientFluidTypeExt : IClientFluidTypeExtensions {
         private val fluidTypeExts = hashMapOf<String, ArrayList<Pair<() -> Holder<FluidType>, IClientFluidTypeExtensions>>>()
 
         fun FluidTypeBuilder<*>.client(block: KSimpleClientFluidTypeExt.() -> Unit) {
-            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
                 { fluidTypeRegistry } to KSimpleClientFluidTypeExt().apply(block)
         }
 
         fun <T: IClientFluidTypeExtensions> FluidTypeBuilder<*>.client(ext: T) {
-            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
                 { fluidTypeRegistry } to ext
         }
 
         fun <T: IClientFluidTypeExtensions> FluidTypeBuilder<*>.client(ext: T, block: T.() -> Unit) {
-            fluidTypeExts.computeIfAbsent(name) { arrayListOf() } +=
+            fluidTypeExts.computeIfAbsent(id) { arrayListOf() } +=
                 { fluidTypeRegistry } to ext.apply(block)
         }
 

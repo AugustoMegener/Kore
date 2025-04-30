@@ -6,6 +6,7 @@ import io.kito.kore.common.registry.BlockRegister.BlockBuilder
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.loc
+import io.kito.kore.util.neoforge.ResourceLocationExt.item
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries.BLOCK
@@ -69,8 +70,8 @@ abstract class DataGenHelper(private val modId: String) {
 
     fun ItemBuilder<*>.bucketModel() { model { loc, _ ->
         withExistingParent("$loc", mcLoc("item/generated"))
-            .texture("layer0", mcLoc("bucket"))
-            .texture("layer1", loc)
+            .texture("layer0", mcLoc("bucket").item)
+            .texture("layer1", loc.item)
     } }
 
     fun ItemBuilder<*>.named(vararg entries: Pair<String, String>)

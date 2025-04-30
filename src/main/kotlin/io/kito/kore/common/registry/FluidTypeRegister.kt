@@ -20,6 +20,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
     inner class FluidTypeBuilder<T: FluidType>(val name: String, val supplier: (FluidTypeProp) -> T) {
 
+        val id = this@FluidTypeRegister.id
+
         val fluidTypeRegistry by lazy { register.register(name) { -> supplier(prop) } }
 
         private val prop = FluidTypeProp.create()

@@ -18,6 +18,7 @@ import io.kito.kore_tests.ID
 import io.kito.kore_tests.client.renderer.KMobRenderer
 import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.world.entity.MobCategory.MISC
+import net.minecraft.world.level.block.Blocks.WATER
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
 @Scan
@@ -30,6 +31,7 @@ object EntityTypes : EntityTypeRegister(ID) {
 
         props {
             sized(1f, 1f)
+            WATER
         }
 
         attributes {
