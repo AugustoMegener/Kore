@@ -1,16 +1,24 @@
 package io.kito.kore.common.registry
 
 import io.kito.kore.common.registry.BlockRegister.BlockBuilder
+import io.kito.kore.common.registry.BlockRegister.BlockRegistry
+import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeRegistry
+import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeTemplate
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
+import io.kito.kore.common.template.Template
+import io.kito.kore.util.Indexable
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.FlowingFluidProp
 import io.kito.kore.util.minecraft.ItemProp
 import net.minecraft.core.registries.BuiltInRegistries.FLUID
+import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.BucketItem
 import net.minecraft.world.item.Items.BUCKET
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.LiquidBlock
 import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.material.FlowingFluid
 import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.material.PushReaction
@@ -22,6 +30,9 @@ import net.neoforged.neoforge.fluids.FluidType
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
+import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.isAccessible
 
 typealias DeferredFluid<T> = DeferredHolder<Fluid, T>
 
@@ -124,8 +135,43 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
 
     class FlowingFluidRegistry(val source: DeferredHolder<Fluid, Source>,
                                val flowing: DeferredHolder<Fluid, Flowing>,
-                               val liquidBlock: BlockRegister.BlockRegistry<out LiquidBlock>?,
+                               val liquidBlock: BlockRegistry<out LiquidBlock>?,
                                val bucketItem: DeferredItem<out BucketItem>?)
+
+
+    class FlowingFluidTemplate<T, B: LiquidBlock, I: BucketItem>(val builder: (T) -> FlowingFluidRegistry) :
+        Template<T, FlowingFluidRegistry>
+    {
+        private val entries = hashMapOf<T, FlowingFluidRegistry>()
+
+        override val allIdxs by lazy { entries.keys }
+
+        val source = object : Indexable<T, Source?> { override fun get(idx: T) = entries[idx]?.source?.get() }
+        val flowing = object : Indexable<T, Flowing?> { override fun get(idx: T) = entries[idx]?.flowing?.get() }
+        
+        val bucketItem   = object : Indexable<T, I?> {
+            override fun get(idx: T) = entries[idx]?.bucketItem?.get() as I?
+        }
+        val liquidBlock = object : Indexable<T, BlockRegistry<B>?> {
+            override fun get(idx: T) = entries[idx]?.liquidBlock as BlockRegistry<B>?
+        }
+
+        override fun get(idx: T): FlowingFluidRegistry? = entries[idx]
+
+        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
+    }
+
+    fun <T> flowingFluidTemplate(builder: (T) -> FlowingFluidRegistry) =
+        FlowingFluidTemplate<T, LiquidBlock, BucketItem>(builder)
+
+    fun <T, B: LiquidBlock> flowingFluidTemplateWithLiquidBlock(builder: (T) -> FlowingFluidRegistry) =
+        FlowingFluidTemplate<T, B, BucketItem>(builder)
+
+    fun <T, I: BucketItem> flowingFluidTemplateWithBucketItem(builder: (T) -> FlowingFluidRegistry) =
+        FlowingFluidTemplate<T, LiquidBlock, I>(builder)
+
+    fun <T, B: LiquidBlock, I: BucketItem> flowingFluidTemplateFull(builder: (T) -> FlowingFluidRegistry) =
+        FlowingFluidTemplate<T, B, I>(builder)
 
     override fun register(bus: IEventBus) {
         register.register(bus)

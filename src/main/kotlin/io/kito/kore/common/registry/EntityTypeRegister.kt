@@ -9,7 +9,7 @@ import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.ItemProp
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.minecraft.loc
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE

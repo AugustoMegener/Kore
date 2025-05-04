@@ -1,12 +1,16 @@
-// 1.21.1	2025-04-30T17:28:01.8826388	Item Models: kore_tests
+// 1.21.1	2025-05-02T12:19:32.1026985	Item Models: kore_tests
 c3c8c8126b8c0acb678e4d9eaf27d9b30b165216 assets/kore_tests/models/item/block.json
 c3c8c8126b8c0acb678e4d9eaf27d9b30b165216 assets/kore_tests/models/item/cute_block.json
+d2c4ff574baf7b038e2874a22373f3b730d92d8b assets/kore_tests/models/item/cute_fluid_bucket.json
 c763a6f7710b9f5d23cd9c1badefb37519a87def assets/kore_tests/models/item/cute_item.json
 c3c8c8126b8c0acb678e4d9eaf27d9b30b165216 assets/kore_tests/models/item/fool_block.json
+d2c4ff574baf7b038e2874a22373f3b730d92d8b assets/kore_tests/models/item/fool_fluid_bucket.json
 c763a6f7710b9f5d23cd9c1badefb37519a87def assets/kore_tests/models/item/fool_item.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/kore_tests/models/item/mob.json
 d2c4ff574baf7b038e2874a22373f3b730d92d8b assets/kore_tests/models/item/my_fluid_bucket.json
 c3c8c8126b8c0acb678e4d9eaf27d9b30b165216 assets/kore_tests/models/item/nice_block.json
+d2c4ff574baf7b038e2874a22373f3b730d92d8b assets/kore_tests/models/item/nice_fluid_bucket.json
 c763a6f7710b9f5d23cd9c1badefb37519a87def assets/kore_tests/models/item/nice_item.json
 c3c8c8126b8c0acb678e4d9eaf27d9b30b165216 assets/kore_tests/models/item/weird_block.json
+d2c4ff574baf7b038e2874a22373f3b730d92d8b assets/kore_tests/models/item/weird_fluid_bucket.json
 c763a6f7710b9f5d23cd9c1badefb37519a87def assets/kore_tests/models/item/weird_item.json

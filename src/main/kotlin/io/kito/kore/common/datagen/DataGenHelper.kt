@@ -5,8 +5,8 @@ import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister.BlockBuilder
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.minecraft.loc
-import io.kito.kore.util.neoforge.ResourceLocationExt.item
+import io.kito.kore.util.minecraft.ResourceLocationExt.item
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries.BLOCK

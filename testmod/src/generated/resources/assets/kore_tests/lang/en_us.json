@@ -4,10 +4,14 @@
   "block.kore_tests.fool_block": "Fool Block",
   "block.kore_tests.nice_block": "Nice Block",
   "block.kore_tests.weird_block": "Weird Block",
+  "item.kore_tests.cute_fluid_bucket": "Cute Fluid Bucket",
   "item.kore_tests.cute_item": "Cute Item",
+  "item.kore_tests.fool_fluid_bucket": "Fool Fluid Bucket",
   "item.kore_tests.fool_item": "Fool Item",
   "item.kore_tests.my_fluid_bucket": "My Fluid Bucket",
+  "item.kore_tests.nice_fluid_bucket": "Nice Fluid Bucket",
   "item.kore_tests.nice_item": "Nice Item",
+  "item.kore_tests.weird_fluid_bucket": "Weird Fluid Bucket",
   "item.kore_tests.weird_item": "Weird Item",
   "itemGroup.kore_tests.tab": "My Tab"
 }

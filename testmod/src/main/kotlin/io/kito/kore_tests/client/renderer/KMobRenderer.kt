@@ -1,7 +1,7 @@
 package io.kito.kore_tests.client.renderer
 
-import io.kito.kore.util.neoforge.ResourceLocationExt.entity
-import io.kito.kore.util.neoforge.ResourceLocationExt.texture
+import io.kito.kore.util.minecraft.ResourceLocationExt.entity
+import io.kito.kore.util.minecraft.ResourceLocationExt.texture
 import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.client.renderer.entity.EntityRenderer

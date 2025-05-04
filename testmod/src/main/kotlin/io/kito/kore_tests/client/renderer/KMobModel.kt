@@ -15,7 +15,6 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder
 import net.minecraft.client.model.geom.builders.LayerDefinition
 import net.minecraft.client.model.geom.builders.MeshDefinition
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import net.minecraft.world.entity.Entity
 
 class KMobModel(root: ModelPart) : EntityModel<KMob>() {
 
@@ -43,17 +42,17 @@ class KMobModel(root: ModelPart) : EntityModel<KMob>() {
         override val layerLocation = ModelLayerLocation(local("custom_model"), "main")
 
         override fun createBodyLayer(): LayerDefinition {
-            val meshdefinition = MeshDefinition()
-            val partdefinition = meshdefinition.root
+            val meshDefinition = MeshDefinition()
+            val partDefinition = meshDefinition.root
 
-            partdefinition.addOrReplaceChild(
+            partDefinition.addOrReplaceChild(
                 "bb_main",
                 CubeListBuilder.create().texOffs(0, 0)
                     .addBox(-5.0f, -10.0f, -5.0f, 10.0f, 10.0f, 10.0f, CubeDeformation(0.0f)),
                 PartPose.offset(0.0f, 24.0f, 0.0f)
             )
 
-            return LayerDefinition.create(meshdefinition, 64, 64)
+            return LayerDefinition.create(meshDefinition, 64, 64)
         }
     }
 }

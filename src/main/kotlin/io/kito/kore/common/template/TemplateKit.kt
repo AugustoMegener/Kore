@@ -15,7 +15,7 @@ class TemplateKit<I>(templates: Array<out Template<I, *>>) : Template<I, Array<*
 
     override fun get(idx: I) = templates.map { it[idx] } .toTypedArray()
 
-    fun static() = also { static = false }
+    fun static() = also { static = true }
 
     fun include(vararg news: Template<I, *>) {
         if (static) throw IllegalStateException("Can't put new templates on a static template kit")

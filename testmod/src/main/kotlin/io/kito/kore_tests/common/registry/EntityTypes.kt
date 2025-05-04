@@ -31,7 +31,6 @@ object EntityTypes : EntityTypeRegister(ID) {
 
         props {
             sized(1f, 1f)
-            WATER
         }
 
         attributes {

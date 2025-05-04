@@ -5,6 +5,7 @@ import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.FunScanner
 import io.kito.kore.common.reflect.FunScanner.Companion.globalBound
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.commands.CommandSourceStack
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.event.RegisterCommandsEvent
@@ -27,6 +28,7 @@ annotation class RegisterCommand {
 
         override fun validateParameters(parms: List<KParameter>) = parms.size == 1
 
+        @Suppress(UNCHECKED_CAST)
         override fun use(info: IModInfo, container: ModContainer, data: KFunction<LiteralArgumentBuilder<*>>) {
             commands += { data.call(data.javaMethod!!.declaringClass.kotlin.objectInstance) }
                     as () -> LiteralArgumentBuilder<CommandSourceStack>

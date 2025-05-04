@@ -7,6 +7,7 @@ import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.common.registry.Blocks.blockTemplate
+import io.kito.kore_tests.common.registry.FluidTypes.fluidTemplate
 import io.kito.kore_tests.common.registry.Items.itemTemplate
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
@@ -22,6 +23,7 @@ object Tabs : CreativeModeTabRegister(ID) {
             items(Blocks::blockItem, EntityTypes::myMobSpawnEgg)
             templates(blockTemplate)
             templates(itemTemplate)
+            templates(fluidTemplate)
         }
     }
 }

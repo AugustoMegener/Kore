@@ -34,12 +34,9 @@ typealias FlowingFluidProp = BaseFlowingFluid.Properties
 const val EN_US = "en_us"
 const val PT_BR = "pt_br"
 
-fun loc(name: String)             : ResourceLocation = withDefaultNamespace(    name)
-fun loc(id: String, name: String) : ResourceLocation = fromNamespaceAndPath(id, name)
 
-fun String.toLoc() = parse(this)
 
-fun itemProp() = Item.Properties()
+fun itemProp() = Properties()
 fun blockProp(): BlockBehaviour.Properties = BlockBehaviour.Properties.of()
 
 fun <T> recordCodecOf(builder: RecordCodecBuilder.Instance<T>.() -> App<RecordCodecBuilder.Mu<T>, T>): Codec<T> =
@@ -71,8 +68,8 @@ fun <T> createDynamicCodec(fields: List<App<RecordCodecBuilder.Mu<T>, out Any>>,
 
 inline val   nbtOps:  NbtOps get() =  NbtOps.INSTANCE
 inline val  jsonOps: JsonOps get() = JsonOps.INSTANCE
-inline val jsoncOps: JsonOps get() = JsonOps.COMPRESSED
-inline val javaOps: JavaOps get() = JavaOps.INSTANCE
+inline val jsonCOps: JsonOps get() = JsonOps.COMPRESSED
+inline val  javaOps: JavaOps get() = JavaOps.INSTANCE
 
 
 operator fun CompoundTag.set(name: String, tag: Tag) = put(name, tag)
@@ -96,7 +93,7 @@ fun shaped(vararg pattern: String) = Shape(pattern)
 
 operator fun <T, A : ArgumentBuilder<T, A>> A.plus(block: A.() -> Unit) = apply(block)
 
-inline fun <reified T> CommandContext<*>.arg(name: String) = getArgument(name, T::class.java)
+inline fun <reified T> CommandContext<*>.arg(name: String): T = getArgument(name, T::class.java)
 
 
 fun <T, A : ArgumentBuilder<T, A>> A.runs(block: CommandContext<T>.() -> Int) { executes(block) }

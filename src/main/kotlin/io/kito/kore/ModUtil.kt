@@ -1,6 +1,6 @@
 package io.kito.kore
 
-import io.kito.kore.util.minecraft.loc
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 
 abstract class ModUtil(private val modId: String) {
 

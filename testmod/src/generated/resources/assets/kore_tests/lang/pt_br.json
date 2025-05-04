@@ -4,10 +4,14 @@
   "block.kore_tests.fool_block": "Bloco Fool",
   "block.kore_tests.nice_block": "Bloco Nice",
   "block.kore_tests.weird_block": "Bloco Weird",
+  "item.kore_tests.cute_fluid_bucket": "Balde de Fluido Cute",
   "item.kore_tests.cute_item": "Block Cute",
+  "item.kore_tests.fool_fluid_bucket": "Balde de Fluido Fool",
   "item.kore_tests.fool_item": "Block Fool",
   "item.kore_tests.my_fluid_bucket": "Meu Balde de Fluido",
+  "item.kore_tests.nice_fluid_bucket": "Balde de Fluido Nice",
   "item.kore_tests.nice_item": "Block Nice",
+  "item.kore_tests.weird_fluid_bucket": "Balde de Fluido Weird",
   "item.kore_tests.weird_item": "Block Weird",
   "itemGroup.kore_tests.tab": "Minha Aba"
 }

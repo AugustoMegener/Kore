@@ -5,7 +5,7 @@ import io.kito.kore.common.registry.ItemRegister
 import io.kito.kore.common.registry.RegistryTemplate
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
-import io.kito.kore.util.neoforge.ResourceLocationExt.item
+import io.kito.kore.util.minecraft.ResourceLocationExt.item
 import io.kito.kore.util.toTitle
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named

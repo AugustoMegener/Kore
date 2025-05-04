@@ -16,8 +16,4 @@ object ItemHandlerExt {
     fun stackHandlerOf(size: Int, vararg stacks: Pair<Int, ItemStack>) =
         ItemStackHandler(NonNullList.withSize(size, ItemStack.EMPTY))
             .also { stacks.forEach { (i, s) -> it[i] = s } }
-
-
-
-
 }

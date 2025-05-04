@@ -38,13 +38,13 @@ object Capability {
     inline val entityFluidHandler: EntityCapability<IFluidHandler, Direction?>
         get() = Capabilities.FluidHandler.ENTITY
 
-    inline val blockEnergStorage: BlockCapability<IEnergyStorage, Direction?>
+    inline val blockEnergyStorage: BlockCapability<IEnergyStorage, Direction?>
         get() = Capabilities.EnergyStorage.BLOCK
 
-    inline val stackEnergStorage: ItemCapability<IEnergyStorage, Void?>
+    inline val stackEnergyStorage: ItemCapability<IEnergyStorage, Void?>
         get() = Capabilities.EnergyStorage.ITEM
 
-    inline val entityEnergStorage: EntityCapability<IEnergyStorage, Direction?>
+    inline val entityEnergyStorage: EntityCapability<IEnergyStorage, Direction?>
         get() = Capabilities.EnergyStorage.ENTITY
 
 

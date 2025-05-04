@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.server.command.RegisterCommand
 import io.kito.kore.util.minecraft.*
+import io.kito.kore.util.minecraft.ResourceLocationExt.toLoc
 import io.kito.kore_tests.common.resource.NiceDataReloadListener
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands.argument

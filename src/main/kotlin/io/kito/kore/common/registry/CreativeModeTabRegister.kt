@@ -25,6 +25,12 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
     fun Output.items(vararg items: () -> ItemLike) =
         acceptAll(items.asList().map { it().asItem().defaultInstance })
 
+    fun <T> Output.templates(vararg templates: FluidTypeRegister.FluidTypeTemplate<T, *, *>) =
+        items(*templates.flatMap { it.allIdxs.map { i -> { it.flowingFluid.bucketItem[i]!! } } }.toTypedArray())
+
+    fun <T> Output.templates(vararg templates: FlowingFluidRegister.FlowingFluidTemplate<T, *, *>) =
+        items(*templates.flatMap { it.allIdxs.map { i -> { it.bucketItem[i]!! } } }.toTypedArray())
+
     fun <T> Output.templates(vararg templates: BlockRegister.BlockTemplate<T, *, *, *>) =
         items(*templates.flatMap { it.allIdxs.map { i -> { it.item[i]!! } } }.toTypedArray())
 

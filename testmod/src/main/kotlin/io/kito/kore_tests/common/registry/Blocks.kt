@@ -21,8 +21,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 object Blocks : BlockRegister(ID) {
 
     val block by "block" of ::CustomBlock where {
-        named(
-            EN_US to "Block",
+        named(EN_US to "Block",
               PT_BR to "Bloco")
 
         state { _, b -> simpleBlock(b) }
