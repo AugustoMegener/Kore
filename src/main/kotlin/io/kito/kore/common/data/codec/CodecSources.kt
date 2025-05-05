@@ -51,10 +51,10 @@ object CodecSources {
     fun listCodec(type: KType) = Codec.list(type.arguments[0].type!!.codec)
 
     @CodecSource
-    fun pairCodec(type: KType) = Codec.pair(type.arguments[0].type!!.codec, type.arguments[0].type!!.codec)
+    fun pairCodec(type: KType) = Codec.pair(type.arguments[0].type!!.codec, type.arguments[1].type!!.codec)
 
     @CodecSource
-    fun eitherCodec(type: KType) = Codec.either(type.arguments[0].type!!.codec, type.arguments[0].type!!.codec)
+    fun eitherCodec(type: KType) = Codec.either(type.arguments[0].type!!.codec, type.arguments[1].type!!.codec)
 
 
     @CodecSource

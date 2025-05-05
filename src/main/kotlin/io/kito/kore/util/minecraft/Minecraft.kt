@@ -13,6 +13,7 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.codec.StreamCodec
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.resources.ResourceLocation.*
 import net.minecraft.world.item.Item
@@ -64,6 +65,66 @@ fun <T> createDynamicCodec(fields: List<App<RecordCodecBuilder.Mu<T>, out Any>>,
             else -> throw IllegalArgumentException("Unsupported number from fields: ${fields.size}")
         }
     }
+
+fun <B, T> createDynamicStreamCodec(
+    fields: List<Pair<StreamCodec<B, out Any>, (T) -> Any?>>,
+    decoder: (List<Any>) -> T
+): StreamCodec<B, T> =
+    when (fields.size) {
+        1 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second
+        ) { f0 ->
+            decoder(listOf(f0))
+        }
+
+        2 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second,
+            fields[1].first as StreamCodec<B, Any>, fields[1].second
+        ) { f0, f1 ->
+            decoder(listOf(f0, f1))
+        }
+
+        3 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second,
+            fields[1].first as StreamCodec<B, Any>, fields[1].second,
+            fields[2].first as StreamCodec<B, Any>, fields[2].second
+        ) { f0, f1, f2 ->
+            decoder(listOf(f0, f1, f2))
+        }
+
+        4 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second,
+            fields[1].first as StreamCodec<B, Any>, fields[1].second,
+            fields[2].first as StreamCodec<B, Any>, fields[2].second,
+            fields[3].first as StreamCodec<B, Any>, fields[3].second
+        ) { f0, f1, f2, f3 ->
+            decoder(listOf(f0, f1, f2, f3))
+        }
+
+        5 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second,
+            fields[1].first as StreamCodec<B, Any>, fields[1].second,
+            fields[2].first as StreamCodec<B, Any>, fields[2].second,
+            fields[3].first as StreamCodec<B, Any>, fields[3].second,
+            fields[4].first as StreamCodec<B, Any>, fields[4].second
+        ) { f0, f1, f2, f3, f4 ->
+            decoder(listOf(f0, f1, f2, f3, f4))
+        }
+
+        6 -> StreamCodec.composite(
+            fields[0].first as StreamCodec<B, Any>, fields[0].second,
+            fields[1].first as StreamCodec<B, Any>, fields[1].second,
+            fields[2].first as StreamCodec<B, Any>, fields[2].second,
+            fields[3].first as StreamCodec<B, Any>, fields[3].second,
+            fields[4].first as StreamCodec<B, Any>, fields[4].second,
+            fields[5].first as StreamCodec<B, Any>, fields[5].second
+        ) { f0, f1, f2, f3, f4, f5 ->
+            decoder(listOf(f0, f1, f2, f3, f4, f5))
+        }
+
+        else -> throw IllegalArgumentException("Unsupported number of fields: ${fields.size}")
+    }
+
 
 
 inline val   nbtOps:  NbtOps get() =  NbtOps.INSTANCE

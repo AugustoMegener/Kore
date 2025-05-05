@@ -3,10 +3,10 @@ package io.kito.kore_tests.common.world.level.block
 import io.kito.kore.common.world.level.block.KBaseEntityBlock
 import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.literal
+import io.kito.kore.util.minecraft.withMcClient
 import io.kito.kore.util.neoforge.Capability.blockItemHandler
 import io.kito.kore.util.neoforge.ItemHandlerExt.get
 import io.kito.kore.util.neoforge.ItemHandlerExt.set
-import io.kito.kore.util.minecraft.withMcClient
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -28,8 +28,7 @@ class CustomBlock(properties: BlockProp) : KBaseEntityBlock<CustomBlockEntity>(p
                                 level     : Level,
                                 pos       : BlockPos,
                                 player    : Player,
-                                hitResult : BlockHitResult
-    ): InteractionResult
+                                hitResult : BlockHitResult): InteractionResult
     {
         withBlockEntity(level, pos) { be ->
             be.name = player.name.string
