@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 
 abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
                                       private val target     : PackOutput.Target,
-                                      private val modid      : String,
+                                      private val modiId      : String,
                                       private val dir        : String,
                                       serializer: () -> KCodecSerializer<T>) : DataProvider
 {
@@ -26,12 +26,12 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
     override fun run(output: CachedOutput): CompletableFuture<*> {
         addData()
 
-        val path = packOutput.getOutputFolder(DATA_PACK).resolve(modid).resolve(dir)
+        val path = packOutput.getOutputFolder(DATA_PACK).resolve(modiId).resolve(dir)
 
         return CompletableFuture.allOf(
             *jsons.map { (n, j) -> DataProvider.saveStable(output, j, path.resolve("${n}.json")) }.toTypedArray()
         )
     }
 
-    override fun getName() = "$modid's $dir"
+    override fun getName() = "$modiId's $dir"
 }

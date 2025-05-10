@@ -38,8 +38,8 @@ annotation class ObjectScanner(val clazz: KClass<*>, val priority: Int = 0) {
                         val obj = data.objectInstance ?: continue
 
                         fn.javaMethod!!.declaringClass.kotlin.objectInstance
-                            ?.let { fn.call(it, info, container, obj) }
-                            ?:run { fn.call(    info, container, obj) }
+                                ?.let { fn.call(it, info, container, obj) }
+                                ?:run { fn.call(    info, container, obj) }
                     }
                 }
         }

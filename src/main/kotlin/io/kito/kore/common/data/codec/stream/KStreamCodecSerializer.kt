@@ -13,17 +13,19 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, deserializer: ((List<Any>) -> T)? = null) {
+open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf: KClass<B>, deserializer: ((List<Any>) -> T)? = null) {
 
-    private val fields = clazz.memberProperties
-        .filter { it.hasAnnotation<Send>() }
-        .map { it.returnType.streamCodec to it }
-        .sortedBy { it.second.findAnnotation<Send>()!!.ord }
+    private val fields by lazy {
+        clazz.memberProperties
+            .filter { it.hasAnnotation<Send>() }
+            .map { it.returnType.streamCodec to it }
+            .sortedBy { it.second.findAnnotation<Send>()!!.ord }
+    }
 
     private val new = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() }
                         ?: clazz.primaryConstructor!!
 
-    init { StreamCodecSource.Companion.sources[clazz] = { _ -> codec } }
+    init { StreamCodecSource.Companion.sources += byteBuf to { _ -> codec } }
 
     val codec by lazy {
         @Suppress(UNCHECKED_CAST)

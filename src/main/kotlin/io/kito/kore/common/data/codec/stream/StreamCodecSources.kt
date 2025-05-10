@@ -2,12 +2,6 @@ package io.kito.kore.common.data.codec.stream
 
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.PropertyMap
-import com.mojang.datafixers.util.Unit
-import com.mojang.serialization.Codec
-import com.mojang.serialization.Dynamic
-import com.mojang.serialization.codecs.PrimitiveCodec
-import io.kito.kore.common.data.codec.CodecSource
-import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.common.data.codec.stream.StreamCodecSource.Companion.streamCodec
 import io.kito.kore.common.reflect.Scan
 import io.netty.buffer.ByteBuf
@@ -17,10 +11,7 @@ import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import java.nio.ByteBuffer
-import java.util.Optional
-import java.util.stream.IntStream
-import java.util.stream.LongStream
+import java.util.*
 import kotlin.reflect.KType
 
 
@@ -110,14 +101,5 @@ object StreamCodecSources {
             ::LinkedHashMap,
             type.arguments[0].type!!.streamCodec,
             type.arguments[1].type!!.streamCodec
-        )
-
-    @StreamCodecSource
-    fun boundedMapCodec(type: KType, maxSize: Int) =
-        ByteBufCodecs.map(
-            ::LinkedHashMap,
-            type.arguments[0].type!!.streamCodec,
-            type.arguments[1].type!!.streamCodec,
-            maxSize
         )
 }
