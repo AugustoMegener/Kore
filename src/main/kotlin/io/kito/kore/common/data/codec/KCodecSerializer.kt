@@ -8,34 +8,51 @@ import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.createDynamicCodec
 import io.kito.kore.util.snakeCased
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KCodecSerializer<T : Any>(clazz: KClass<T>)
-    : IKSerializer<T, Codec<T>>
-{
-    override val fields = clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
+open class KCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<Any>) -> T)? = null) {
 
-    override val constructor =
-        clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() } ?: clazz.primaryConstructor!!
+    private val fields = clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
+
+    private val new = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() }
+                        ?: clazz.primaryConstructor!!
 
     init { CodecSource.sources[clazz] = { _ -> codec } }
 
-    override val codec by lazy {
-        @Suppress(UNCHECKED_CAST)(
-            createDynamicCodec<T>(
-                fields.map {
-                    (it.first as Codec<Any>)
-                        .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
-                            ?: it.second.name.snakeCased())
-                        .forGetter { o -> it.second.get(o) }
-                }, ::newFrom
-            )
-        )
+    val codec by lazy {
+        @Suppress(UNCHECKED_CAST)
+        (createDynamicCodec<T>(
+        fields.map {
+            (it.first as Codec<Any>)
+                .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
+                    ?: it.second.name.snakeCased())
+                .forGetter { o -> it.second.get(o) }
+        }, deserializer ?: ::decode
+    ))
     }
 
+    @Suppress(UNCHECKED_CAST)
+    private fun decode(values: List<Any>): T {
+        var flds = ArrayList(fields).map { it.second }.withIndex()
+        val constructorFlds = new.parameters.mapNotNull { flds.find { (_, f) -> it.name == f.name } }
+                                            .also       { flds -= it }
+
+        val nonConstructor: List<Any>
+
+
+        val obj = new.call(*constructorFlds.mapNotNull { values.withIndex().find { (i, _) -> i == it.index }?.value }
+                                           .also       { nonConstructor = values - it.toSet()              }
+                                           .toTypedArray())
+
+        nonConstructor.withIndex().mapNotNull { (i, v) -> flds.find { (ii, _) -> i == ii }?.let { it.value to v } }
+            .forEach { (fld, vl) -> (fld as? KMutableProperty1<T, Any>)?.set(obj, vl) }
+
+        return obj
+    }
 
     fun <E> T.encode(ops: DynamicOps<E>): E = codec.encodeStart(ops, this).orThrow
     fun <E> T.encodePartial(ops: DynamicOps<E>): E = codec.encodeStart(ops, this).partialOrThrow
