@@ -13,28 +13,14 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KCodecSerializer<T : Any>(clazz: KClass<T>)
-    : IKSerializer<T, Codec<T>>
-{
-    override val fields = clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
+interface IKCodecSerializer<T : Any> : IKSerializer<T, Codec<T>> {
+    val clazz: KClass<T>
 
-    override val constructor =
-        clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() } ?: clazz.primaryConstructor!!
+    override val fields
+        get() = clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
 
-    init { CodecSource.sources[clazz] = { _ -> codec } }
-
-    override val codec by lazy {
-        @Suppress(UNCHECKED_CAST)(
-            createDynamicCodec<T>(
-                fields.map {
-                    (it.first as Codec<Any>)
-                        .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
-                            ?: it.second.name.snakeCased())
-                        .forGetter { o -> it.second.get(o) }
-                }, ::newFrom
-            )
-        )
-    }
+    override val constructor
+        get() = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() } ?: clazz.primaryConstructor!!
 
 
     fun <E> T.encode(ops: DynamicOps<E>): E = codec.encodeStart(ops, this).orThrow
@@ -50,4 +36,21 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>)
     fun <E> safeDecode(ops: DynamicOps<E>, data: E) = codec.parse(ops, data).takeIf { it.isSuccess }?.orThrow
     fun <E> safeDecodePartial(ops: DynamicOps<E>, data: E) =
         codec.parse(ops, data).takeIf { it.hasResultOrPartial() }?.partialOrThrow
+
+
+    companion object {
+        fun <T : Any> IKCodecSerializer<T>.lazyCodec() =
+            lazy {
+                @Suppress(UNCHECKED_CAST)(
+                        createDynamicCodec<T>(
+                            fields.map {
+                                (it.first as Codec<Any>)
+                                    .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
+                                        ?: it.second.name.snakeCased())
+                                    .forGetter { o -> it.second.get(o) }
+                            }, ::newFrom
+                        )
+                )
+            }
+    }
 }
