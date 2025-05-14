@@ -1,0 +1,14 @@
+{
+  "type": "kore_tests:my_nice_recipe",
+  "input1": {
+    "item": "kore_tests:nice_item"
+  },
+  "input2": {
+    "count": 5,
+    "item": "kore_tests:weird_item"
+  },
+  "result": {
+    "count": 1,
+    "id": "kore_tests:fool_fluid_bucket"
+  }
+}

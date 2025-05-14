@@ -6,6 +6,9 @@ import com.mojang.serialization.Dynamic
 import com.mojang.serialization.codecs.PrimitiveCodec
 import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.common.reflect.Scan
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+import net.neoforged.neoforge.common.crafting.SizedIngredient
 import java.nio.ByteBuffer
 import java.util.stream.IntStream
 import java.util.stream.LongStream
@@ -62,4 +65,13 @@ object CodecSources {
 
     @CodecSource
     fun unitCodec(): Codec<Unit> = Codec.EMPTY.codec()
+
+    @CodecSource
+    fun ingredientCodec(): Codec<Ingredient> = Ingredient.CODEC
+
+    @CodecSource
+    fun sizedIngredientCodec(): Codec<SizedIngredient> = SizedIngredient.FLAT_CODEC
+
+    @CodecSource
+    fun itemStackCodec(): Codec<ItemStack> = ItemStack.CODEC
 }

@@ -17,14 +17,15 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.neoforge.client.settings.KeyConflictContext
 import net.neoforged.neoforge.fluids.BaseFlowingFluid
 import net.neoforged.neoforge.fluids.FluidType
-import net.neoforged.neoforge.server.ServerLifecycleHooks
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
 import thedarkcolour.kotlinforforge.neoforge.forge.runWhenOn
 
@@ -191,3 +192,5 @@ inline fun <reified T> CommandContext<*>.arg(name: String): T = getArgument(name
 fun <T, A : ArgumentBuilder<T, A>> A.runs(block: CommandContext<T>.() -> Int) { executes(block) }
 
 inline val localPlayer get() = Minecraft.getInstance().player
+
+operator fun RecipeInput.get(idx: Int): ItemStack = getItem(idx)

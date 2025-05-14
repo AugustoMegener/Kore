@@ -95,9 +95,9 @@ abstract class DataGenHelper(private val modId: String) {
 
     fun <T : RecipeInput> recipe(loc: ResourceLocation,
                                  advancement: AdvancementHolder,
-                                 vararg condidions: ICondition,
+                                 vararg conditions: ICondition,
                                  builder: RecipeBuilder<T>)
-    { recipeBuilders += { accept(loc, builder(it), advancement, *condidions) } }
+    { recipeBuilders += { accept(loc, builder(it), advancement, *conditions) } }
 
     fun register(event: GatherDataEvent) {
         blocks.forEach { it() }

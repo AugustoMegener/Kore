@@ -29,19 +29,19 @@ annotation class RegisterPacket(val version: String, val target: PacketTarget) {
                     PacketTarget.SERVER ->
                         reg.playToServer(
                             data.type as CustomPacketPayload.Type<Packet>,
-                            data.codec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
+                            data.streamCodec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
                             data as IPayloadHandler<Packet>
                         )
                     PacketTarget.CLIENT ->
                         reg.playToClient(
                             data.type as CustomPacketPayload.Type<Packet>,
-                            data.codec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
+                            data.streamCodec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
                             data as IPayloadHandler<Packet>
                         )
                     PacketTarget.BOTH ->
                         reg.playBidirectional(
                             data.type as CustomPacketPayload.Type<Packet>,
-                            data.codec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
+                            data.streamCodec as StreamCodec<in RegistryFriendlyByteBuf, Packet>,
                             data as IPayloadHandler<Packet>
                         )
                 }

@@ -7,8 +7,12 @@ import io.kito.kore.common.reflect.Scan
 import io.netty.buffer.ByteBuf
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+import net.neoforged.neoforge.common.crafting.SizedIngredient
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import java.util.*
@@ -102,4 +106,13 @@ object StreamCodecSources {
             type.arguments[0].type!!.streamCodec,
             type.arguments[1].type!!.streamCodec
         )
+
+    @StreamCodecSource
+    fun ingredientCodec(): StreamCodec<RegistryFriendlyByteBuf, Ingredient> = Ingredient.CONTENTS_STREAM_CODEC
+
+    @StreamCodecSource
+    fun sizedIngredientCodec(): StreamCodec<RegistryFriendlyByteBuf, SizedIngredient> = SizedIngredient.STREAM_CODEC
+
+    @StreamCodecSource
+    fun itemStackCodec(): StreamCodec<RegistryFriendlyByteBuf, ItemStack> = ItemStack.STREAM_CODEC
 }

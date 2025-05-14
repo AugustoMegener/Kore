@@ -57,7 +57,8 @@ open class KMapCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<A
         return obj
     }
 
-    fun <E> T.encode(ops: DynamicOps<E>, prefix: RecordBuilder<E>) = mapCodec.encode<E>(this, ops, prefix)
+    fun <E> RecordBuilder<E>.encode(ops: DynamicOps<E>, data: T): RecordBuilder<E> =
+        mapCodec.encode<E>(data, ops, this)
 
     fun <E> MapLike<E>.decode(ops: DynamicOps<E>): T = mapCodec.decode(ops, this).orThrow
     fun <E> MapLike<E>.decodePartial(ops: DynamicOps<E>): T = mapCodec.decode(ops, this).partialOrThrow

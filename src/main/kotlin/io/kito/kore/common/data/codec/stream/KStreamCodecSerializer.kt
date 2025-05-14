@@ -25,9 +25,9 @@ open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf
     private val new = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() }
                         ?: clazz.primaryConstructor!!
 
-    init { StreamCodecSource.Companion.sources += byteBuf to { _ -> codec } }
+    init { StreamCodecSource.Companion.sources += byteBuf to { _ -> streamCodec } }
 
-    val codec by lazy {
+    val streamCodec by lazy {
         @Suppress(UNCHECKED_CAST)
         (createDynamicStreamCodec(
             fields.map { (it.first as StreamCodec<B, Any>) to { o -> it.second.get(o) } },
@@ -54,7 +54,7 @@ open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf
         return obj
     }
 
-    fun B.put(data: T) { codec.encode(this, data) }
+    fun B.put(data: T) { streamCodec.encode(this, data) }
 
-    fun B.read(): T = codec.decode(this)
+    fun B.read(): T = streamCodec.decode(this)
 }
