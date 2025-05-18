@@ -2,6 +2,7 @@ package io.kito.kore.common.capabilities
 
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.world.level.block.Block
 import net.neoforged.neoforge.capabilities.BlockCapability
 import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider
@@ -16,6 +17,7 @@ object BlockCapRegister {
                                                                  val capSupplier : IBlockCapabilityProvider<O, C>)
 
     @KSubscribe
+    @Suppress(UNCHECKED_CAST)
     fun RegisterCapabilitiesEvent.onRegisterCaps() {
         blockCaps.forEach { (sblock, regs) ->
             regs.forEach {

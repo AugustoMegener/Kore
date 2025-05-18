@@ -2,29 +2,11 @@ package io.kito.kore_tests.common.world.level.block
 
 import io.kito.kore.common.world.level.block.KBaseEntityBlock
 import io.kito.kore.util.minecraft.BlockProp
-import io.kito.kore.util.minecraft.literal
-import io.kito.kore.util.minecraft.withMcClient
-import io.kito.kore.util.neoforge.Capability.blockItemHandler
-import io.kito.kore.util.neoforge.ItemHandlerExt.get
-import io.kito.kore.util.neoforge.ItemHandlerExt.set
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.ItemInteractionResult
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.phys.BlockHitResult
-import net.neoforged.neoforge.items.IItemHandlerModifiable
 
 class CustomBlock(properties: BlockProp) : KBaseEntityBlock<CustomBlockEntity>(properties) {
 
-    override fun useWithoutItem(state     : BlockState,
+    /*override fun useWithoutItem(state     : BlockState,
                                 level     : Level,
                                 pos       : BlockPos,
                                 player    : Player,
@@ -81,5 +63,5 @@ class CustomBlock(properties: BlockProp) : KBaseEntityBlock<CustomBlockEntity>(p
                 mc.player!!.sendSystemMessage("Inventory: ${inv[0]}".literal)
             }
         }
-    }
+    }*/
 }

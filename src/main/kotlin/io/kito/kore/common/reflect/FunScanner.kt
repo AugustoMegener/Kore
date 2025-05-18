@@ -1,5 +1,6 @@
 package io.kito.kore.common.reflect
 
+import io.kito.kore.common.reflect.Scan.Companion.scaneables
 import io.kito.kore.util.Bound
 import io.kito.kore.util.UNCHECKED_CAST
 import net.neoforged.fml.ModContainer
@@ -46,6 +47,7 @@ interface FunScanner<T : Any> {
                           scanner.validateParameters(fn.parameters) &&
                           fn.returnType.jvmErasure.isSubclassOf(scanner.returnType))) return@forEach
 
+                    scaneables
                     scanner.use(info, container, fn as KFunction<Nothing>)
                 }
             }

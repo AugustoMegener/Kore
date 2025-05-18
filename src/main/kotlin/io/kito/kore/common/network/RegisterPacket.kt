@@ -2,6 +2,7 @@ package io.kito.kore.common.network
 
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -25,6 +26,7 @@ annotation class RegisterPacket(val version: String, val target: PacketTarget) {
             container.eventBus?.addListener { it: RegisterPayloadHandlersEvent ->
                 val reg = it.registrar(registry.version)
 
+                @Suppress(UNCHECKED_CAST)
                 when (registry.target) {
                     PacketTarget.SERVER ->
                         reg.playToServer(

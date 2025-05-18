@@ -8,6 +8,7 @@ import io.kito.kore.common.data.Save
 import io.kito.kore.common.data.codec.CodecSource
 import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.common.data.codec.DeserializerConstructor
+import io.kito.kore.common.data.codec.stream.StreamCodecSource.Companion.streamCodec
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.createDynamicMapCodec
 import io.kito.kore.util.minecraft.createDynamicStreamCodec
@@ -26,6 +27,12 @@ open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byte
 
     private val fields by
         lazy { clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it } }
+
+    private val streamFields by lazy {
+        clazz.memberProperties
+            .filter { it.hasAnnotation<Save>() }
+            .map { it.returnType.streamCodec to it }
+    }
 
     private val new = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() }
         ?: clazz.primaryConstructor!!
@@ -81,7 +88,7 @@ open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byte
     val streamCodec by lazy {
         @Suppress(UNCHECKED_CAST)
         (createDynamicStreamCodec(
-            fields.map { (it.first as StreamCodec<B, Any>) to { o -> it.second.get(o) } },
+            streamFields.map { (it.first as StreamCodec<B, Any>) to { o -> it.second.get(o) } },
             deserializer ?: ::streamDecode
         ))
     }
@@ -93,7 +100,6 @@ open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byte
             .also       { flds -= it }
 
         val nonConstructor: List<Any>
-
 
         val obj = new.call(*constructorFlds.mapNotNull { values.withIndex().find { (i, _) -> i == it.index }?.value }
             .also       { nonConstructor = values - it.toSet()              }

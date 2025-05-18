@@ -35,7 +35,6 @@ object Blocks : BlockRegister(ID) {
             }
         }
 
-
         blockEntity(::CustomBlockEntity) {
             withCaps { blockItemHandler { inventory } }
         }
@@ -53,9 +52,6 @@ object Blocks : BlockRegister(ID) {
             defaultItem {
                 model { l, _ ->
                     getBuilder(l.toString()).parent(ModelFile.UncheckedModelFile("kore_tests:block/block"))
-                }
-                props {
-                    stacksTo(1)
                 }
             }
         }

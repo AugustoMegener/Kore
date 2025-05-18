@@ -57,7 +57,7 @@ abstract class KRecipe<T : RecipeInput>(private val type: RecipeType<*>? = null,
 
     override fun canCraftInDimensions(width: Int, height: Int) = true
 
-    override fun getResultItem(registries: HolderLookup.Provider) = result
+    override fun getResultItem(registries: HolderLookup.Provider) = result.copy()
 
     override fun getSerializer() = recipeSerializer ?: this::class.companionObject!!.objectInstance as RecipeSerializer<*>
 

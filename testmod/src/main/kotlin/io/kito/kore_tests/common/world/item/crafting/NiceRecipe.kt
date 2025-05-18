@@ -15,7 +15,7 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient
 data class NiceRecipe(@Save @Slot(0) val input1: Ingredient,
                       @Save @Slot(1) val input2: SizedIngredient,
                       @Save @Result  val result: ItemStack) :
-    KRecipeItemHandler()
+    KRecipeItemHandler<NiceRecipeInput>()
 {
     @RegisterRecipeType
     companion object : KRecipeType<NiceRecipe>(local("my_nice_recipe"), NiceRecipe::class) {

@@ -1,9 +1,7 @@
 package io.kito.kore.util.minecraft
 
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.resources.ResourceLocation.fromNamespaceAndPath
-import net.minecraft.resources.ResourceLocation.parse
-import net.minecraft.resources.ResourceLocation.withDefaultNamespace
+import net.minecraft.resources.ResourceLocation.*
 
 object ResourceLocationExt {
 
@@ -18,5 +16,11 @@ object ResourceLocationExt {
 
     inline val ResourceLocation.block: ResourceLocation get() = withPrefix("block/")
 
+    inline val ResourceLocation.gui: ResourceLocation get() = withPrefix("gui/")
+
+    inline val ResourceLocation.container: ResourceLocation get() = withPrefix("container/")
+
     inline val ResourceLocation.texture: ResourceLocation get() = withPrefix("textures/")
+
+    inline val ResourceLocation.png: ResourceLocation get() = withSuffix(".png")
 }

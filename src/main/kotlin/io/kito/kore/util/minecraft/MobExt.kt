@@ -64,6 +64,10 @@ object MobExt {
         get() = throw IllegalStateException("Can't get a set-only var")
         set(value) { add(KNOCKBACK_RESISTANCE, value) }
 
+    var AttributeSupplier.Builder.explosionKnockbackResistance: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(EXPLOSION_KNOCKBACK_RESISTANCE, value) }
+
     var AttributeSupplier.Builder.attackDamage: Double
         get() = throw IllegalStateException("Can't get a set-only var")
         set(value) { add(ATTACK_DAMAGE, value) }

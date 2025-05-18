@@ -4,20 +4,22 @@ package io.kito.kore.common.world.level.block.entity
 import io.kito.kore.common.data.nbt.KNBTSerializable
 import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.bet
 import io.kito.kore.util.minecraft.set
-
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.Connection
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import kotlin.reflect.KProperty
 
 abstract class KBlockEntity(pos: BlockPos, blockState: BlockState, type: BlockEntityType<*>? = null)
     : BlockEntity(type ?: bet(blockState.block::class), pos, blockState), KNBTSerializable
 {
+    open val itemDrops = NonNullList.create<ItemStack>()
+
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider)
         { tag["data"] = serializeNBT(registries)
           super.saveAdditional(tag, registries) }

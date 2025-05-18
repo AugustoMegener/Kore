@@ -4,6 +4,7 @@ import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.EntityTypeRegister
 import io.kito.kore.util.minecraft.MobExt.armor
 import io.kito.kore.util.minecraft.MobExt.armorToughness
+import io.kito.kore.util.minecraft.MobExt.explosionKnockbackResistance
 import io.kito.kore.util.minecraft.MobExt.followRange
 import io.kito.kore.util.minecraft.MobExt.gravity
 import io.kito.kore.util.minecraft.MobExt.knockbackResistance
@@ -18,7 +19,6 @@ import io.kito.kore_tests.ID
 import io.kito.kore_tests.client.renderer.KMobRenderer
 import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.world.entity.MobCategory.MISC
-import net.minecraft.world.level.block.Blocks.WATER
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
 @Scan
@@ -45,6 +45,7 @@ object EntityTypes : EntityTypeRegister(ID) {
             armor               =  0.0
             armorToughness      =  0.0
             knockbackResistance =  0.0
+            explosionKnockbackResistance = 0.0
         }
     }
 

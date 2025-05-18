@@ -7,16 +7,16 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 
-open class KRecipeItemHandler : KRecipe<ItemHandlerRecipeInput<*>>() {
+abstract class KRecipeItemHandler<T : ItemHandlerRecipeInput<*>> : KRecipe<T>() {
     override fun assembleInput(slot: Int,
                                ingredient: ICustomIngredient,
-                               input: ItemHandlerRecipeInput<*>,
+                               input: T,
                                registries: HolderLookup.Provider)
-        { if (slot !in keepSlots) if (slot !in keepSlots)input.extractItem(slot, 1, false) }
+        { if (slot !in keepSlots)  input.extractItem(slot, 1, false) }
 
     override fun assembleInput(slot: Int,
                                ingredient: SizedIngredient,
-                               input: ItemHandlerRecipeInput<*>,
+                               input: T,
                                registries: HolderLookup.Provider)
         { if (slot !in keepSlots) input.extractItem(slot, ingredient.count(), false) }
 

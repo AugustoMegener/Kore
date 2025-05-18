@@ -37,10 +37,10 @@ annotation class RegisterInput {
                 }
 
                 fld.isAccessible = true
-                val action = (fld.getDelegate(data) as? InputRegistry)?.action ?: continue
+                val reg = (fld.getDelegate(data) as? InputRegistry) ?: continue
 
                 EVENT_BUS.addListener { event: ClientTickEvent.Post ->
-                    if ((fld.get(data) as KeyMapping).consumeClick()) action()
+                    if ((fld.get(data) as KeyMapping).consumeClick() && reg.canUse()) reg.action()
                 }
             }
         }
