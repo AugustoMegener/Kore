@@ -100,6 +100,10 @@ publishing {
     }
     publications {
         register<MavenPublication>("gpr") {
+            groupId = "mod_group_id".prop
+            artifactId = "mod_id".prop
+            version = "mod_version".prop
+
             from(components["java"])
         }
     }
