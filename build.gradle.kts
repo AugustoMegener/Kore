@@ -88,14 +88,20 @@ tasks.withType<ProcessResources>().configureEach {
 }
 
 publishing {
-    publications {
-        register("mavenJava", MavenPublication::class) {
-            from(components["java"])
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/AugustoMegener/Kore")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
-
-    repositories {
-        maven { url = uri("file://${project.projectDir}/repo") }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
     }
 }
 
@@ -109,3 +115,4 @@ idea {
         isDownloadJavadoc = true
     }
 }
+
