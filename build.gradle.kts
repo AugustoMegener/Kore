@@ -87,6 +87,11 @@ tasks.withType<ProcessResources>().configureEach {
     filesMatching("META-INF/neoforge.mods.toml") { expand(replaceProperties) }
 }
 
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
 publishing {
     repositories {
         maven {
@@ -104,6 +109,7 @@ publishing {
             artifactId = "mod_id".prop
             version = "mod_version".prop
 
+            artifact(tasks["sourcesJar"])
             from(components["java"])
         }
     }
