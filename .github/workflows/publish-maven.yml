@@ -32,8 +32,8 @@ jobs:
       - name: Checkout site branch
         uses: actions/checkout@v4
         with:
-          ref: site
-          path: site
+          ref: repo
+          path: repo
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
