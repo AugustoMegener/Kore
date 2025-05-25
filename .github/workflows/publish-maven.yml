@@ -41,7 +41,7 @@ jobs:
       - name: Update repo
         run: |
           ./gradlew publishAllPublicationsToMavenRepository
-          cd ./site
+          cd ./repo
           git config user.name "augustomegener"
           git config user.email "76854495+AugustoMegener@users.noreply.github.com"
           git add .
