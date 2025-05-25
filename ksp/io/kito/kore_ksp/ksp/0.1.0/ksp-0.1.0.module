@@ -1,0 +1,117 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.kito.kore_ksp",
+    "module": "ksp",
+    "version": "0.1.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.1.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ksp-0.1.0.jar",
+          "url": "ksp-0.1.0.jar",
+          "size": 8372,
+          "sha512": "daa4066199e2a26b4319a2829aaa51a0e9f5cc0d1ba92d7d17397b87ad158fa68c17727642ffdf6fabe59d77e13b17c6b1926619a6a4b216727efbd7771e3400",
+          "sha256": "c91d7a21ae61a156d117c3e164f5145738b1c7fceefb09eb8b5d2f1da4779211",
+          "sha1": "bf3ce846b71be3705bc979f2d8d1abd95d961ab1",
+          "md5": "1603ee0fdf03969cc17c22d4764d8982"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "thedarkcolour",
+          "module": "kotlinforforge-neoforge",
+          "version": {
+            "requires": "5.5.0"
+          }
+        },
+        {
+          "group": "io.github.augustomegener",
+          "module": "Kore",
+          "version": {
+            "requires": "0.1.0"
+          }
+        },
+        {
+          "group": "com.squareup",
+          "module": "kotlinpoet",
+          "version": {
+            "requires": "1.14.2"
+          }
+        },
+        {
+          "group": "com.google.dagger",
+          "module": "dagger-compiler",
+          "version": {
+            "requires": "2.51.1"
+          }
+        },
+        {
+          "group": "com.google.devtools.ksp",
+          "module": "symbol-processing-api",
+          "version": {
+            "requires": "2.1.0-1.0.29"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.1.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ksp-0.1.0.jar",
+          "url": "ksp-0.1.0.jar",
+          "size": 8372,
+          "sha512": "daa4066199e2a26b4319a2829aaa51a0e9f5cc0d1ba92d7d17397b87ad158fa68c17727642ffdf6fabe59d77e13b17c6b1926619a6a4b216727efbd7771e3400",
+          "sha256": "c91d7a21ae61a156d117c3e164f5145738b1c7fceefb09eb8b5d2f1da4779211",
+          "sha1": "bf3ce846b71be3705bc979f2d8d1abd95d961ab1",
+          "md5": "1603ee0fdf03969cc17c22d4764d8982"
+        }
+      ]
+    }
+  ]
+}

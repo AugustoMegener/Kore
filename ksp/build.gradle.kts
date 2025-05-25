@@ -36,24 +36,23 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
+
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/AugustoMegener/Kore")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifact(sourcesJar.get())
         }
     }
-    publications {
-        register<MavenPublication>("gpr") {
-            groupId = "mod_group_id".prop
-            artifactId = "ksp"
-            version = "processor_version".prop
 
-            from(components["java"])
+    repositories {
+        maven {
+            name = "kore"
+            url = uri("file://${layout.buildDirectory}/repo")
         }
     }
 }

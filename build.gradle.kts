@@ -88,67 +88,25 @@ tasks.withType<ProcessResources>().configureEach {
     filesMatching("META-INF/neoforge.mods.toml") { expand(replaceProperties) }
 }
 
-println("KEY present? ${System.getenv("OSSRH_USERNAME")}")
-println("KEY present? ${System.getenv("OSSRH_PASSWORD")}")
-
-println("KEY present? ${System.getenv("SIGNING_KEY")}")
-println("KEY present? ${System.getenv("SINGNING_PASSWORD")}")
-
-tasks.register<Jar>("sourcesJar") {
+val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
-    from(sourceSets.main.get().allSource)
+    from(sourceSets["main"].allSource)
 }
 
 publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifact(sourcesJar.get())
+        }
+    }
+
     repositories {
         maven {
-            name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
-            }
+            name = "kore"
+            url = uri("file://${layout.buildDirectory}/repo")
         }
     }
-    publications {
-        register<MavenPublication>("gpr") {
-            groupId = "mod_group_id".prop
-            artifactId = "mod_id".prop
-            version = "mod_version".prop
-
-            artifact(tasks["sourcesJar"])
-            from(components["java"])
-
-            pom {
-                name.set("mod_name".prop)
-                description.set("mod_description".prop)
-                url.set("https://github.com/AugustoMegener/Kore")
-
-                licenses {
-                    license {
-                        name.set("MIT")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer { name.set("Kito") }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/AugustoMegener/Kore.git")
-                    developerConnection.set("scm:git:ssh://github.com:AugustoMegener/Kore.git")
-                    url.set("https://github.com/AugustoMegener/Kore")
-                }
-            }
-        }
-    }
-}
-
-signing {
-    useInMemoryPgpKeys(
-        file("private_key.txt").readText(),
-        System.getenv("SINGNING_PASSWORD")
-    )
-    sign(publishing.publications["gpr"])
 }
 
 tasks.withType<JavaCompile>().configureEach {
