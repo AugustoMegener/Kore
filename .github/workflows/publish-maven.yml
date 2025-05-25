@@ -8,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, '[Maven]') || github.event_name == 'workflow_dispatch'"
     steps:
-      - name: Allow
-        run: chmod +x ./gradlew
       - name: Checkout code
         uses: actions/checkout@v4
 
