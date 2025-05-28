@@ -1,7 +1,6 @@
 name: Publish maven
 
 on: [ push ]
-
 jobs:
   release:
     name: Publish release JAR for Kore
