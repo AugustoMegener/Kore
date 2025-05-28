@@ -15,6 +15,7 @@ import io.kito.kore.util.minecraft.createDynamicStreamCodec
 import io.kito.kore.util.snakeCased
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.StreamCodec
+
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -23,7 +24,7 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf: KClass<B>, deserializer: ((List<Any>) -> T)? = null) {
+open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf: KClass<B>) {
 
     private val fields by
         lazy { clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it } }
@@ -50,12 +51,12 @@ open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byte
                     .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
                         ?: it.second.name.snakeCased())
                     .forGetter { o -> it.second.get(o) }
-            }, deserializer ?: ::mapDecode
+            }, ::mapDecode
         ))
     }
 
     @Suppress(UNCHECKED_CAST)
-    private fun mapDecode(values: List<Any>): T {
+    open fun mapDecode(values: List<Any>): T {
         var flds = ArrayList(fields).map { it.second }.withIndex()
         val constructorFlds = new.parameters.mapNotNull { flds.find { (_, f) -> it.name == f.name } }
             .also       { flds -= it }
@@ -89,12 +90,12 @@ open class KStreamMapCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byte
         @Suppress(UNCHECKED_CAST)
         (createDynamicStreamCodec(
             streamFields.map { (it.first as StreamCodec<B, Any>) to { o -> it.second.get(o) } },
-            deserializer ?: ::streamDecode
+            ::streamDecode
         ))
     }
 
     @Suppress(UNCHECKED_CAST)
-    private fun streamDecode(values: List<Any>): T {
+    open fun streamDecode(values: List<Any>): T {
         var flds = ArrayList(fields).map { it.second }.withIndex()
         val constructorFlds = new.parameters.mapNotNull { flds.find { (_, f) -> it.name == f.name } }
             .also       { flds -= it }

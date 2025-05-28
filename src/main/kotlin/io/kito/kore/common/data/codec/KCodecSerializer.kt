@@ -14,9 +14,11 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<Any>) -> T)? = null) {
+open class KCodecSerializer<T : Any>(clazz: KClass<T>) {
 
-    private val fields = clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
+    private val fields  by lazy {
+        clazz.memberProperties.filter { it.hasAnnotation<Save>() }.map { it.returnType.codec to it }
+    }
 
     private val new = clazz.constructors.find { it.hasAnnotation<DeserializerConstructor>() }
                         ?: clazz.primaryConstructor!!
@@ -31,12 +33,12 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>, deserializer: ((List<Any>
                 .fieldOf(it.second.findAnnotation<Save>()!!.id.takeIf { s -> s.isNotEmpty() }
                     ?: it.second.name.snakeCased())
                 .forGetter { o -> it.second.get(o) }
-        }, deserializer ?: ::decode
+        }, ::decode
     ))
     }
 
     @Suppress(UNCHECKED_CAST)
-    private fun decode(values: List<Any>): T {
+    open fun decode(values: List<Any>): T {
         var flds = ArrayList(fields).map { it.second }.withIndex()
         val constructorFlds = new.parameters.mapNotNull { flds.find { (_, f) -> it.name == f.name } }
                                             .also       { flds -= it }

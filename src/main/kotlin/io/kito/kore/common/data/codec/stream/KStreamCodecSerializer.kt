@@ -13,7 +13,7 @@ import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf: KClass<B>, deserializer: ((List<Any>) -> T)? = null) {
+open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf: KClass<B>) {
 
     private val fields by lazy {
         clazz.memberProperties
@@ -31,12 +31,12 @@ open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf
         @Suppress(UNCHECKED_CAST)
         (createDynamicStreamCodec(
             fields.map { (it.first as StreamCodec<B, Any>) to { o -> it.second.get(o) } },
-            deserializer ?: ::decode
+            ::decode
         ))
     }
 
     @Suppress(UNCHECKED_CAST)
-    private fun decode(values: List<Any>): T {
+    open fun decode(values: List<Any>): T {
         var flds = ArrayList(fields).map { it.second }.withIndex()
         val constructorFlds = new.parameters.mapNotNull { flds.find { (_, f) -> it.name == f.name } }
                                             .also       { flds -= it }
