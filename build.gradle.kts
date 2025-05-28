@@ -102,11 +102,9 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "kore"
-            url = uri("file://${layout.buildDirectory}/site")
-        }
+        maven { url = uri("file://${project.projectDir}/site") }
     }
+
 }
 
 tasks.withType<JavaCompile>().configureEach {
