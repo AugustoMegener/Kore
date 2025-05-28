@@ -3,7 +3,7 @@
 
 2. Run update_maven.jl with Julia
 ```shell
-julia update_maven.jl <kff mod branch folder>
+julia update_maven.jl <mod branch folder>
 ```
 
 credits: [thedarkcolour](https://github.com/thedarkcolour/KotlinForForge/tree/site)
