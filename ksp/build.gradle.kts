@@ -8,7 +8,7 @@ plugins {
     id("net.neoforged.gradle.userdev") version "7.0.170"
 }
 
-group = "io.kito.kore_ksp"
+group = "mod_group_id".prop + ".kore"
 version = "mod_version".prop
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -50,10 +50,7 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "kore"
-            url = uri("file://${layout.buildDirectory}/repo")
-        }
+        maven { url = uri("file://${project.projectDir}/site") }
     }
 }
 

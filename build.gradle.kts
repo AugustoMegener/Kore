@@ -104,7 +104,6 @@ publishing {
     repositories {
         maven { url = uri("file://${project.projectDir}/site") }
     }
-
 }
 
 tasks.withType<JavaCompile>().configureEach {
