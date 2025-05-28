@@ -104,7 +104,7 @@ publishing {
     repositories {
         maven {
             name = "kore"
-            url = uri("file://${layout.buildDirectory}/repo")
+            url = uri("file://${layout.buildDirectory}/site")
         }
     }
 }
