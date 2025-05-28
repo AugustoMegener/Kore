@@ -28,5 +28,3 @@ repo
 .gradle/secrets.properties
 setup_secrets.sh
 private_key.txt
-site
-ksp/site
