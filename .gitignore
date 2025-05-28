@@ -20,11 +20,9 @@ build
 # other
 eclipse
 run
-runs
-run-data
+*local.xml
+*local.xml.md5
+*local.xml.sha1
 
-repo
-.env
-.gradle/secrets.properties
-setup_secrets.sh
-private_key.txt
+# Files from Forge MDK
+forge*changelog.txt
