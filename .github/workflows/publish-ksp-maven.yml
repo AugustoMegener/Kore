@@ -40,11 +40,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Publish only ksp module
-        run: ./gradlew ksp:publishAllPublicationsToMavenRepository
-
       - name: Update site
         run: |
+          ./gradlew ksp:publishAllPublicationsToMavenRepository
           cd ./ksp/site
           git config user.name "augustomegener"
           git config user.email "76854495+AugustoMegener@users.noreply.github.com"
