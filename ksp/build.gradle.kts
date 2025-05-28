@@ -50,7 +50,7 @@ publishing {
     }
 
     repositories {
-        maven { url = uri("file://${project.projectDir}/site") }
+        maven { url = uri("file://${rootProject.projectDir}/site") }
     }
 }
 
