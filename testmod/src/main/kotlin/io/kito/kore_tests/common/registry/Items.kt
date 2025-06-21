@@ -15,8 +15,20 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
 
+/**
+ * Registers custom item types for the Kore Tests mod.
+ * Annotated with `@Scan` to be automatically discovered by Kore for item registration.
+ * Extends `ItemRegister` with the mod ID, providing a DSL for defining item types.
+ */
 @Scan
 object Items : ItemRegister(ID) {
+    /**
+     * A template for defining similar items programmatically.
+     * It takes a string `i` to generate unique item names and localized names.
+     * - `of ::Item`: Uses the generic `Item` class.
+     * - `named`: Sets the localized names for the item (English and Brazilian Portuguese).
+     * - `model`: Configures the item model to use a generated item model with a specific texture.
+     */
     val itemTemplate = RegistryTemplate { i: String ->
         "${i}_item" of ::Item where {
             named(EN_US to "${i.toTitle()} Item",
@@ -30,3 +42,4 @@ object Items : ItemRegister(ID) {
         }
     }
 }
+

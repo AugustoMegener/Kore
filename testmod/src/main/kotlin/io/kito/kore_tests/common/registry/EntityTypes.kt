@@ -21,9 +21,22 @@ import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.world.entity.MobCategory.MISC
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
+/**
+ * Registers custom entity types for the Kore Tests mod.
+ * Annotated with `@Scan` to be automatically discovered by Kore for entity type registration.
+ * Extends `EntityTypeRegister` with the mod ID, providing a DSL for defining entity types.
+ */
 @Scan
 object EntityTypes : EntityTypeRegister(ID) {
 
+    /**
+     * Defines a custom mob entity type named "mob".
+     * - `ofMob (::KMob to MISC)`: Specifies the entity class `KMob` and its `MobCategory` as `MISC`.
+     * - `renderer`: Associates `KMobRenderer` for rendering this entity.
+     * - `spawnEgg`: Configures the spawn egg with colors and model generation.
+     * - `props`: Sets entity properties like `sized`.
+     * - `attributes`: Defines various attributes for the mob, such as `maxHealth`, `movementSpeed`, `armor`, etc.
+     */
     val myMobType by "mob" ofMob (::KMob to MISC) that {
         renderer(::KMobRenderer)
 
@@ -49,5 +62,9 @@ object EntityTypes : EntityTypeRegister(ID) {
         }
     }
 
+    /**
+     * Lazily initialized property to get the spawn egg associated with `myMobType`.
+     */
     val myMobSpawnEgg by ::myMobType.spawnEgg
 }
+
