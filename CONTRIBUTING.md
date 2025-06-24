@@ -1,73 +1,64 @@
-# Como Contribuir para o Kore
+# Contributing to Kore
 
-Bem-vindo ao projeto Kore! Agradecemos seu interesse em contribuir. Este documento descreve as diretrizes para contribuir com o código, documentação e outros recursos para o projeto Kore.
+We welcome contributions to the Kore project! By contributing, you help us improve and expand the framework for the entire Minecraft modding community. Please take a moment to review this document to understand how to contribute effectively.
 
-## Sumário
+## Table of Contents
 
-1.  [Código de Conduta](#código-de-conduta)
-2.  [Como Contribuir](#como-contribuir)
-    *   [Reportando Bugs](#reportando-bugs)
-    *   [Sugerindo Novas Funcionalidades](#sugerindo-novas-funcionalidades)
-    *   [Enviando Pull Requests](#enviando-pull-requests)
-3.  [Configuração do Ambiente de Desenvolvimento](#configuração-do-ambiente-de-desenvolvimento)
-4.  [Estilo de Código](#estilo-de-código)
-5.  [Licença](#licença)
+- [Code of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
+  - [Reporting Bugs](#reporting-bugs)
+  - [Suggesting Enhancements](#suggesting-enhancements)
+  - [Pull Requests](#pull-requests)
+- [Development Setup](#development-setup)
+- [Coding Guidelines](#coding-guidelines)
+- [License](#license)
 
-## Código de Conduta
+## Code of Conduct
 
-Esperamos que todos os colaboradores sigam nosso Código de Conduta. Ele promove um ambiente aberto e acolhedor. Por favor, leia o [Código de Conduta](CODE_OF_CONDUCT.md) antes de contribuir.
+This project adheres to the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/0/code_of_conduct.html). By participating, you are expected to uphold this code. Please report unacceptable behavior to [augusto.megener@example.com](mailto:augusto.megener@example.com).
 
-## Como Contribuir
+## How to Contribute
 
-### Reportando Bugs
+### Reporting Bugs
 
-Se você encontrar um bug, por favor, abra uma issue no GitHub. Ao reportar um bug, inclua o máximo de detalhes possível:
+If you find a bug, please open an issue on the [GitHub Issues page](https://github.com/AugustoMegener/Kore/issues). When reporting a bug, please include:
 
-*   Uma descrição clara e concisa do bug.
-*   Passos para reproduzir o comportamento.
-*   O comportamento esperado.
-*   O comportamento real.
-*   Versão do Kore e do Minecraft.
-*   Quaisquer mensagens de erro ou logs relevantes.
+- A clear and concise description of the bug.
+- Steps to reproduce the behavior.
+- Expected behavior.
+- Screenshots or error messages if applicable.
+- Your environment (Minecraft version, NeoForge version, Kore version).
 
-### Sugerindo Novas Funcionalidades
+### Suggesting Enhancements
 
-Se você tiver uma ideia para uma nova funcionalidade, por favor, abra uma issue no GitHub para discuti-la. Isso nos permite discutir a ideia, sua viabilidade e como ela se encaixa na visão geral do projeto.
+We love new ideas! If you have a suggestion for an enhancement or a new feature, please open an issue on the [GitHub Issues page](https://github.com/AugustoMegener/Kore/issues). Describe your idea in detail, including why you think it would be beneficial to the project.
 
-### Enviando Pull Requests
+### Pull Requests
 
-1.  **Faça um Fork do Repositório**: Comece fazendo um fork do repositório Kore para sua conta GitHub.
-2.  **Clone o Repositório**: Clone seu fork para sua máquina local:
-    ```bash
-    git clone https://github.com/SEU_USUARIO/Kore.git
-    cd Kore
-    ```
-3.  **Crie uma Nova Branch**: Crie uma nova branch para suas alterações. Use um nome descritivo para a branch (ex: `feature/nova-funcionalidade` ou `bugfix/correcao-de-erro`).
-    ```bash
-    git checkout -b feature/sua-nova-funcionalidade
-    ```
-4.  **Faça Suas Alterações**: Implemente suas alterações, garantindo que elas sigam o [Estilo de Código](#estilo-de-código) do projeto.
-5.  **Teste Suas Alterações**: Certifique-se de que suas alterações não introduzam novos bugs e que as funcionalidades existentes continuem funcionando corretamente. Se possível, adicione testes para suas novas funcionalidades ou correções.
-6.  **Commit Suas Alterações**: Escreva mensagens de commit claras e concisas. Cada commit deve representar uma única alteração lógica.
-    ```bash
-    git commit -m "feat: Adiciona nova funcionalidade X"
-    ```
-7.  **Envie para o Seu Fork**: Envie suas alterações para o seu fork no GitHub.
-    ```bash
-    git push origin feature/sua-nova-funcionalidade
-    ```
-8.  **Abra um Pull Request**: Vá para o repositório original do Kore no GitHub e abra um novo Pull Request da sua branch para a branch `main` (ou a branch de desenvolvimento apropriada). Forneça uma descrição detalhada de suas alterações e referencie quaisquer issues relevantes.
+We welcome pull requests for bug fixes, new features, and improvements. Before submitting a pull request, please:
 
-## Configuração do Ambiente de Desenvolvimento
+1.  **Fork the repository** and create your branch from `main` (or the most appropriate development branch).
+2.  **Ensure your code adheres to the [Coding Guidelines](#coding-guidelines)**.
+3.  **Write clear, concise commit messages**.
+4.  **Add appropriate tests** for new features or bug fixes.
+5.  **Update documentation** as necessary.
+6.  **Ensure your branch is up-to-date** with the upstream repository.
 
-Para configurar seu ambiente de desenvolvimento, siga as instruções de instalação no [README.md](README.md).
+## Development Setup
 
-## Estilo de Código
+To set up your development environment, please refer to the [Installation](#installation) section in the `README.md` file.
 
-O projeto Kore segue as diretrizes de estilo de código Kotlin padrão. Por favor, use o formatador de código da sua IDE para garantir a consistência.
+## Coding Guidelines
 
-## Licença
+- **Kotlin First**: All new code should be written in Kotlin.
+- **Readability**: Write clean, readable, and well-commented code.
+- **Consistency**: Follow the existing coding style and conventions used in the project.
+- **Modularity**: Design code to be modular and reusable.
+- **Performance**: Be mindful of performance implications, especially in game-critical loops.
+- **Error Handling**: Implement robust error handling where appropriate.
 
-Ao contribuir para o Kore, você concorda que suas contribuições serão licenciadas sob a licença [MIT](LICENSE) do projeto.
+## License
+
+By contributing to Kore, you agree that your contributions will be licensed under the MIT License. For more details, see the [LICENSE](LICENSE) file.
 
 

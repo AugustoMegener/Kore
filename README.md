@@ -1,54 +1,150 @@
-# Kore: Um Framework de Desenvolvimento para Minecraft
+# Kore: A Minecraft Modding Framework
 
-Kore é um framework de desenvolvimento robusto e modular projetado para simplificar e acelerar a criação de mods para Minecraft. Ele oferece uma base sólida com funcionalidades pré-construídas e uma arquitetura extensível, permitindo que desenvolvedores se concentrem na lógica de seus mods sem se preocuparem com a complexidade de baixo nível da integração com o jogo.
+Kore is a comprehensive Minecraft modding framework designed to streamline the development of new content for the game. It provides a set of utilities, abstractions, and helper functions to simplify common modding tasks, allowing developers to focus on creating unique gameplay experiences.
 
-## Funcionalidades Principais
+## Features
 
-- **Estrutura Modular**: Facilita a organização do código e a reutilização de componentes.
-- **Abstrações de Alto Nível**: Simplifica interações complexas com o jogo, como registro de itens, blocos e entidades.
-- **Ferramentas de Desenvolvimento**: Inclui utilitários para depuração, testes e automação de tarefas comuns.
-- **Compatibilidade**: Projetado para ser compatível com as versões mais recentes do Minecraft e suas APIs de modding.
+- **Simplified Registration**: Kore offers a streamlined process for registering various game elements, including blocks, items, entities, and more, reducing boilerplate code.
+- **Event Handling**: A robust event system allows for easy subscription and handling of in-game events, enabling dynamic and responsive mod behavior.
+- **Data Generation**: Tools for automated data generation (e.g., recipes, block states, item models) help maintain consistency and reduce manual effort.
+- **Capability Integration**: Seamless integration with NeoForge capabilities for handling inventories, energy, fluids, and other interactions.
+- **Utility Functions**: A collection of utility functions for common tasks, such as NBT serialization, resource location management, and attribute manipulation.
 
-## Por que usar Kore?
+## Installation
 
-Desenvolver mods para Minecraft pode ser uma tarefa desafiadora devido à sua complexidade e à necessidade de lidar com a API do jogo em um nível detalhado. Kore visa mitigar esses desafios, fornecendo:
+This repository contains the source code for the Kore framework. To use Kore in your Minecraft modding project, you typically add it as a dependency in your `build.gradle` file. Please refer to the specific instructions for your build system (e.g., Gradle, Maven) on how to include a library from a GitHub repository or a published artifact.
 
-- **Produtividade Aumentada**: Reduza o tempo de desenvolvimento com componentes reutilizáveis e abstrações.
-- **Código Mais Limpo**: Encoraja uma arquitetura de código organizada e de fácil manutenção.
-- **Curva de Aprendizagem Suavizada**: Ajuda novos desenvolvedores a entrar no mundo do modding de Minecraft mais rapidamente.
-- **Comunidade Ativa**: Beneficie-se de uma comunidade de desenvolvedores que utilizam e contribuem para o framework.
+### For Developers (Cloning and Building)
 
-## Primeiros Passos
+If you intend to contribute to Kore or build it from source, follow these steps:
 
-Para começar a desenvolver com Kore, siga as instruções de instalação e configuração detalhadas na seção [Instalação](#instalação).
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/AugustoMegener/Kore.git
+    cd Kore
+    ```
+2.  **Checkout the desired branch** (e.g., `NF-1.21.1-0.1.0`):
+    ```bash
+    git checkout NF-1.21.1-0.1.0
+    ```
+3.  **Set up the development environment**:
+    Kore is a NeoForge project. You can set up your development environment using Gradle:
+    ```bash
+    ./gradlew genEclipseRuns
+    ./gradlew genIntellijRuns
+    ```
+    Or, if you prefer to use the standard Gradle wrapper:
+    ```bash
+    gradlew genEclipseRuns
+    gradlew genIntellijRuns
+    ```
+    (Replace `genEclipseRuns` and `genIntellijRuns` with the appropriate tasks for your IDE, e.g., `setupDecompWorkspace` for older Forge versions).
 
+4.  **Build the project**:
+    ```bash
+    ./gradlew build
+    ```
+    The compiled `.jar` files will be located in the `build/libs` directory.
 
+## Usage
 
+Once Kore is set up in your project, you can start leveraging its features. Here are some common use cases:
 
-## Instalação
+### Registering Items
 
-Este repositório de template pode ser clonado diretamente para iniciar um novo mod. Basta criar um novo repositório clonado a partir deste, seguindo as instruções em [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+```kotlin
+// In your main mod class or a dedicated registration class
+object MyItems {
+    val ITEMS = ItemRegister(Kore.ID) // Assuming Kore.ID is your mod ID
 
-Uma vez que você tenha seu clone, basta abrir o repositório na IDE de sua escolha. A recomendação usual para uma IDE é IntelliJ IDEA ou Eclipse.
+    val EXAMPLE_ITEM = ITEMS.of { Item(it) } where { // 'of' or 'where' can be used
+        props { creativeTab(CreativeModeTabs.BUILDING_BLOCKS) }
+    }
 
-> **Nota**: Para Eclipse, use as tarefas em `Launch Group` em vez das encontradas em `Java Application`. Uma tarefa de preparação deve ser executada antes de iniciar o jogo. NeoGradle usa grupos de lançamento para fazer isso subsequentemente.
+    fun register(eventBus: IEventBus) {
+        ITEMS.register(eventBus)
+    }
+}
 
-Se a qualquer momento você estiver com falta de bibliotecas em sua IDE, ou tiver problemas, você pode executar `gradlew --refresh-dependencies` para atualizar o cache local. `gradlew clean` para resetar tudo (isso não afeta seu código) e então iniciar o processo novamente.
+// In your main mod class's constructor
+@Mod(Kore.ID)
+class MyMod {
+    init {
+        val modEventBus = FMLJavaModLoadingContext.get().modEventBus
+        MyItems.register(modEventBus)
+    }
+}
+```
 
-## Nomes de Mapeamento
+### Handling Events
 
-Por padrão, o MDK é configurado para usar os nomes de mapeamento oficiais da Mojang para métodos e campos na base de código do Minecraft. Esses nomes são cobertos por uma licença específica. Todos os modders devem estar cientes desta licença. Para o texto da licença mais recente, consulte o próprio arquivo de mapeamento, ou a cópia de referência aqui: [Mojang.md](https://github.com/NeoForged/NeoForm/blob/main/Mojang.md)
+```kotlin
+// In an event subscriber class or object
+object MyEvents {
+    @SubscribeEvent
+    fun onPlayerLoggedIn(event: PlayerEvent.PlayerLoggedInEvent) {
+        // Handle player login event
+        println("Player ${event.entity.name.string} logged in!")
+    }
 
-## Recursos Adicionais
+    fun register(eventBus: IEventBus) {
+        eventBus.register(this)
+    }
+}
 
-- Documentação da Comunidade: [https://docs.neoforged.net/](https://docs.neoforged.net/)
-- Discord NeoForged: [https://discord.neoforged.net/](https://discord.neoforged.net/)
+// In your main mod class's constructor
+@Mod(Kore.ID)
+class MyMod {
+    init {
+        val modEventBus = FMLJavaModLoadingContext.get().modEventBus
+        MyEvents.register(modEventBus)
+    }
+}
+```
 
+### Data Generation
 
+Kore provides utilities to simplify data generation. You typically create dedicated data provider classes.
 
+```kotlin
+// Example: A simple recipe data provider
+class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<HolderLookup.Provider>) :
+    RecipeProvider(output, registries) {
 
-## Licença
+    override fun buildRecipes(exporter: RecipeOutput) {
+        // Define your recipes here using Kore's data generation helpers
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, Blocks.STONE)
+            .pattern("SS", "SS")
+            .define('S', Items.STICK)
+            .unlockedBy("has_stick", has(Items.STICK))
+            .save(exporter)
+    }
+}
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+// In your main mod class, during the DataGenEvent
+@Mod(Kore.ID)
+class MyMod {
+    init {
+        val modEventBus = FMLJavaModLoadingContext.get().modEventBus
+        modEventBus.addListener(this::gatherData)
+    }
+
+    private fun gatherData(event: GatherDataEvent) {
+        val generator = event.generator
+        val packOutput = generator.packOutput
+        val lookupProvider = event.lookupProvider
+
+        generator.addProvider(event.includeServer(), ModRecipeProvider(packOutput, lookupProvider))
+    }
+}
+```
+
+## Contributing
+
+We welcome contributions to Kore! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute.
+
+## License
+
+Kore is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 
