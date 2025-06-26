@@ -12,21 +12,41 @@ import net.neoforged.neoforge.registries.DeferredHolder
  * @property builder A lambda that takes an index of type [I] and returns a [DeferredHolder] for the registered item.
  */
 class RegistryTemplate<I, T>(val builder: (I) -> DeferredHolder<*, T>) : Template<I, T> {
-    private val entries = hashMapOf<I, DeferredHolder<*, T>>()
+    // This map will store the *actually* registered DeferredHolder instances, after the call to register()
+    private val registeredEntries = hashMapOf<I, DeferredHolder<*, T>>()
 
-    override val allIdxs by lazy { entries.keys }
+    // This list will store the index suppliers passed to addEntry
+    private val pendingEntrySuppliers = mutableListOf<() -> I>()
+
+    // allIdxs should reflect the indices of items that have been effectively registered
+    override val allIdxs by lazy { registeredEntries.keys }
 
     /**
-     * Registers items for the given indices using the provided builder.
-     * @param idxs A vararg of indices for which to register items.
+     * Adds the index suppliers to the pending list.
+     * The invocation of suppliers and the actual registration will occur in register().
+     * @param idxs A vararg of suppliers for the indices.
      */
-    override fun register(vararg idxs: I) { idxs.forEach { entries[it] = builder(it) } }
+    override fun addEntry(vararg idxs: () -> I) {
+        pendingEntrySuppliers.addAll(idxs)
+    }
+
+    /**
+     * Performs the registration of items.
+     * Invokes all index suppliers added via addEntry
+     * and registers them in the entries map.
+     */
+    override fun register() {
+        pendingEntrySuppliers.forEach { supplier ->
+            val idx = supplier() // HERE is where the supplier is invoked!
+            registeredEntries[idx] = builder(idx)
+        }
+        pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+    }
 
     /**
      * Retrieves a registered item by its index.
      * @param idx The index of the item.
      * @return The registered item instance, or `null` if not found.
      */
-    override fun get(idx: I) = entries[idx]?.get()
+    override fun get(idx: I) = registeredEntries[idx]?.get()
 }
-

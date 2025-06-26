@@ -60,7 +60,7 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new flowing fluid, starting from a [FluidType].
-     * This is the first step in a chain to register a flowing fluid.
+     * This is the first step in a chain to addEntry a flowing fluid.
      *
      * @param name The name of the fluid (e.g., "my_fluid").
      * @param type A lambda that supplies the [FluidType] for this fluid.
@@ -250,30 +250,35 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
     class FlowingFluidTemplate<T, B: LiquidBlock, I: BucketItem>(val builder: (T) -> FlowingFluidRegistry) :
         Template<T, FlowingFluidRegistry>
     {
-        private val entries = hashMapOf<T, FlowingFluidRegistry>()
+        // This map will store the *actually* registered fluid registries, after the call to register()
+        private val registeredEntries = hashMapOf<T, FlowingFluidRegistry>()
 
-        override val allIdxs by lazy { entries.keys }
+        // This list will store the index suppliers passed to addEntry
+        private val pendingEntrySuppliers = mutableListOf<() -> T>()
+
+        // allIdxs should reflect the indices of fluid registries that have been effectively registered
+        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * An [Indexable] property to access the source [FlowingFluid]s by their index.
          */
-        val source = object : Indexable<T, Source?> { override fun get(idx: T) = entries[idx]?.source?.get() }
+        val source = object : Indexable<T, Source?> { override fun get(idx: T) = registeredEntries[idx]?.source?.get() }
         /**
          * An [Indexable] property to access the flowing [FlowingFluid]s by their index.
          */
-        val flowing = object : Indexable<T, Flowing?> { override fun get(idx: T) = entries[idx]?.flowing?.get() }
-        
+        val flowing = object : Indexable<T, Flowing?> { override fun get(idx: T) = registeredEntries[idx]?.flowing?.get() }
+
         /**
          * An [Indexable] property to access the [BucketItem]s by their index.
          */
         val bucketItem   = object : Indexable<T, I?> {
-            override fun get(idx: T) = entries[idx]?.bucketItem?.get() as I?
+            override fun get(idx: T) = registeredEntries[idx]?.bucketItem?.get() as I?
         }
         /**
          * An [Indexable] property to access the [LiquidBlock]s by their index.
          */
         val liquidBlock = object : Indexable<T, BlockRegistry<B>?> {
-            override fun get(idx: T) = entries[idx]?.liquidBlock as BlockRegistry<B>?
+            override fun get(idx: T) = registeredEntries[idx]?.liquidBlock as BlockRegistry<B>?
         }
 
         /**
@@ -281,14 +286,31 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
          * @param idx The index of the fluid.
          * @return The [FlowingFluidRegistry] instance, or `null` if not found.
          */
-        override fun get(idx: T): FlowingFluidRegistry? = entries[idx]
+        override fun get(idx: T): FlowingFluidRegistry? = registeredEntries[idx]
 
         /**
-         * Registers flowing fluids for the given indices using the provided builder.
-         * @param idxs A vararg of indices for which to register flowing fluids.
+         * Adds the index suppliers to the pending list.
+         * The invocation of suppliers and the actual registration will occur in register().
+         * @param idxs A vararg of suppliers for the indices.
          */
-        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
+        override fun addEntry(vararg idxs: () -> T) {
+            pendingEntrySuppliers.addAll(idxs)
+        }
+
+        /**
+         * Performs the registration of flowing fluids.
+         * Invokes all index suppliers added via addEntry
+         * and registers them in the entries map.
+         */
+        override fun register() {
+            pendingEntrySuppliers.forEach { supplier ->
+                val idx = supplier() // HERE is where the supplier is invoked!
+                registeredEntries[idx] = builder(idx)
+            }
+            pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+        }
     }
+
 
     /**
      * Creates a [FlowingFluidTemplate] for fluids without a specific liquid block or bucket item type.
@@ -332,9 +354,9 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
 
     /**
      * Registers the [DeferredRegister]s with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined fluids and their associated components.
+     * This method is called by Kore during mod initialization to addEntry all defined fluids and their associated components.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register.register(bus)

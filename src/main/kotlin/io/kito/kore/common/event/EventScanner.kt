@@ -49,7 +49,7 @@ object EventScanner : FunScanner<Unit> {
         (parms.count() == 2 && parms[1].type.jvmErasure.isSubclassOf(Event::class)).also { parms[0].type.jvmErasure }
 
     /**
-     * Uses the information from the annotated function to register an event listener.
+     * Uses the information from the annotated function to addEntry an event listener.
      * This function is invoked by Kore during mod initialization.
      *
      * It determines which event bus to use (Mod Bus or Forge Bus) and registers the function

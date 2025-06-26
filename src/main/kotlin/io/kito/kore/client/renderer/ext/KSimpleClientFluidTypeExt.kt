@@ -51,7 +51,7 @@ open class KSimpleClientFluidTypeExt : IClientFluidTypeExtensions {
 
     /**
      * Companion object providing extension functions for [FluidTypeBuilder] to easily configure
-     * client-side fluid properties and a function to register these extensions.
+     * client-side fluid properties and a function to addEntry these extensions.
      */
     companion object {
 

@@ -40,7 +40,7 @@ typealias TranslationBuilder = LanguageProvider.() -> Unit
  * Abstract base class for mod-specific data generation helpers in Kore.
  * Subclasses of this helper are responsible for collecting and registering various data providers
  * such as block states, item models, recipes, and language entries for their respective mods.
- * This class integrates with Kore's scanning system to automatically register data providers
+ * This class integrates with Kore's scanning system to automatically addEntry data providers
  * with NeoForge's data generation event.
  *
  * @property modId The unique identifier of the mod this data generation helper belongs to.
@@ -249,7 +249,7 @@ abstract class DataGenHelper(private val modId: String) {
     companion object {
 
         /**
-         * Scans for objects that extend [DataGenHelper] and attaches their `register` method
+         * Scans for objects that extend [DataGenHelper] and attaches their `addEntry` method
          * to the [GatherDataEvent] for the corresponding mod.
          *
          * This function is invoked by Kore's [ObjectScanner] during mod initialization.

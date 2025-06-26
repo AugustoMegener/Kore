@@ -49,7 +49,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new [Block] with a supplier for creating [Block] instances.
-     * This is the first step in a chain to register a block.
+     * This is the first step in a chain to addEntry a block.
      *
      * @param T The type of the [Block] to be registered.
      * @param supplier A lambda that supplies a new instance of the [Block] given [BlockProp].
@@ -69,9 +69,9 @@ open class BlockRegister(final override val id: String) : AutoRegister {
 
     /**
      * Registers all deferred registers ([Block], [Item], [BlockEntityType]) with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined blocks and their associated components.
+     * This method is called by Kore during mod initialization to addEntry all defined blocks and their associated components.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register    .register(bus)
@@ -308,31 +308,52 @@ open class BlockRegister(final override val id: String) : AutoRegister {
     class BlockTemplate<T, B : Block, I : BlockItem, E : BlockEntity>(val builder: (T) -> BlockRegistry<B>) :
         Template<T, B>
     {
-        private val entries = hashMapOf<T, BlockRegistry<B>>()
+        // This map will store the *actually* registered items, after the call to register()
+        private val registeredEntries = hashMapOf<T, BlockRegistry<B>>()
 
-        override val allIdxs by lazy { entries.keys }
+        // This list will store the index suppliers passed to addEntry
+        private val pendingEntrySuppliers = mutableListOf<() -> T>()
+
+        // allIdxs should reflect the indices of items that have been effectively registered
+        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * An [Indexable] property to access the [BlockItem]s by their index.
          */
-        val item   = object : Indexable<T, I?> { override fun get(idx: T) = entries[idx]?.itemRegistry?.get() as I? }
+        val item   = object : Indexable<T, I?> { override fun get(idx: T) = registeredEntries[idx]?.itemRegistry?.get() as I? }
         /**
          * An [Indexable] property to access the [BlockEntity]s by their index.
          */
-        val entity = object : Indexable<T, E?> { override fun get(idx: T) = entries[idx]?.beRegistry  ?.get() as E? }
+        val entity = object : Indexable<T, E?> { override fun get(idx: T) = registeredEntries[idx]?.beRegistry  ?.get() as E? }
 
         /**
          * Retrieves a [Block] by its index.
          * @param idx The index of the block.
          * @return The [Block] instance, or `null` if not found.
          */
-        override fun get(idx: T): B? = entries[idx]?.blockRegistry?.get()
+        override fun get(idx: T): B? = registeredEntries[idx]?.blockRegistry?.get()
 
         /**
-         * Registers blocks for the given indices using the provided builder.
-         * @param idxs A vararg of indices for which to register blocks.
+         * Adds the index suppliers to the pending list.
+         * The invocation of suppliers and the actual registration will occur in register().
+         * @param idxs A vararg of suppliers for the indices.
          */
-        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
+        override fun addEntry(vararg idxs: () -> T) {
+            pendingEntrySuppliers.addAll(idxs)
+        }
+
+        /**
+         * Performs the registration of items.
+         * Invokes all index suppliers added via addEntry
+         * and registers them in the entries map.
+         */
+        override fun register() {
+            pendingEntrySuppliers.forEach { supplier ->
+                val idx = supplier() // HERE is where the supplier is invoked!
+                registeredEntries[idx] = builder(idx)
+            }
+            pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+        }
     }
 
     /**

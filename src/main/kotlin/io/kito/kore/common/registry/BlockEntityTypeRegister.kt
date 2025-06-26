@@ -38,7 +38,7 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
 
     /**
      * Infix function to define a new [BlockEntityType] with a supplier for creating [BlockEntity] instances.
-     * This is the first step in a chain to register a block entity type.
+     * This is the first step in a chain to addEntry a block entity type.
      *
      * @param T The type of the [BlockEntity] that this type will create.
      * @param name The name of the block entity type (e.g., "my_block_entity").
@@ -137,9 +137,9 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
 
     /**
      * Registers the [DeferredRegister] with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined block entity types.
+     * This method is called by Kore during mod initialization to addEntry all defined block entity types.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) { registry.register(bus) }
 

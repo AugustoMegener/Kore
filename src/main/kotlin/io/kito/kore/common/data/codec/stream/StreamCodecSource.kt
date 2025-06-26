@@ -17,7 +17,7 @@ import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Annotation used to mark functions or property getters that provide a Minecraft [StreamCodec] for a specific type.
- * This allows Kore to automatically discover and register stream codecs for various data types,
+ * This allows Kore to automatically discover and addEntry stream codecs for various data types,
  * facilitating efficient serialization and deserialization of data to and from [io.netty.buffer.ByteBuf]s.
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
@@ -54,7 +54,7 @@ annotation class StreamCodecSource {
             (parms.size == 1) || (parms.size == 2 && parms[1].type.jvmErasure == KType::class)
 
         /**
-         * Uses the information from the annotated function to register a stream codec source.
+         * Uses the information from the annotated function to addEntry a stream codec source.
          * This function is invoked by Kore's [FunScanner] during mod initialization.
          *
          * @param info The [IModInfo] of the mod being processed.

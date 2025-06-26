@@ -27,7 +27,7 @@ class DynamicRecipeProvider(output: PackOutput,
      * Builds all recipes by iterating through the provided [entries]
      * and applying each lambda function to the given [RecipeOutput] and [HolderLookup.Provider].
      *
-     * @param recipeOutput The [RecipeOutput] to register recipes with.
+     * @param recipeOutput The [RecipeOutput] to addEntry recipes with.
      * @param holderLookup The [HolderLookup.Provider] for accessing registries.
      */
     override fun buildRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
