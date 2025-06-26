@@ -98,6 +98,7 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>) {
      * @return The encoded representation of the object.
      */
     fun <E> T.encode(ops: DynamicOps<E>): E = codec.encodeStart(ops, this).orThrow
+
     /**
      * Encodes the current instance of [T] partially into a dynamic representation.
      * This is useful for debugging or when only a subset of the data is needed.
@@ -115,6 +116,7 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>) {
      * @return The encoded representation of the object, or `null` if encoding fails.
      */
     fun <E> T.safeEncode(ops: DynamicOps<E>) = codec.encodeStart(ops, this).takeIf { it.isSuccess }?.orThrow
+
     /**
      * Safely encodes the current instance of [T] partially into a dynamic representation.
      * Returns `null` if the encoding process fails or no partial result is available.
@@ -133,6 +135,7 @@ open class KCodecSerializer<T : Any>(clazz: KClass<T>) {
      * @return A new instance of [T] populated with the decoded data.
      */
     fun <E> decode(ops: DynamicOps<E>, data: E): T = codec.parse(ops, data).orThrow
+
     /**
      * Decodes data partially from a dynamic representation into an instance of [T].
      * This is useful for debugging or when only a subset of the data is needed.

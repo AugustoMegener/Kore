@@ -47,6 +47,8 @@ object Blocks : BlockRegister(ID) {
             props {
                 stacksTo(1)
             }
+
+
         }
 
         blockEntity(::CustomBlockEntity) {

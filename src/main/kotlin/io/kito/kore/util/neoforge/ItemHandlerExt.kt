@@ -24,13 +24,13 @@ object ItemHandlerExt {
      */
     operator fun IItemHandler.get(idx: Int): ItemStack = getStackInSlot(idx)
 
-
     /**
      * Creates a new [ItemStackHandler] with initial stacks.
      * @param stack A vararg of [ItemStack]s to initialize the handler with.
      * @return A new [ItemStackHandler] instance.
      */
     fun stackHandlerOf(vararg stack: ItemStack) = ItemStackHandler(NonNullList.of(ItemStack.EMPTY, *stack))
+
     /**
      * Creates a new [ItemStackHandler] with a specified size and initial stacks at specific indices.
      * @param size The number of slots in the item stack handler.

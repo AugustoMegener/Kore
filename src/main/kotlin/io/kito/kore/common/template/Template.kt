@@ -38,7 +38,7 @@ interface Template<I, T> : Indexable<I, T?> {
      */
     companion object {
         /**
-         * Extension function to register items for a template using an infix `on` syntax.
+         * Extension function to register items for a template.
          * @param I The type of the index.
          * @param T The type of the item.
          * @param R The type of the [Template].
