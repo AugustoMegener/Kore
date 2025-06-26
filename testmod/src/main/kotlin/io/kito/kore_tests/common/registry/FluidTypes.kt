@@ -17,9 +17,21 @@ import io.kito.kore_tests.KoreTests.local
 import net.minecraft.world.item.Items.BUCKET
 import net.neoforged.neoforge.fluids.FluidType
 
+/**
+ * Registers custom fluid types for the Kore Tests mod.
+ * Annotated with `@Scan` to be automatically discovered by Kore for fluid type registration.
+ * Extends `FluidTypeRegister` with the mod ID, providing a DSL for defining fluid types.
+ */
 @Scan
 object FluidTypes : FluidTypeRegister(ID) {
 
+    /**
+     * Defines a custom fluid named "my_fluid".
+     * - `of ::FluidType`: Specifies the fluid type class.
+     * - `flowingFluid`: Configures properties for the flowing fluid, such as `slopeFindDistance` and `levelDecreasePerBlock`.
+     * - `bucketItem`: Defines the associated bucket item, including its name, stack size, craft remainder, and model.
+     * - `client`: Sets client-side rendering properties like color and textures for still and flowing states.
+     */
     val myFluid by "my_fluid" of ::FluidType where {
 
         flowingFluid {
@@ -48,6 +60,13 @@ object FluidTypes : FluidTypeRegister(ID) {
         }
     }
 
+    /**
+     * A template for defining similar fluid types programmatically.
+     * It takes a string `i` to generate unique fluid names and localized bucket names.
+     * - `flowingFluid`: Configures common flowing fluid properties.
+     * - `bucketItem`: Defines the associated bucket item with dynamic naming and a generic bucket model.
+     * - `client`: Sets common client-side rendering properties.
+     */
     val fluidTemplate = fluidTypeTemplate { i: String ->
         "${i}_fluid" of ::FluidType where {
             flowingFluid {
@@ -81,3 +100,4 @@ object FluidTypes : FluidTypeRegister(ID) {
         }
     }
 }
+

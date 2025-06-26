@@ -17,9 +17,23 @@ import net.minecraft.world.level.block.Block
 import net.neoforged.neoforge.client.model.generators.ModelFile
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
+/**
+ * Registers all custom blocks for the Kore Tests mod.
+ * Annotated with `@Scan` to be automatically discovered by Kore for block registration.
+ * Extends `BlockRegister` with the mod ID, providing a DSL for defining blocks.
+ */
 @Scan
 object Blocks : BlockRegister(ID) {
 
+    /**
+     * Defines a custom block named "block".
+     * - `of ::CustomBlock`: Specifies the block class `CustomBlock`.
+     * - `named`: Sets the localized names for the block (English and Brazilian Portuguese).
+     * - `state`: Defines the block state generation using `simpleBlock`.
+     * - `props`: Sets block properties like `explosionResistance`.
+     * - `defaultItem`: Configures the default item form of the block, including its model and item properties.
+     * - `blockEntity`: Associates a `CustomBlockEntity` with this block and defines its capabilities (e.g., item handling).
+     */
     val block by "block" of ::CustomBlock where {
         named(EN_US to "Block",
               PT_BR to "Bloco")
@@ -33,6 +47,8 @@ object Blocks : BlockRegister(ID) {
             props {
                 stacksTo(1)
             }
+
+
         }
 
         blockEntity(::CustomBlockEntity) {
@@ -40,6 +56,14 @@ object Blocks : BlockRegister(ID) {
         }
     }
 
+    /**
+     * A template for defining similar blocks programmatically.
+     * It takes a string `i` to generate unique block names and localized names.
+     * - `of ::Block`: Uses the generic `Block` class.
+     * - `state`: Defines a simple block state with `cubeAll` using the base "block" model.
+     * - `props`: Sets common block properties.
+     * - `defaultItem`: Configures the item model to reference the base "block" model.
+     */
     val blockTemplate = blockTemplate { i: String ->
         "${i}_block" of ::Block where {
             named(EN_US to "${i.toTitle()} Block",
@@ -57,6 +81,13 @@ object Blocks : BlockRegister(ID) {
         }
     }
 
+    /**
+     * Lazily initialized property to get the `blockItem` associated with the `block`.
+     */
     val blockItem   by Blocks::block.blockItem
+    /**
+     * Lazily initialized property to get the `blockEntity` associated with the `block`.
+     */
     val blockEntity by Blocks::block.blockEntity
 }
+

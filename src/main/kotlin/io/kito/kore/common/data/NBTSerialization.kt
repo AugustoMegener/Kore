@@ -16,10 +16,34 @@ import kotlin.reflect.full.isSupertypeOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 
+/**
+ * An implementation of [SerializationStrategy] that handles serialization and deserialization
+ * of data to and from Minecraft's NBT (Named Binary Tag) format.
+ * It supports various data types, including [INBTSerializable] objects, [ArrayList], [NonNullList],
+ * and other types via Mojang's `Codec` system.
+ *
+ * @param provider The [HolderLookup.Provider] used for NBT serialization/deserialization, providing access to registries.
+ */
 class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
 
+    /**
+     * An internal [CodecSerialization] instance specifically for NBT operations.
+     * This is used as a fallback for types not explicitly handled by this class.
+     */
     private val nbtCodecSerializer = CodecSerialization(nbtOps)
 
+    /**
+     * Encodes a given value into an NBT [Tag].
+     * It handles different types specifically:
+     * - If the value is [INBTSerializable], it uses its `serializeNBT` method.
+     * - If the value is an [ArrayList] or [NonNullList], it serializes each element into a [ListTag].
+     * - For all other types, it delegates to the internal [nbtCodecSerializer].
+     *
+     * @param D The type of the value to encode.
+     * @param value The instance of the value to encode.
+     * @param valueType The [KType] of the value, used for generic type information, especially for lists.
+     * @return The encoded value as an NBT [Tag].
+     */
     override fun <D : Any> encode(value: D, valueType: KType): Tag =
         when(value) {
             is INBTSerializable<*> -> value.serializeNBT(provider)
@@ -32,6 +56,20 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
         }
 
 
+    /**
+     * Decodes data from an NBT [Tag] into a Kotlin object.
+     * It handles different types specifically:
+     * - If `oldValue` is [INBTSerializable], it applies the decoded NBT to the existing object (stateful).
+     * - If `oldValue` is an [ArrayList], it decodes elements into the existing list (stateful).
+     * - If `oldValue` is a [NonNullList], it decodes elements into the existing list (stateful) or creates a new one (stateless).
+     * - For all other types, it delegates to the internal [nbtCodecSerializer] (stateless).
+     *
+     * @param D The type of the value to decode.
+     * @param data The NBT [Tag] to decode.
+     * @param oldValue An optional existing object to decode into (for stateful decoding).
+     * @param valueType The [KType] of the value, used for generic type information, especially for lists.
+     * @return A [DecodeResult] containing the decoded value or an action to apply the decoded data.
+     */
     @Suppress(UNCHECKED_CAST)
     override fun <D : Any> decode(data: Tag, oldValue: D?, valueType: KType): DecodeResult<D> =
         when(oldValue) {
@@ -72,3 +110,4 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
         }
 
 }
+
