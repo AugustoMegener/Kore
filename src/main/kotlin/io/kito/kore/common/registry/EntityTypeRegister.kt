@@ -54,7 +54,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new [EntityType] with an entity factory and a mob category.
-     * This is the first step in a chain to register a generic entity type.
+     * This is the first step in a chain to addEntry a generic entity type.
      *
      * @param T The type of the [Entity] that this type will create.
      * @param name The name of the entity type (e.g., "my_entity").
@@ -66,7 +66,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new [EntityType] for a [Mob] with an entity factory and a mob category.
-     * This is the first step in a chain to register a mob entity type.
+     * This is the first step in a chain to addEntry a mob entity type.
      *
      * @param T The type of the [Mob] that this type will create.
      * @param name The name of the mob entity type (e.g., "my_mob").
@@ -335,35 +335,56 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
     class EntityTypeTemplate<T, E : Entity, I : SpawnEggItem>(val builder: (T) -> EntityRegistry<E>) :
         Template<T, EntityType<E>>
     {
-        private val entries = hashMapOf<T, EntityRegistry<E>>()
+        // This map will store the *actually* registered entity types, after the call to register()
+        private val registeredEntries = hashMapOf<T, EntityRegistry<E>>()
 
-        override val allIdxs by lazy { entries.keys }
+        // This list will store the index suppliers passed to addEntry
+        private val pendingEntrySuppliers = mutableListOf<() -> T>()
+
+        // allIdxs should reflect the indices of entity types that have been effectively registered
+        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * An [Indexable] property to access the [SpawnEggItem]s by their index.
          */
-        val egg = object : Indexable<T, I?> { override fun get(idx: T) = entries[idx]?.spawnEggRegistry?.get() as I? }
+        val egg = object : Indexable<T, I?> { override fun get(idx: T) = registeredEntries[idx]?.spawnEggRegistry?.get() as I? }
 
         /**
          * Retrieves an [EntityType] by its index.
          * @param idx The index of the entity type.
          * @return The [EntityType] instance, or `null` if not found.
          */
-        override fun get(idx: T): EntityType<E>? = entries[idx]?.entityRegistry?.get()
+        override fun get(idx: T): EntityType<E>? = registeredEntries[idx]?.entityRegistry?.get()
 
         /**
-         * Registers entity types for the given indices using the provided builder.
-         * @param idxs A vararg of indices for which to register entity types.
+         * Adds the index suppliers to the pending list.
+         * The invocation of suppliers and the actual registration will occur in register().
+         * @param idxs A vararg of suppliers for the indices.
          */
-        override fun register(vararg idxs: T) { idxs.forEach { entries[it] = builder(it) } }
+        override fun addEntry(vararg idxs: () -> T) {
+            pendingEntrySuppliers.addAll(idxs)
+        }
 
+        /**
+         * Performs the registration of entity types.
+         * Invokes all index suppliers added via addEntry
+         * and registers them in the entries map.
+         */
+        override fun register() {
+            pendingEntrySuppliers.forEach { supplier ->
+                val idx = supplier() // HERE is where the supplier is invoked!
+                registeredEntries[idx] = builder(idx)
+            }
+            pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+        }
     }
+
 
     /**
      * Registers the [DeferredRegister]s with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined entity types and their associated items.
+     * This method is called by Kore during mod initialization to addEntry all defined entity types and their associated items.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register.register(bus)

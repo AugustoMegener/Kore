@@ -10,7 +10,7 @@ import net.neoforged.neoforgespi.language.IModInfo
 
 /**
  * Interface for defining custom model layers in Kore.
- * Implementations of this interface provide the necessary information to register a model layer
+ * Implementations of this interface provide the necessary information to addEntry a model layer
  * with Minecraft, allowing custom 3D models to be used for entities, blocks, or items.
  */
 interface ModelLayer {

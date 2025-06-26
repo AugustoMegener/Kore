@@ -57,7 +57,7 @@ annotation class RegisterLayer(val id: String, val mode: LayerRegisterMode, val 
                     parms[2].type.jvmErasure == DeltaTracker::class
 
         /**
-         * Uses the information from the annotated function to register a GUI layer with NeoForge.
+         * Uses the information from the annotated function to addEntry a GUI layer with NeoForge.
          * This function is invoked by Kore's [FunScanner] during mod initialization.
          *
          * @param info The [IModInfo] of the mod being processed.

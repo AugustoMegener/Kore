@@ -16,7 +16,7 @@ import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Annotation used to mark functions or property getters that provide a Mojang [Codec] for a specific type.
- * This allows Kore to automatically discover and register codecs for various data types,
+ * This allows Kore to automatically discover and addEntry codecs for various data types,
  * facilitating serialization and deserialization processes.
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
@@ -53,7 +53,7 @@ annotation class CodecSource {
             (parms.size == 1) || (parms.size == 2 && parms[1].type.jvmErasure == KType::class)
 
         /**
-         * Uses the information from the annotated function to register a codec source.
+         * Uses the information from the annotated function to addEntry a codec source.
          * This function is invoked by Kore's [FunScanner] during mod initialization.
          *
          * @param info The [IModInfo] of the mod being processed.

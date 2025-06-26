@@ -29,23 +29,25 @@ interface Template<I, T> : Indexable<I, T?> {
 
     /**
      * Registers items for the given indices.
-     * @param idxs A vararg of indices to register.
+     * @param idxs A vararg of indices to addEntry.
      */
-    fun register(vararg idxs: I)
+    fun addEntry(vararg idxs: () -> I)
+
+    fun register()
 
     /**
      * Companion object providing utility functions for [Template]s.
      */
     companion object {
         /**
-         * Extension function to register items for a template.
+         * Extension function to addEntry items for a template.
          * @param I The type of the index.
          * @param T The type of the item.
          * @param R The type of the [Template].
-         * @param idxs A vararg of indices to register.
+         * @param idxs A vararg of indices to addEntry.
          * @return The [Template] instance for fluent chaining.
          */
-        fun <I, T, R : Template<I, T>> R.on(vararg idxs: I): R = also { register(*idxs) }
+        fun <I, T, R : Template<I, T>> R.on(vararg idxs: () -> I): R = also { addEntry(*idxs) }
     }
 }
 

@@ -11,7 +11,7 @@ import kotlin.reflect.full.hasAnnotation
 /**
  * Annotation used to mark [PreparableReloadListener] implementations for automatic registration on the client side.
  * When a class is annotated with `@RegisterClientReloadListener` and implements [PreparableReloadListener],
- * Kore will automatically discover it and register it with NeoForge, ensuring that its `reload` method
+ * Kore will automatically discover it and addEntry it with NeoForge, ensuring that its `reload` method
  * is called when client-side resources are reloaded (e.g., when resource packs are changed).
  */
 @Scan

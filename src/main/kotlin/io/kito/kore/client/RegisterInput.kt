@@ -16,7 +16,7 @@ import kotlin.reflect.jvm.isAccessible
 /**
  * Annotation used to mark properties that represent key input registrations.
  * When applied to a property of type [InputRegistry] (or a delegated property that provides a [KeyMapping]),
- * Kore will automatically register the associated key mapping and set up its action listener.
+ * Kore will automatically addEntry the associated key mapping and set up its action listener.
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

@@ -37,9 +37,9 @@ open class DataComponentTypeRegister(final override val id: String) : AutoRegist
 
     /**
      * Registers the [DeferredRegister.DataComponents] with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined data component types.
+     * This method is called by Kore during mod initialization to addEntry all defined data component types.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register.register(bus)

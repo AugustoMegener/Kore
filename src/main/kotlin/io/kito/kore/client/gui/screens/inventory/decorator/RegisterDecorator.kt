@@ -11,7 +11,7 @@ import kotlin.reflect.full.hasAnnotation
 /**
  * Annotation used to mark [KItemDecorator] implementations for automatic registration.
  * When a class is annotated with `@RegisterDecorator` and implements [KItemDecorator],
- * Kore will automatically discover it and register its associated item decorations with NeoForge.
+ * Kore will automatically discover it and addEntry its associated item decorations with NeoForge.
  */
 @Scan
 @Target(AnnotationTarget.CLASS)
@@ -42,7 +42,7 @@ annotation class RegisterDecorator {
 
             // Add a listener to the mod's event bus for registering item decorations
             container.eventBus?.addListener { event: RegisterItemDecorationsEvent ->
-                // For each target item specified by the decorator, register the decorator
+                // For each target item specified by the decorator, addEntry the decorator
                 data.targetItems.forEach { event.register(it, data) }
             }
         }

@@ -26,7 +26,7 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
 
     /**
      * Infix function to define a new [CreativeModeTab] with a builder for its properties.
-     * This is the first step in a chain to register a creative tab.
+     * This is the first step in a chain to addEntry a creative tab.
      *
      * @param name The name of the creative tab (e.g., "my_tab").
      * @param builder A lambda that takes a [CreativeModeTab.Builder] and the tab name, and applies properties to it.
@@ -98,9 +98,9 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
 
     /**
      * Registers the [DeferredRegister] with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined creative tabs.
+     * This method is called by Kore during mod initialization to addEntry all defined creative tabs.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register.register(bus)

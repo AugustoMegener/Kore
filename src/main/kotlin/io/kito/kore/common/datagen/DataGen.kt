@@ -43,7 +43,7 @@ annotation class DataGen(val dataGenerator: KClass<out DataGenHelper>) {
         override fun validateParameters(parms: List<KParameter>) = parms.size <= 1
 
         /**
-         * Uses the information from the annotated function to register a data generation block.
+         * Uses the information from the annotated function to addEntry a data generation block.
          * This function is invoked by Kore's [FunScanner] during mod initialization.
          *
          * @param info The [IModInfo] of the mod being processed.

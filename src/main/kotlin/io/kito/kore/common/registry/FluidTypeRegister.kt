@@ -42,7 +42,7 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new [FluidType] with a supplier for creating [FluidType] instances.
-     * This is the first step in a chain to register a fluid type.
+     * This is the first step in a chain to addEntry a fluid type.
      *
      * @param name The name of the fluid type (e.g., "my_fluid_type").
      * @param supplier A lambda that supplies a new instance of the [FluidType] given [FluidTypeProp].
@@ -141,36 +141,60 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param B The base type of the [LiquidBlock]s associated with the fluids in this template.
      * @param I The type of the [BucketItem]s associated with the fluids in this template.
      */
-    class FluidTypeTemplate<T,  B: LiquidBlock, I: BucketItem>(val builder: (T) -> FluidTypeRegistry) :
+    class FluidTypeTemplate<T, B: LiquidBlock, I: BucketItem>(val builder: (T) -> FluidTypeRegistry) :
         Template<T, FluidType>
     {
-        private val entries = hashMapOf<T, FluidTypeRegistry>()
+        // This map will store the *actually* registered fluid type registries, after the call to register()
+        private val registeredEntries = hashMapOf<T, FluidTypeRegistry>()
 
-        override val allIdxs by lazy { entries.keys }
+        // This list will store the index suppliers passed to addEntry for this template
+        private val pendingEntrySuppliers = mutableListOf<() -> T>()
+
+        // allIdxs should reflect the indices of fluid types that have been effectively registered
+        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * A [FlowingFluidRegister.FlowingFluidTemplate] instance to manage the flowing fluids associated with this template.
+         * Its builder relies on the FluidTypeRegistry being present in 'registeredEntries' when its 'register()' is called.
          */
-        val flowingFluid = FlowingFluidRegister.FlowingFluidTemplate<T, B, I> { entries[it]!!.flowingRegistry!! }
+        val flowingFluid = FlowingFluidRegister.FlowingFluidTemplate<T, B, I> { registeredEntries[it]!!.flowingRegistry!! }
 
         /**
          * Retrieves a [FluidType] by its index.
          * @param idx The index of the fluid type.
          * @return The [FluidType] instance, or `null` if not found.
          */
-        override fun get(idx: T): FluidType? = entries[idx]?.registry?.get()
+        override fun get(idx: T): FluidType? = registeredEntries[idx]?.registry?.get()
 
         /**
-         * Registers fluid types for the given indices using the provided builder.
-         * It also registers the associated flowing fluids if they are present.
+         * Adds the index suppliers to the pending list for this template and also for the associated flowing fluid template.
+         * The invocation of suppliers and the actual registration will occur in register().
          *
-         * @param idxs A vararg of indices for which to register fluid types.
+         * @param idxs A vararg of suppliers for the indices.
          */
-        override fun register(vararg idxs: T) {
-            idxs.forEach {
-                entries[it] = builder(it)
-                if (entries[it]?.flowingRegistry != null) flowingFluid.register(it)
+        override fun addEntry(vararg idxs: () -> T) {
+            pendingEntrySuppliers.addAll(idxs)
+            // Also pass the suppliers to the nested flowingFluid template
+            flowingFluid.addEntry(*idxs)
+        }
+
+        /**
+         * Performs the registration of fluid types.
+         * Invokes all index suppliers added via addEntry for this template,
+         * registers them, and then triggers the registration for the associated flowing fluids.
+         */
+        override fun register() {
+            // First, process and register the entries for this FluidTypeTemplate
+            pendingEntrySuppliers.forEach { supplier ->
+                val idx = supplier() // HERE is where the supplier is invoked for FluidTypeTemplate
+                registeredEntries[idx] = builder(idx)
             }
+            pendingEntrySuppliers.clear() // Clear pending suppliers after processing
+
+            // After this template's entries are registered, trigger the registration for flowingFluid.
+            // At this point, 'registeredEntries[idx]' will contain the necessary FluidTypeRegistry
+            // for the flowingFluid's builder to work.
+            flowingFluid.register()
         }
     }
 
@@ -216,9 +240,9 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
 
     /**
      * Registers the [DeferredRegister]s with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined fluid types and their associated flowing fluids.
+     * This method is called by Kore during mod initialization to addEntry all defined fluid types and their associated flowing fluids.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) {
         register.register(bus)

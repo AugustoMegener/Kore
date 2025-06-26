@@ -14,6 +14,8 @@ class TemplateKit<I>(templates: Array<out Template<I, *>>) : Template<I, Array<*
     @Suppress(UNCHECKED_CAST)
     private var templates = templates as Array<Template<I, *>>
 
+    val entries = arrayListOf<() -> I>()
+
     /**
      * A list to store all registered indices for this template kit.
      */
@@ -24,9 +26,9 @@ class TemplateKit<I>(templates: Array<out Template<I, *>>) : Template<I, Array<*
     /**
      * Registers indices with this template kit.
      * Note: This only adds indices to the kit's internal list; actual registration with individual templates happens when [apply] is called.
-     * @param idxs A vararg of indices to register.
+     * @param idxs A vararg of indices to addEntry.
      */
-    override fun register(vararg idxs: I) { allIdxs += idxs }
+    override fun addEntry(vararg idxs: () -> I) { entries += idxs }
 
     /**
      * Retrieves an array of items from all managed templates for a given index.
@@ -54,11 +56,10 @@ class TemplateKit<I>(templates: Array<out Template<I, *>>) : Template<I, Array<*
 
     /**
      * Applies the registered indices to all managed templates.
-     * This method iterates through all collected indices and calls the `register` method on each individual template.
+     * This method iterates through all collected indices and calls the `addEntry` method on each individual template.
      */
-    @Suppress(UNCHECKED_CAST)
-    fun apply() {
-        templates.forEach { it.register(*allIdxs.toArray() as Array<out I>) }
+    override fun register() {
+        templates.forEach { it.addEntry(*entries.toTypedArray()); it.register() }
     }
 
     /**

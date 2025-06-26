@@ -13,7 +13,7 @@ import kotlin.reflect.full.primaryConstructor
 /**
  * Annotation used to mark [DataProvider] implementations for automatic registration.
  * When a class is annotated with `@RegisterDataProvider`, Kore will automatically discover it
- * and register it with the specified [DataGenHelper] for the given [Dist] (client or server).
+ * and addEntry it with the specified [DataGenHelper] for the given [Dist] (client or server).
  *
  * This simplifies the process of integrating custom data generators into the modding environment.
  *

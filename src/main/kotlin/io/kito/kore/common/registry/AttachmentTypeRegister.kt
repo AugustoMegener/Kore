@@ -24,7 +24,7 @@ open class AttachmentTypeRegister(final override val id: String) : AutoRegister 
 
     /**
      * Infix function to define a new [AttachmentType] with a default value supplier and a [Codec].
-     * This is the first step in a chain to register a codec-serializable attachment type.
+     * This is the first step in a chain to addEntry a codec-serializable attachment type.
      *
      * @param T The type of the data stored in the attachment.
      * @param name The name of the attachment type (e.g., "my_attachment").
@@ -77,9 +77,9 @@ open class AttachmentTypeRegister(final override val id: String) : AutoRegister 
 
     /**
      * Registers the [DeferredRegister] with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined attachment types.
+     * This method is called by Kore during mod initialization to addEntry all defined attachment types.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) { register.register(bus) }
 }

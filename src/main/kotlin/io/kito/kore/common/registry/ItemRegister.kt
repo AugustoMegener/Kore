@@ -31,7 +31,7 @@ open class ItemRegister(final override val id: String) : AutoRegister {
 
     /**
      * Infix function to define a new [Item] with a supplier for creating [Item] instances.
-     * This is the first step in a chain to register an item.
+     * This is the first step in a chain to addEntry an item.
      *
      * @param T The type of the [Item] to be registered.
      * @param name The name of the item (e.g., "my_item").
@@ -52,9 +52,9 @@ open class ItemRegister(final override val id: String) : AutoRegister {
 
     /**
      * Registers the [DeferredRegister] with the provided [IEventBus].
-     * This method is called by Kore during mod initialization to register all defined items.
+     * This method is called by Kore during mod initialization to addEntry all defined items.
      *
-     * @param bus The [IEventBus] to register with (typically the Mod Event Bus).
+     * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
     override fun register(bus: IEventBus) = register.register(bus)
 

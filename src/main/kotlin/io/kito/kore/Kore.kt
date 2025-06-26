@@ -28,7 +28,7 @@ object Kore {
      * The initialization block for the Kore mod.
      * This block is executed when the mod is loaded by NeoForged.
      * It performs essential setup tasks:
-     * - `scanClasses()`: Scans for annotated classes and functions to register various mod components.
+     * - `scanClasses()`: Scans for annotated classes and functions to addEntry various mod components.
      * - `handleTemplates()`: Processes and applies templates for different mod elements.
      * - `registerFluidTypeClientExts()`: Registers client-side extensions for fluid types, enabling custom fluid rendering.
      */

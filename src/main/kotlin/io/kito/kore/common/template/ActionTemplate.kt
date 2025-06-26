@@ -9,6 +9,9 @@ package io.kito.kore.common.template
  * @property action The lambda function that defines the action to be performed for each index.
  */
 class ActionTemplate<T>(val action: (T) -> Unit) : Template<T, Unit> {
+
+    val entries = arrayListOf<() -> T>()
+
     /**
      * A list to store all registered indices.
      */
@@ -18,9 +21,12 @@ class ActionTemplate<T>(val action: (T) -> Unit) : Template<T, Unit> {
      * Registers indices and performs the defined action for each of them.
      * @param idxs A vararg of indices for which the action will be executed.
      */
-    override fun register(vararg idxs: T) {
-        allIdxs += idxs
-        idxs.forEach { action(it) }
+    override fun addEntry(vararg idxs: () -> T) {
+        entries += idxs
+    }
+
+    override fun register() {
+        allIdxs += entries.map { it().also { i -> action(i) } }
     }
 
     /**
