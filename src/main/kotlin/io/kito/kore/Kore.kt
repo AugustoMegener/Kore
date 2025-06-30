@@ -4,8 +4,18 @@ import io.kito.kore.Kore.ID
 import io.kito.kore.client.renderer.ext.KSimpleClientFluidTypeExt.Companion.registerFluidTypeClientExts
 import io.kito.kore.common.event.TemplateHandlingEvent.Companion.handleTemplates
 import io.kito.kore.common.reflect.ClassScanner.Companion.scanClasses
+import io.kito.kore.common.registry.early.RegisterEarlyRegistry.Companion.registerEarlyRegistries
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
+/*import java.lang.Thread.currentThread
+import kotlin.script.experimental.api.ResultWithDiagnostics
+import kotlin.script.experimental.api.ScriptCompilationConfiguration
+import kotlin.script.experimental.api.ScriptEvaluationConfiguration
+import kotlin.script.experimental.host.toScriptSource
+import kotlin.script.experimental.jvm.baseClassLoader
+import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
+import kotlin.script.experimental.jvm.jvm
+import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost*/
 
 /**
  * The main entry point for the Kore framework.
@@ -34,8 +44,10 @@ object Kore {
      */
     init {
         scanClasses()
+        registerEarlyRegistries()
         handleTemplates()
         registerFluidTypeClientExts()
     }
 }
+
 

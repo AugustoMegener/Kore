@@ -62,7 +62,7 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
      * @param templates A vararg of [FluidTypeRegister.FluidTypeTemplate]s.
      */
     fun <T> Output.templates(vararg templates: FluidTypeRegister.FluidTypeTemplate<T, *, *>) =
-        items(*templates.flatMap { it.allIdxs.map { i -> { it.flowingFluid.bucketItem[i]!! } } }.toTypedArray())
+        items(*templates.flatMap { it.registry.all.map { i -> { it.flowingFluid.bucketItem[i]!! } } }.toTypedArray())
 
     /**
      * Extension function for [CreativeModeTab.Output] to accept items from multiple [FlowingFluidRegister.FlowingFluidTemplate]s.
@@ -70,7 +70,7 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
      * @param templates A vararg of [FlowingFluidRegister.FlowingFluidTemplate]s.
      */
     fun <T> Output.templates(vararg templates: FlowingFluidRegister.FlowingFluidTemplate<T, *, *>) =
-        items(*templates.flatMap { it.allIdxs.map { i -> { it.bucketItem[i]!! } } }.toTypedArray())
+        items(*templates.flatMap { it.registry.all.map { i -> { it.bucketItem[i]!! } } }.toTypedArray())
 
     /**
      * Extension function for [CreativeModeTab.Output] to accept items from multiple [BlockRegister.BlockTemplate]s.
@@ -78,7 +78,7 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
      * @param templates A vararg of [BlockRegister.BlockTemplate]s.
      */
     fun <T> Output.templates(vararg templates: BlockRegister.BlockTemplate<T, *, *, *>) =
-        items(*templates.flatMap { it.allIdxs.map { i -> { it.item[i]!! } } }.toTypedArray())
+        items(*templates.flatMap { it.registry.all.map { i -> { it.item[i]!! } } }.toTypedArray())
 
     /**
      * Extension function for [CreativeModeTab.Output] to accept items from multiple [EntityTypeRegister.EntityTypeTemplate]s.
@@ -86,7 +86,7 @@ open class CreativeModeTabRegister(final override val id: String) : AutoRegister
      * @param templates A vararg of [EntityTypeRegister.EntityTypeTemplate]s.
      */
     fun <T> Output.templates(vararg templates: EntityTypeRegister.EntityTypeTemplate<T, *, *>) =
-        items(*templates.flatMap { it.allIdxs.map { i -> { it.egg[i]!! } } }.toTypedArray())
+        items(*templates.flatMap { it.registry.all.map { i -> { it.egg[i]!! } } }.toTypedArray())
 
     /**
      * Extension function for [CreativeModeTab.Output] to accept items from multiple [RegistryTemplate]s.

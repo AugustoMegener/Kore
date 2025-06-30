@@ -1,6 +1,7 @@
 package io.kito.kore_tests.common.registry
 
 import io.kito.kore.client.renderer.ext.KSimpleClientFluidTypeExt.Companion.client
+import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.FluidTypeRegister
 import io.kito.kore.util.minecraft.EN_US
@@ -14,6 +15,7 @@ import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
+import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import net.minecraft.world.item.Items.BUCKET
 import net.neoforged.neoforge.fluids.FluidType
 
@@ -67,7 +69,8 @@ object FluidTypes : FluidTypeRegister(ID) {
      * - `bucketItem`: Defines the associated bucket item with dynamic naming and a generic bucket model.
      * - `client`: Sets common client-side rendering properties.
      */
-    val fluidTemplate = fluidTypeTemplate { i: String ->
+    @RegisterTemplate
+    val fluidTemplate = fluidTypeTemplate(stringRegistry) { i: String ->
         "${i}_fluid" of ::FluidType where {
             flowingFluid {
                 props {

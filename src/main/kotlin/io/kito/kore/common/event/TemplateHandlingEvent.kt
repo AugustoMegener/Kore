@@ -3,7 +3,6 @@ package io.kito.kore.common.event
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.template.Template
-import io.kito.kore.common.template.TemplateKit
 import net.neoforged.bus.api.Event
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforgespi.language.IModInfo
@@ -22,7 +21,7 @@ class TemplateHandlingEvent : Event() {
      * Registers a [TemplateKit] to be applied when this event is handled.
      * @param kit The [TemplateKit] instance to addEntry.
      */
-    fun register(kit: TemplateKit<*>) { templatesToRegister += kit }
+    fun register(kit: Template<*, *>) { templatesToRegister += kit }
 
     /**
      * Companion object responsible for handling the collection and application of [TemplateKit]s.

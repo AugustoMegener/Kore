@@ -1,5 +1,6 @@
 package io.kito.kore.common.template
 
+import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.util.Indexable
 
 /**
@@ -11,43 +12,12 @@ import io.kito.kore.util.Indexable
  */
 interface Template<I, T> : Indexable<I, T?> {
 
-    /**
-     * Returns a collection of all indices managed by this template.
-     */
-    val allIdxs: Collection<I>
-    /**
-     * Returns a collection of suppliers for all registered items.
-     */
-    val registereds: Collection<() -> T> get() = allIdxs.map { { get(it)!! } }
+    val registry: EarlyRegistry<I>
 
-    /**
-     * Checks if the template contains an item for the given index.
-     * @param idx The index to check.
-     * @return `true` if an item exists for the index, `false` otherwise.
-     */
-    operator fun contains(idx: I) = idx in allIdxs
+    val registereds: Collection<() -> T> get() = registry.all.map { { get(it)!! } }
 
-    /**
-     * Registers items for the given indices.
-     * @param idxs A vararg of indices to addEntry.
-     */
-    fun addEntry(vararg idxs: () -> I)
+    operator fun contains(idx: I) = idx in registry.all
 
-    fun register()
-
-    /**
-     * Companion object providing utility functions for [Template]s.
-     */
-    companion object {
-        /**
-         * Extension function to addEntry items for a template.
-         * @param I The type of the index.
-         * @param T The type of the item.
-         * @param R The type of the [Template].
-         * @param idxs A vararg of indices to addEntry.
-         * @return The [Template] instance for fluent chaining.
-         */
-        fun <I, T, R : Template<I, T>> R.on(vararg idxs: () -> I): R = also { addEntry(*idxs) }
-    }
+    abstract fun register()
 }
 

@@ -1,5 +1,6 @@
 package io.kito.kore_tests.common.registry
 
+import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.ItemRegister
 import io.kito.kore.common.registry.RegistryTemplate
@@ -13,6 +14,7 @@ import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.DataGenerator.recipe
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
+import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items.STICK
@@ -36,7 +38,8 @@ object Items : ItemRegister(ID) {
      * - `named`: Sets the localized names for the item (English and Brazilian Portuguese).
      * - `model`: Configures the item model to use a generated item model with a specific texture.
      */
-    val itemTemplate = RegistryTemplate { i: String ->
+    @RegisterTemplate
+    val itemTemplate = RegistryTemplate(stringRegistry) { i: String ->
         "${i}_item" of ::Item where {
             named(EN_US to "${i.toTitle()} Item",
                   PT_BR to "Item ${i.toTitle()}")

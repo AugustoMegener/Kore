@@ -5,6 +5,7 @@ import io.kito.kore.common.capabilities.EntityCapRegister
 import io.kito.kore.common.capabilities.EntityCapRegister.EntityCapRegistry
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.ItemProp
@@ -310,8 +311,8 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns an [EntityRegistry].
      * @return A new [EntityTypeTemplate] instance.
      */
-    fun <T, E : Entity> entityTypeTemplate(builder: (T) -> EntityRegistry<E>) =
-        EntityTypeTemplate<T, E, Nothing>(builder)
+    fun <T, E : Entity> entityTypeTemplate(registry: EarlyRegistry<T>, builder: (T) -> EntityRegistry<E>) =
+        EntityTypeTemplate<T, E, Nothing>(registry, builder)
 
     /**
      * Creates an [EntityTypeTemplate] for entities with a specific spawn egg item type.
@@ -321,8 +322,9 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns an [EntityRegistry].
      * @return A new [EntityTypeTemplate] instance.
      */
-    fun <T, E : LivingEntity, I : SpawnEggItem> entityTypeTemplateWithEgg(builder: (T) -> EntityRegistry<E>) =
-        EntityTypeTemplate<T, E, I>(builder)
+    fun <T, E : LivingEntity, I : SpawnEggItem> entityTypeTemplateWithEgg(registry: EarlyRegistry<T>,
+                                                                          builder: (T) -> EntityRegistry<E>) =
+        EntityTypeTemplate<T, E, I>(registry, builder)
 
     /**
      * A template class for registering multiple entity types based on an index.
@@ -332,17 +334,14 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
      * @param E The base type of the [Entity]s in this template.
      * @param I The type of the [SpawnEggItem]s associated with the entities in this template.
      */
-    class EntityTypeTemplate<T, E : Entity, I : SpawnEggItem>(val builder: (T) -> EntityRegistry<E>) :
+    class EntityTypeTemplate<T, E : Entity, I : SpawnEggItem>(override val registry: EarlyRegistry<T>,
+                                                              val builder: (T) -> EntityRegistry<E>
+
+    ) :
         Template<T, EntityType<E>>
     {
         // This map will store the *actually* registered entity types, after the call to register()
         private val registeredEntries = hashMapOf<T, EntityRegistry<E>>()
-
-        // This list will store the index suppliers passed to addEntry
-        private val pendingEntrySuppliers = mutableListOf<() -> T>()
-
-        // allIdxs should reflect the indices of entity types that have been effectively registered
-        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * An [Indexable] property to access the [SpawnEggItem]s by their index.
@@ -356,14 +355,6 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): EntityType<E>? = registeredEntries[idx]?.entityRegistry?.get()
 
-        /**
-         * Adds the index suppliers to the pending list.
-         * The invocation of suppliers and the actual registration will occur in register().
-         * @param idxs A vararg of suppliers for the indices.
-         */
-        override fun addEntry(vararg idxs: () -> T) {
-            pendingEntrySuppliers.addAll(idxs)
-        }
 
         /**
          * Performs the registration of entity types.
@@ -371,11 +362,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
          * and registers them in the entries map.
          */
         override fun register() {
-            pendingEntrySuppliers.forEach { supplier ->
-                val idx = supplier() // HERE is where the supplier is invoked!
-                registeredEntries[idx] = builder(idx)
-            }
-            pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+            registry.all.forEach { registeredEntries[it] = builder(it) }
         }
     }
 

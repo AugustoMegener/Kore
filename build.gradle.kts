@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.utils.extendsFrom
+
 inline val String.prop get() = project.findProperty(this) as String
 
 val modId = "mod_id".prop
@@ -14,6 +16,8 @@ plugins {
 
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
 }
+
+jarJar.enable()
 
 tasks.named<Wrapper>("wrapper") {
     distributionType = Wrapper.DistributionType.BIN
@@ -36,11 +40,23 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+val libraries by configurations.creating
+
+
+configurations {
+
+    implementation.get().also { it.isCanBeResolved = true }.extendsFrom(libraries)
+}
+
 runs {
     configureEach {
         systemProperty("forge.logging.markers", "REGISTRIES")
         systemProperty("forge.logging.console.level", "debug")
         modSource(project.sourceSets["main"])
+
+        dependencies {
+            runtime(configurations.implementation.get().extendsFrom(libraries))
+        }
     }
 
     create("client") {
@@ -67,15 +83,17 @@ runs {
 
 sourceSets["main"].resources.srcDir("src/generated/resources")
 
-configurations {
-    runtimeClasspath.configure { extendsFrom(configurations.localRuntime.get()) }
-}
-
 dependencies {
     implementation(kotlin("reflect"))
 
     implementation("net.neoforged:neoforge:${"neo_version".prop}")
     implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
+
+    /*libraries("org.jetbrains.kotlin:kotlin-scripting-jvm:2.1.0")
+    libraries("org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.1.0")
+    libraries("org.jetbrains.kotlin:kotlin-scripting-common:2.1.0")
+    libraries("org.jetbrains.kotlin:kotlin-scripting-dependencies:2.1.0")
+    libraries("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:2.1.0")*/
 }
 
 tasks.withType<ProcessResources>().configureEach {

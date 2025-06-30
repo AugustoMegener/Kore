@@ -9,6 +9,7 @@ import io.kito.kore_tests.common.registry.Blocks
 import io.kito.kore_tests.common.registry.Blocks.blockTemplate
 import io.kito.kore_tests.common.registry.Items
 import io.kito.kore_tests.common.registry.Items.itemTemplate
+import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 
 import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.crafting.Ingredient
@@ -16,7 +17,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 
 
 object Recipes {
-    val recipeTemplate = ActionTemplate { i: String ->
+    val recipeTemplate = ActionTemplate(stringRegistry) { i: String ->
         recipe(local("${i}_recipe")) {
             ShapedRecipe(ID, CraftingBookCategory.MISC,
                 shaped("###",

@@ -3,6 +3,7 @@ package io.kito.kore.common.registry
 import io.kito.kore.common.registry.BlockRegister.BlockRegistry
 import io.kito.kore.common.registry.FlowingFluidRegister.FlowingFluidBuilder
 import io.kito.kore.common.registry.FlowingFluidRegister.FlowingFluidRegistry
+import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.UNCHECKED_CAST
@@ -141,23 +142,19 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param B The base type of the [LiquidBlock]s associated with the fluids in this template.
      * @param I The type of the [BucketItem]s associated with the fluids in this template.
      */
-    class FluidTypeTemplate<T, B: LiquidBlock, I: BucketItem>(val builder: (T) -> FluidTypeRegistry) :
-        Template<T, FluidType>
+    class FluidTypeTemplate<T, B: LiquidBlock, I: BucketItem>(override val registry: EarlyRegistry<T>,
+                                                              val builder: (T) -> FluidTypeRegistry)
+        : Template<T, FluidType>
     {
-        // This map will store the *actually* registered fluid type registries, after the call to register()
         private val registeredEntries = hashMapOf<T, FluidTypeRegistry>()
 
-        // This list will store the index suppliers passed to addEntry for this template
-        private val pendingEntrySuppliers = mutableListOf<() -> T>()
-
-        // allIdxs should reflect the indices of fluid types that have been effectively registered
-        override val allIdxs by lazy { registeredEntries.keys }
-
         /**
-         * A [FlowingFluidRegister.FlowingFluidTemplate] instance to manage the flowing fluids associated with this template.
-         * Its builder relies on the FluidTypeRegistry being present in 'registeredEntries' when its 'register()' is called.
+         * A [FlowingFluidRegister.FlowingFluidTemplate] instance to manage the flowing fluids associated with
+         * this template.
          */
-        val flowingFluid = FlowingFluidRegister.FlowingFluidTemplate<T, B, I> { registeredEntries[it]!!.flowingRegistry!! }
+        val flowingFluid =
+            FlowingFluidRegister.FlowingFluidTemplate<T, B, I>(registry) { registeredEntries[it]!!.flowingRegistry!! }
+
 
         /**
          * Retrieves a [FluidType] by its index.
@@ -166,34 +163,9 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): FluidType? = registeredEntries[idx]?.registry?.get()
 
-        /**
-         * Adds the index suppliers to the pending list for this template and also for the associated flowing fluid template.
-         * The invocation of suppliers and the actual registration will occur in register().
-         *
-         * @param idxs A vararg of suppliers for the indices.
-         */
-        override fun addEntry(vararg idxs: () -> T) {
-            pendingEntrySuppliers.addAll(idxs)
-            // Also pass the suppliers to the nested flowingFluid template
-            flowingFluid.addEntry(*idxs)
-        }
 
-        /**
-         * Performs the registration of fluid types.
-         * Invokes all index suppliers added via addEntry for this template,
-         * registers them, and then triggers the registration for the associated flowing fluids.
-         */
         override fun register() {
-            // First, process and register the entries for this FluidTypeTemplate
-            pendingEntrySuppliers.forEach { supplier ->
-                val idx = supplier() // HERE is where the supplier is invoked for FluidTypeTemplate
-                registeredEntries[idx] = builder(idx)
-            }
-            pendingEntrySuppliers.clear() // Clear pending suppliers after processing
-
-            // After this template's entries are registered, trigger the registration for flowingFluid.
-            // At this point, 'registeredEntries[idx]' will contain the necessary FluidTypeRegistry
-            // for the flowingFluid's builder to work.
+            registry.all.forEach { registeredEntries[it] = builder(it) }
             flowingFluid.register()
         }
     }
@@ -204,8 +176,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [FluidTypeRegistry].
      * @return A new [FluidTypeTemplate] instance.
      */
-    fun <T> fluidTypeTemplate(builder: (T) -> FluidTypeRegistry) =
-        FluidTypeTemplate<T, LiquidBlock, BucketItem>(builder)
+    fun <T> fluidTypeTemplate(registry: EarlyRegistry<T>,builder: (T) -> FluidTypeRegistry) =
+        FluidTypeTemplate<T, LiquidBlock, BucketItem>(registry, builder)
 
     /**
      * Creates a [FluidTypeTemplate] for fluid types with a specific liquid block type.
@@ -214,8 +186,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [FluidTypeRegistry].
      * @return A new [FluidTypeTemplate] instance.
      */
-    fun <T, B: LiquidBlock> fluidTypeTemplateWithLiquidBlock(builder: (T) -> FluidTypeRegistry) =
-        FluidTypeTemplate<T, B, BucketItem>(builder)
+    fun <T, B: LiquidBlock> fluidTypeTemplateWithLiquidBlock(registry: EarlyRegistry<T>, builder: (T) -> FluidTypeRegistry) =
+        FluidTypeTemplate<T, B, BucketItem>(registry, builder)
 
     /**
      * Creates a [FluidTypeTemplate] for fluid types with a specific bucket item type.
@@ -224,8 +196,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [FluidTypeRegistry].
      * @return A new [FluidTypeTemplate] instance.
      */
-    fun <T, I: BucketItem> fluidTypeTemplateWithBucketItem(builder: (T) -> FluidTypeRegistry) =
-        FluidTypeTemplate<T, LiquidBlock, I>(builder)
+    fun <T, I: BucketItem> fluidTypeTemplateWithBucketItem(registry: EarlyRegistry<T>, builder: (T) -> FluidTypeRegistry) =
+        FluidTypeTemplate<T, LiquidBlock, I>(registry, builder)
 
     /**
      * Creates a [FluidTypeTemplate] for fluid types with both a specific liquid block type and a specific bucket item type.
@@ -235,8 +207,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [FluidTypeRegistry].
      * @return A new [FluidTypeTemplate] instance.
      */
-    fun <T, B: LiquidBlock, I: BucketItem> fluidTypeTemplateFull(builder: (T) -> FluidTypeRegistry) =
-        FluidTypeTemplate<T, B, I>(builder)
+    fun <T, B: LiquidBlock, I: BucketItem> fluidTypeTemplateFull(registry: EarlyRegistry<T>, builder: (T) -> FluidTypeRegistry) =
+        FluidTypeTemplate<T, B, I>(registry, builder)
 
     /**
      * Registers the [DeferredRegister]s with the provided [IEventBus].

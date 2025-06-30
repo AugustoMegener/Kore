@@ -1,5 +1,6 @@
 package io.kito.kore_tests.common.registry
 
+import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister
 import io.kito.kore.util.minecraft.EN_US
@@ -11,6 +12,7 @@ import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.DataGenerator.state
 import io.kito.kore_tests.ID
+import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.world.level.block.CustomBlock
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
 import net.minecraft.world.level.block.Block
@@ -64,7 +66,8 @@ object Blocks : BlockRegister(ID) {
      * - `props`: Sets common block properties.
      * - `defaultItem`: Configures the item model to reference the base "block" model.
      */
-    val blockTemplate = blockTemplate { i: String ->
+    @RegisterTemplate
+    val blockTemplate = blockTemplate(stringRegistry) { i: String ->
         "${i}_block" of ::Block where {
             named(EN_US to "${i.toTitle()} Block",
                   PT_BR to "Bloco ${i.toTitle()}")

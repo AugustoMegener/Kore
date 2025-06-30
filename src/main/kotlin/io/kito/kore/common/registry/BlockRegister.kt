@@ -18,6 +18,7 @@ import kotlin.reflect.jvm.isAccessible
 import net.minecraft.world.item.Item.Properties as ItemProp
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties as BlockProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
+import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import net.minecraft.core.BlockPos
@@ -259,8 +260,8 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [BlockRegistry].
      * @return A new [BlockTemplate] instance.
      */
-    fun <T, B : Block> blockTemplate(builder: (T) -> BlockRegistry<B>) =
-        BlockTemplate<T, B, BlockItem, Nothing>(builder)
+    fun <T, B : Block> blockTemplate(registry: EarlyRegistry<T>, builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, BlockItem, Nothing>(registry, builder)
 
     /**
      * Creates a [BlockTemplate] for blocks with a specific item type but no block entity type.
@@ -270,8 +271,8 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [BlockRegistry].
      * @return A new [BlockTemplate] instance.
      */
-    fun <T, B : Block, I : BlockItem> blockTemplateWithItem(builder: (T) -> BlockRegistry<B>) =
-        BlockTemplate<T, B, I, Nothing>(builder)
+    fun <T, B : Block, I : BlockItem> blockTemplateWithItem(registry: EarlyRegistry<T>, builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, I, Nothing>(registry, builder)
 
     /**
      * Creates a [BlockTemplate] for blocks with a specific block entity type but no specific item type.
@@ -281,8 +282,9 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [BlockRegistry].
      * @return A new [BlockTemplate] instance.
      */
-    fun <T, B : Block, E : BlockEntity> blockTemplateWithEntity(builder: (T) -> BlockRegistry<B>) =
-        BlockTemplate<T, B, BlockItem, E>(builder)
+    fun <T, B : Block, E : BlockEntity> blockTemplateWithEntity(registry: EarlyRegistry<T>,
+                                                                builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, BlockItem, E>(registry, builder)
 
     /**
      * Creates a [BlockTemplate] for blocks with both a specific item type and a specific block entity type.
@@ -293,8 +295,9 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @param builder A lambda that takes an index of type [T] and returns a [BlockRegistry].
      * @return A new [BlockTemplate] instance.
      */
-    fun <T, B : Block, I : BlockItem, E : BlockEntity> blockTemplateFull(builder: (T) -> BlockRegistry<B>) =
-        BlockTemplate<T, B, I, E>(builder)
+    fun <T, B : Block, I : BlockItem, E : BlockEntity> blockTemplateFull(registry: EarlyRegistry<T>,
+                                                                         builder: (T) -> BlockRegistry<B>) =
+        BlockTemplate<T, B, I, E>(registry, builder)
 
     /**
      * A template class for registering multiple blocks based on an index.
@@ -305,17 +308,12 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @param I The type of the [BlockItem]s associated with the blocks in this template.
      * @param E The type of the [BlockEntity]s associated with the blocks in this template.
      */
-    class BlockTemplate<T, B : Block, I : BlockItem, E : BlockEntity>(val builder: (T) -> BlockRegistry<B>) :
-        Template<T, B>
+    class BlockTemplate<T, B : Block, I : BlockItem, E : BlockEntity>(override val registry: EarlyRegistry<T>,
+                                                                      val builder: (T) -> BlockRegistry<B>)
+        : Template<T, B>
     {
         // This map will store the *actually* registered items, after the call to register()
         private val registeredEntries = hashMapOf<T, BlockRegistry<B>>()
-
-        // This list will store the index suppliers passed to addEntry
-        private val pendingEntrySuppliers = mutableListOf<() -> T>()
-
-        // allIdxs should reflect the indices of items that have been effectively registered
-        override val allIdxs by lazy { registeredEntries.keys }
 
         /**
          * An [Indexable] property to access the [BlockItem]s by their index.
@@ -333,14 +331,6 @@ open class BlockRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): B? = registeredEntries[idx]?.blockRegistry?.get()
 
-        /**
-         * Adds the index suppliers to the pending list.
-         * The invocation of suppliers and the actual registration will occur in register().
-         * @param idxs A vararg of suppliers for the indices.
-         */
-        override fun addEntry(vararg idxs: () -> T) {
-            pendingEntrySuppliers.addAll(idxs)
-        }
 
         /**
          * Performs the registration of items.
@@ -348,11 +338,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
          * and registers them in the entries map.
          */
         override fun register() {
-            pendingEntrySuppliers.forEach { supplier ->
-                val idx = supplier() // HERE is where the supplier is invoked!
-                registeredEntries[idx] = builder(idx)
-            }
-            pendingEntrySuppliers.clear() // Clears the list of pending suppliers after registration
+            registry.all.forEach { registeredEntries[it] = builder(it) }
         }
     }
 
