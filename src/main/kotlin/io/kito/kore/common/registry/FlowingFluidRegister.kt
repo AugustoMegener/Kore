@@ -6,6 +6,7 @@ import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeRegistry
 import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeTemplate
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.common.registry.early.EarlyRegistry
+import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.UNCHECKED_CAST
@@ -13,6 +14,7 @@ import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.FlowingFluidProp
 import io.kito.kore.util.minecraft.ItemProp
 import net.minecraft.core.registries.BuiltInRegistries.FLUID
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.BucketItem
 import net.minecraft.world.item.Items.BUCKET
@@ -285,13 +287,20 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): FlowingFluidRegistry? = registeredEntries[idx]
 
-        /**
-         * Performs the registration of flowing fluids.
-         * Invokes all index suppliers added via addEntry
-         * and registers them in the entries map.
-         */
+        override val indexesIds = arrayListOf<ResourceLocation>()
+        val groups = arrayListOf<EarlyRegistryGoup>()
+
+        override fun putAllIndexes() { indexesIds += registry.idxs }
+
+        override fun putIndex(id: ResourceLocation) { indexesIds += id }
+
+        override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+
         override fun register() {
-            registry.all.forEach { registeredEntries[it] = builder(it) }
+            indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }
+            indexesIds.distinct().let { indexesIds.clear(); indexesIds += it }
+
+            indexes.forEach { registeredEntries[it] = builder(it) }
         }
     }
 

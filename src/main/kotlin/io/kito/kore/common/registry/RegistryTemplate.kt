@@ -1,7 +1,9 @@
 package io.kito.kore.common.registry
 
 import io.kito.kore.common.registry.early.EarlyRegistry
+import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
+import net.minecraft.resources.ResourceLocation
 import net.neoforged.neoforge.registries.DeferredHolder
 
 /**
@@ -17,13 +19,20 @@ class RegistryTemplate<I, T>(override val registry: EarlyRegistry<I>,val builder
 {
     private val registeredEntries = hashMapOf<I, DeferredHolder<*, T>>()
 
-    /**
-     * Performs the registration of items.
-     * Invokes all index suppliers added via addEntry
-     * and registers them in the entries map.
-     */
+    override val indexesIds = arrayListOf<ResourceLocation>()
+    val groups = arrayListOf<EarlyRegistryGoup>()
+
+    override fun putAllIndexes() { indexesIds += registry.idxs }
+
+    override fun putIndex(id: ResourceLocation) { indexesIds += id }
+
+    override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+
     override fun register() {
-        registry.all.forEach { registeredEntries[it] = builder(it) }
+        indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }
+        indexesIds.distinct().let { indexesIds.clear(); indexesIds += it }
+
+        indexes.forEach { registeredEntries[it] = builder(it) }
     }
 
     override fun get(idx: I) = registeredEntries[idx]?.get()

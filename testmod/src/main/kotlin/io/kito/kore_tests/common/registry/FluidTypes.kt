@@ -4,6 +4,7 @@ import io.kito.kore.client.renderer.ext.KSimpleClientFluidTypeExt.Companion.clie
 import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.FluidTypeRegister
+import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.minecraft.ResourceLocationExt.block
@@ -16,6 +17,7 @@ import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
+import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import net.minecraft.world.item.Items.BUCKET
 import net.neoforged.neoforge.fluids.FluidType
 
@@ -101,6 +103,5 @@ object FluidTypes : FluidTypeRegister(ID) {
                 flowingTexturePath = loc("water_flow").block
             }
         }
-    }
-}
+    }.include(myGroup)}
 

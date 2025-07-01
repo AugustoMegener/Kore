@@ -4,6 +4,7 @@ import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.ItemRegister
 import io.kito.kore.common.registry.RegistryTemplate
+import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.minecraft.ResourceLocationExt.item
@@ -15,6 +16,7 @@ import io.kito.kore_tests.DataGenerator.recipe
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
+import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items.STICK
@@ -50,7 +52,7 @@ object Items : ItemRegister(ID) {
                     .texture("layer0", local("item/item"))
             }
         }
-    }
+    }.include(myGroup)
 
     val exampleItem: Item by "example_item" of ::Item where {
         recipe(local("gro")) {

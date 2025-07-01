@@ -19,9 +19,11 @@ import net.minecraft.world.item.Item.Properties as ItemProp
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties as BlockProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
 import io.kito.kore.common.registry.early.EarlyRegistry
+import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.neoforge.capabilities.BlockCapability
@@ -331,14 +333,20 @@ open class BlockRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): B? = registeredEntries[idx]?.blockRegistry?.get()
 
+        override val indexesIds = arrayListOf<ResourceLocation>()
+        val groups = arrayListOf<EarlyRegistryGoup>()
 
-        /**
-         * Performs the registration of items.
-         * Invokes all index suppliers added via addEntry
-         * and registers them in the entries map.
-         */
+        override fun putAllIndexes() { indexesIds += registry.idxs }
+
+        override fun putIndex(id: ResourceLocation) { indexesIds += id }
+
+        override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+
         override fun register() {
-            registry.all.forEach { registeredEntries[it] = builder(it) }
+            indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }
+            indexesIds.distinct().let { indexesIds.clear(); indexesIds += it }
+
+            indexes.forEach { registeredEntries[it] = builder(it) }
         }
     }
 

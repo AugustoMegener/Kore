@@ -6,6 +6,7 @@ import io.kito.kore.common.capabilities.EntityCapRegister.EntityCapRegistry
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.early.EarlyRegistry
+import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.ItemProp
@@ -14,6 +15,7 @@ import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EntityType.Builder.of as etBulderOf
@@ -355,14 +357,20 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
          */
         override fun get(idx: T): EntityType<E>? = registeredEntries[idx]?.entityRegistry?.get()
 
+        override val indexesIds = arrayListOf<ResourceLocation>()
+        val groups = arrayListOf<EarlyRegistryGoup>()
 
-        /**
-         * Performs the registration of entity types.
-         * Invokes all index suppliers added via addEntry
-         * and registers them in the entries map.
-         */
+        override fun putAllIndexes() { indexesIds += registry.idxs }
+
+        override fun putIndex(id: ResourceLocation) { indexesIds += id }
+
+        override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+
         override fun register() {
-            registry.all.forEach { registeredEntries[it] = builder(it) }
+            indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }
+            indexesIds.distinct().let { indexesIds.clear(); indexesIds += it }
+
+            indexes.forEach { registeredEntries[it] = builder(it) }
         }
     }
 

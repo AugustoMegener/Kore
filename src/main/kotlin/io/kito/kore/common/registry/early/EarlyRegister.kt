@@ -21,5 +21,9 @@ abstract class EarlyRegister<T>(val id: String, val registry: EarlyRegistry<T>) 
         val supplier = { registry[location] as E }
 
         operator fun getValue(obj: Any?, prop: KProperty<*>) = supplier()
+
+        infix fun onGroup(group: EarlyRegistryGoup) = also { registry.groupEntries += location to group }
+        infix fun onGroups(groups: Array<EarlyRegistryGoup>) =
+            also { groups.forEach { registry.groupEntries += location to it }  }
     }
 }

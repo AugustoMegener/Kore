@@ -3,6 +3,7 @@ package io.kito.kore_tests.common.registry
 import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister
+import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.neoforge.Capability.blockItemHandler
@@ -13,6 +14,7 @@ import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.DataGenerator.state
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
+import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import io.kito.kore_tests.common.world.level.block.CustomBlock
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
 import net.minecraft.world.level.block.Block
@@ -82,7 +84,7 @@ object Blocks : BlockRegister(ID) {
                 }
             }
         }
-    }
+    }.include(myGroup)
 
     /**
      * Lazily initialized property to get the `blockItem` associated with the `block`.
