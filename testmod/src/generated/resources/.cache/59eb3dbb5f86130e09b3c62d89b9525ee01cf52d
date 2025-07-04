@@ -1,0 +1,5 @@
+// 1.21.1	2025-07-04T13:59:52.4937163	Loot Tables
+1fa55fb57a84832b7475fa671a04ad40acdfd88d data/kore_tests/loot_table/blocks/cute_block.json
+3aa9d5bfa93b7a669abe9d8a55653ad4953de96e data/kore_tests/loot_table/blocks/fool_block.json
+b9a026294c846568bacb30f44953a750b5df18fb data/kore_tests/loot_table/blocks/nice_block.json
+e864b98c571da98046eb8289fb067cf4f054bf46 data/kore_tests/loot_table/blocks/weird_block.json
