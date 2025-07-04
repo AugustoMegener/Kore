@@ -14,11 +14,18 @@ import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.DataGenerator.state
 import io.kito.kore_tests.ID
+import io.kito.kore_tests.common.registry.Items.itemTemplate
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import io.kito.kore_tests.common.world.level.block.CustomBlock
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
+import net.minecraft.data.loot.BlockLootSubProvider
+import net.minecraft.world.flag.FeatureFlagSet
+import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.storage.loot.LootTable
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.NumberProvider
 import net.neoforged.neoforge.client.model.generators.ModelFile
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
@@ -85,8 +92,14 @@ object Blocks : BlockRegister(ID) {
                 }
             }
 
-            blockLootTable { _, block ->
-                this.
+            blockLootTable { lookup, block ->
+                object : BlockLootSubProvider(setOf(), FeatureFlags.REGISTRY.allFlags(), lookup) {
+                    override fun generate() {
+                        add(block, createSingleItemTable(itemTemplate[i]!!, ConstantValue(9f)))
+                    }
+
+                    override fun getKnownBlocks() = mutableListOf(block)
+                }
             }
         }
     }.include(myGroup)

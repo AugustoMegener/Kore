@@ -1,5 +1,6 @@
 package io.kito.kore.common.datagen
 
+import io.kito.kore.Kore.ID
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister.BlockBuilder
@@ -8,6 +9,8 @@ import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.ResourceLocationExt.item
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
+import io.kito.kore.util.minecraft.ResourceLocationExt.png
+import io.kito.kore.util.minecraft.ResourceLocationExt.texture
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.BuiltInRegistries.*
@@ -22,6 +25,7 @@ import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.PackType
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.flag.FeatureFlagSet
@@ -37,6 +41,7 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider
+import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
 import net.neoforged.neoforge.common.conditions.ICondition
 import net.neoforged.neoforge.common.data.LanguageProvider
 import net.neoforged.neoforge.data.event.GatherDataEvent
@@ -139,6 +144,16 @@ abstract class DataGenHelper(private val modId: String) {
      * This uses [ItemModelProvider.basicItem].
      */
     fun ItemBuilder<*>.defaultModel() { model { loc, _ -> basicItem(loc) } }
+
+    fun ItemBuilder<*>.optionalDefaultModel() {
+        model { loc, _ ->
+            if (existingFileHelper.exists(loc.item.texture.png, PackType.CLIENT_RESOURCES)) basicItem(loc)
+            else getBuilder(loc.toString())
+                .parent(UncheckedModelFile("item/generated"))
+                .texture("layer0", loc(ID, "placeholder").item)
+        }
+    }
+
     /**
      * Extension function for [ItemBuilder] to define a simple block item model.
      * This uses [ItemModelProvider.simpleBlockItem].
@@ -235,94 +250,74 @@ abstract class DataGenHelper(private val modId: String) {
     { recipeBuilders += { accept(loc, builder(it, ITEM[itemId] as I), advancement, *conditions) } }
 
 
-    fun blockLootTable(block: BlockLootSubProvider.(HolderLookup.Provider) -> Unit) {
-        lootTableSubProviders +=
-            { it: HolderLookup.Provider ->  KBlockLootTableSubProvider(it, block) } to LootContextParamSets.BLOCK
+    fun blockLootTable(block: (HolderLookup.Provider) -> BlockLootSubProvider) {
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to LootContextParamSets.BLOCK
     }
 
     @Suppress(UNCHECKED_CAST)
-    fun <T : Block> BlockBuilder<T>.blockLootTable(block: BlockLootSubProvider.(HolderLookup.Provider, T) -> Unit) {
-        lootTableSubProviders += { it: HolderLookup.Provider ->
-            KBlockLootTableSubProvider(it, { p -> block(p, BLOCK[blockId] as T) })
-        } to LootContextParamSets.BLOCK
+    fun <T : Block> BlockBuilder<T>.blockLootTable(block: (HolderLookup.Provider, T) -> BlockLootSubProvider) {
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it, BLOCK[blockId] as T) } to
+                LootContextParamSets.BLOCK
     }
 
-    fun blockLootTable(block: BlockLootSubProvider.(HolderLookup.Provider) -> Unit,
-                       items: Set<Item> = setOf(),
-                       featureFlags: FeatureFlagSet = FeatureFlags.REGISTRY.allFlags(),
-                       builders: Map<ResourceKey<LootTable>, LootTable.Builder> = mapOf(),
+    fun blockLootTable(block: (HolderLookup.Provider) -> BlockLootSubProvider,
                        requiredTables: Set<ResourceKey<LootTable>>)
     {
-        lootTableSubProviders +=
-            { it: HolderLookup.Provider ->  KBlockLootTableSubProvider(it, block, items, featureFlags, builders) } to
-                    LootContextParamSets.BLOCK
+        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to LootContextParamSets.BLOCK
         requiredLootTables += requiredTables
     }
 
     @Suppress(UNCHECKED_CAST)
-    fun <T : Block> BlockBuilder<T>.blockLootTable(block: BlockLootSubProvider.(HolderLookup.Provider, T) -> Unit,
-                                                   items: Set<Item> = setOf(),
-                                                   featureFlags: FeatureFlagSet = FeatureFlags.REGISTRY.allFlags(),
-                                                   builders: Map<ResourceKey<LootTable>, LootTable.Builder> = mapOf(),
+    fun <T : Block> BlockBuilder<T>.blockLootTable(block: (HolderLookup.Provider, T) -> BlockLootSubProvider,
                                                    requiredTables: Set<ResourceKey<LootTable>>)
     {
-        lootTableSubProviders += { it: HolderLookup.Provider ->
-            KBlockLootTableSubProvider(it, { p -> block(p, BLOCK[blockId] as T) }, items, featureFlags, builders)
-        } to LootContextParamSets.BLOCK
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it, BLOCK[blockId] as T) } to
+                LootContextParamSets.BLOCK
 
         requiredLootTables += requiredTables
     }
 
-    fun entityLootTable(block: EntityLootSubProvider.(HolderLookup.Provider) -> Unit) {
-        lootTableSubProviders += { it: HolderLookup.Provider ->  KEntityLootTableSubProvider(it, block) } to
-                LootContextParamSets.ENTITY
+    fun entityLootTable(block: (HolderLookup.Provider) -> EntityLootSubProvider) {
+        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to LootContextParamSets.ENTITY
     }
 
     @Suppress(UNCHECKED_CAST)
     fun <T : Entity> EntityTypeBuilder<T>.entityLootTable(
-        block: EntityLootSubProvider.(HolderLookup.Provider, EntityType<T>) -> Unit
+        block: (HolderLookup.Provider, EntityType<T>) -> EntityLootSubProvider
     ) {
         lootTableSubProviders += { it: HolderLookup.Provider ->
-            KEntityLootTableSubProvider(it, { p -> block(p, ENTITY_TYPE[entityTypeId] as EntityType<T>) })
+            block(it, ENTITY_TYPE[entityTypeId] as EntityType<T>)
         } to LootContextParamSets.ENTITY
     }
 
-    fun entityLootTable(block: EntityLootSubProvider.(HolderLookup.Provider) -> Unit,
-                        allowed: FeatureFlagSet = FeatureFlags.REGISTRY.allFlags(),
-                        required: FeatureFlagSet = FeatureFlagSet.of(),
+    fun entityLootTable(block: (HolderLookup.Provider) -> EntityLootSubProvider,
                         requiredTables: Set<ResourceKey<LootTable>>)
     {
-        lootTableSubProviders +=
-            { it: HolderLookup.Provider -> KEntityLootTableSubProvider(it, block, allowed, required) } to
-                    LootContextParamSets.ENTITY
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to LootContextParamSets.ENTITY
         requiredLootTables += requiredTables
     }
 
     @Suppress(UNCHECKED_CAST)
     fun <T : Entity> EntityTypeBuilder<T>.entityLootTable(
-        block: EntityLootSubProvider.(HolderLookup.Provider, EntityType<T>) -> Unit,
-        allowed: FeatureFlagSet = FeatureFlags.REGISTRY.allFlags(),
-        required: FeatureFlagSet = FeatureFlagSet.of(),
+        block: (HolderLookup.Provider, EntityType<T>) -> EntityLootSubProvider,
         requiredTables: Set<ResourceKey<LootTable>>
     ) {
         lootTableSubProviders += { it: HolderLookup.Provider ->
-            KEntityLootTableSubProvider(
-                it, { p -> block(p, ENTITY_TYPE[entityTypeId] as EntityType<T>) }, allowed, required
-            )
+            block(it, ENTITY_TYPE[entityTypeId] as EntityType<T>)
         } to LootContextParamSets.ENTITY
 
         requiredLootTables += requiredTables
     }
 
     fun lootTable(ctx: LootContextParamSet,
-                  block: (BiConsumer<ResourceKey<LootTable>, LootTable.Builder>, HolderLookup.Provider) -> Unit)
-    { lootTableSubProviders += { it: HolderLookup.Provider -> KLootTableSubProvider { c -> block(c, it) } } to ctx }
+                  block: (HolderLookup.Provider) -> LootTableSubProvider)
+    { lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to ctx }
 
     fun lootTable(ctx: LootContextParamSet,
                   requiredTables: Set<ResourceKey<LootTable>>,
-                  block: (BiConsumer<ResourceKey<LootTable>, LootTable.Builder>, HolderLookup.Provider) -> Unit)
+                  block: (HolderLookup.Provider) -> LootTableSubProvider)
     {
-        lootTableSubProviders += { it: HolderLookup.Provider -> KLootTableSubProvider { c -> block(c, it) } } to ctx
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to ctx
         requiredLootTables += requiredTables
     }
 
@@ -359,12 +354,12 @@ abstract class DataGenHelper(private val modId: String) {
         }
 
         // Add DynamicRecipeProvider for recipes.
-        generator.addProvider(event.includeClient(),
+        generator.addProvider(event.includeServer(),
             DynamicRecipeProvider(generator.packOutput, event.lookupProvider, recipeBuilders))
 
 
 
-        generator.addProvider(event.includeClient(),
+        generator.addProvider(event.includeServer(),
             LootTableProvider(
                 generator.packOutput,
                 requiredLootTables,

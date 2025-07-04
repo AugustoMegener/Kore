@@ -55,13 +55,13 @@ object Items : ItemRegister(ID) {
     }.include(myGroup)
 
     val exampleItem: Item by "example_item" of ::Item where {
-        recipe(local("gro")) {
+        recipe(local("gro")) { _, item ->
             ShapedRecipe(ID, CraftingBookCategory.MISC,
                 shaped("###",
                     "###",
                     "###")
                     .by('#' to Ingredient.of(STICK)),
-                exampleItem.defaultInstance
+                item.defaultInstance
             )
         }
     }
