@@ -22,6 +22,7 @@ import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.Level
@@ -140,6 +141,8 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      */
     inner class BlockBuilder<B : Block>(val blockName: String, private val supplier: (BlockProp) -> B)
     {
+
+        val blockId = loc(id, blockName)
 
         private var blockItemSupplier : (B, ItemProp) -> BlockItem = ::BlockItem
         private var blockItemBuilder  : ItemRegister.ItemBuilder<out BlockItem>.() -> Unit = {}

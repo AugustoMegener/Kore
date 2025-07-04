@@ -8,6 +8,7 @@ import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.neoforge.Capability.blockItemHandler
 import io.kito.kore.util.toTitle
+import io.kito.kore_tests.DataGenerator.blockLootTable
 import io.kito.kore_tests.DataGenerator.blockModel
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
@@ -82,6 +83,10 @@ object Blocks : BlockRegister(ID) {
                 model { l, _ ->
                     getBuilder(l.toString()).parent(ModelFile.UncheckedModelFile("kore_tests:block/block"))
                 }
+            }
+
+            blockLootTable { _, block ->
+                this.
             }
         }
     }.include(myGroup)

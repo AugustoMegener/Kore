@@ -115,6 +115,8 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
                                                    val supplier: EntityFactory<T>,
                                                    val category: MobCategory)
     {
+        val entityTypeId = loc(id, name)
+
         var etBuilder: EntityType.Builder<T>.() -> Unit = {}
 
         val entityCaps = EntityCaps()
