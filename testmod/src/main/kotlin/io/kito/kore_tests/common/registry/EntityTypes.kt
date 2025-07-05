@@ -77,19 +77,6 @@ object EntityTypes : EntityTypeRegister(ID) {
             knockbackResistance =  0.0
             explosionKnockbackResistance = 0.0
         }
-
-        entityLootTable { lookup, eType ->
-            object : EntityLootSubProvider(FeatureFlags.REGISTRY.allFlags(), lookup) {
-                override fun generate() {
-                    add(eType, lootTable().pool {
-                        setRolls(exactly(1.0f))
-                        add(lootTableItem(myMobSpawnEgg).apply(setCount(ConstantValue(1f))))
-                    })
-                }
-
-                override fun getKnownEntityTypes(): Stream<EntityType<*>> = Stream.of(eType)
-            }
-        }
     }
 
     /**

@@ -13,7 +13,10 @@ import io.kito.kore.util.minecraft.ResourceLocationExt.png
 import io.kito.kore.util.minecraft.ResourceLocationExt.texture
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.Registry
+import net.minecraft.core.RegistrySetBuilder
 import net.minecraft.core.registries.BuiltInRegistries.*
+import net.minecraft.core.registries.Registries.CONFIGURED_FEATURE
 import net.minecraft.data.DataProvider
 import net.minecraft.data.PackOutput
 import net.minecraft.data.loot.BlockLootSubProvider
@@ -22,10 +25,13 @@ import net.minecraft.data.loot.LootTableProvider
 import net.minecraft.data.loot.LootTableProvider.SubProviderEntry
 import net.minecraft.data.loot.LootTableSubProvider
 import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.features.FeatureUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
+import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.flag.FeatureFlagSet
@@ -34,15 +40,22 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
+import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.neoforged.api.distmarker.Dist
+import net.neoforged.fml.LogicalSide
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider
 import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
 import net.neoforged.neoforge.common.conditions.ICondition
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider
 import net.neoforged.neoforge.common.data.LanguageProvider
 import net.neoforged.neoforge.data.event.GatherDataEvent
 import net.neoforged.neoforgespi.language.IModInfo
@@ -89,6 +102,12 @@ abstract class DataGenHelper(private val modId: String) {
         arrayListOf<Pair<(HolderLookup.Provider) -> LootTableSubProvider, LootContextParamSet>>()
 
     private var requiredLootTables = setOf<ResourceKey<LootTable>>()
+
+    private val builtInProviders =
+        hashMapOf<LogicalSide, ArrayList<Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>>>(
+            LogicalSide.CLIENT to arrayListOf(),
+            LogicalSide.SERVER to arrayListOf()
+        )
 
     /**
      * A list of custom data providers to be registered, along with their distribution target (client or server).
@@ -321,6 +340,109 @@ abstract class DataGenHelper(private val modId: String) {
         requiredLootTables += requiredTables
     }
 
+    @Suppress(UNCHECKED_CAST)
+    fun <T> ResourceKey<out Registry<T>>.provider(side: LogicalSide, bootstrap: (BootstrapContext<T>) -> Unit) {
+        builtInProviders[side]!! +=
+            ((this to bootstrap) as Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>)
+    }
+
+    fun BlockBuilder<*>.oreConfiguration(id: ResourceLocation, rule: RuleTest, size: Int) :
+            ResourceKey<ConfiguredFeature<*, *>>
+    {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(rule, BLOCK[blockId].defaultBlockState(), size)
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.oreConfiguration(rule: RuleTest, size: Int): ResourceKey<ConfiguredFeature<*, *>> {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, blockId)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(rule, BLOCK[blockId].defaultBlockState(), size)
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.stoneOreConfiguration(id: ResourceLocation, size: Int): ResourceKey<ConfiguredFeature<*, *>> {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(
+                    TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES),
+                    BLOCK[blockId].defaultBlockState(),
+                    size
+                )
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.deepslateOreConfiguration(id: ResourceLocation, size: Int): ResourceKey<ConfiguredFeature<*, *>>
+    {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(
+                    TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES),
+                    BLOCK[blockId].defaultBlockState(),
+                    size
+                )
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.stoneOreConfiguration(size: Int): ResourceKey<ConfiguredFeature<*, *>> {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, blockId)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(
+                    TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES),
+                    BLOCK[blockId].defaultBlockState(),
+                    size
+                )
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.deepslateOreConfiguration(size: Int): ResourceKey<ConfiguredFeature<*, *>> {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, blockId)
+
+        CONFIGURED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(
+                    TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES),
+                    BLOCK[blockId].defaultBlockState(),
+                    size
+                )
+            )
+        }
+
+        return key
+    }
+
     /**
      * Registers all collected data providers with the [GatherDataEvent].
      * This method is typically called by NeoForge during the data generation phase.
@@ -365,6 +487,26 @@ abstract class DataGenHelper(private val modId: String) {
                 requiredLootTables,
                 lootTableSubProviders.map { (s, ctx) -> SubProviderEntry(s, ctx) },
                 event.lookupProvider
+            )
+        )
+
+        generator.addProvider(
+            event.includeClient(),
+            DatapackBuiltinEntriesProvider(
+                generator.packOutput,
+                event.lookupProvider,
+                RegistrySetBuilder().apply { builtInProviders[LogicalSide.CLIENT]!!.forEach { (k, s) -> add(k, s) } },
+                mutableSetOf(modId)
+            )
+        )
+
+        generator.addProvider(
+            event.includeServer(),
+            DatapackBuiltinEntriesProvider(
+                generator.packOutput,
+                event.lookupProvider,
+                RegistrySetBuilder().apply { builtInProviders[LogicalSide.SERVER]!!.forEach { (k, s) -> add(k, s) } },
+                mutableSetOf(modId)
             )
         )
 
