@@ -3,8 +3,8 @@ package io.kito.kore_tests.common.registry
 import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister
+import io.kito.kore.common.template.TagTemplate
 import io.kito.kore.common.template.Template.Companion.include
-import io.kito.kore.common.world.TagBiomeModifier
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.minecraft.PlacedFeatureExt.commonOrePlacement
@@ -15,42 +15,28 @@ import io.kito.kore_tests.DataGenerator.blockModel
 import io.kito.kore_tests.DataGenerator.defaultState
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
-import io.kito.kore_tests.DataGenerator.oreConfiguration
-import io.kito.kore_tests.DataGenerator.provider
+import io.kito.kore_tests.DataGenerator.overworldOreTagBiomeModifier
+import io.kito.kore_tests.DataGenerator.placedFeature
 import io.kito.kore_tests.DataGenerator.state
 import io.kito.kore_tests.DataGenerator.stoneOreConfiguration
+import io.kito.kore_tests.DataGenerator.tags
 import io.kito.kore_tests.ID
+import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.Items.itemTemplate
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import io.kito.kore_tests.common.world.level.block.CustomBlock
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
-import net.minecraft.core.HolderSet
-import net.minecraft.core.registries.BuiltInRegistries.BLOCK
-import net.minecraft.core.registries.Registries.CONFIGURED_FEATURE
-import net.minecraft.core.registries.Registries.PLACED_FEATURE
+import net.minecraft.core.registries.Registries.BLOCK
 import net.minecraft.data.loot.BlockLootSubProvider
-import net.minecraft.data.worldgen.features.FeatureUtils
-import net.minecraft.data.worldgen.placement.PlacementUtils
-import net.minecraft.resources.ResourceKey
-import net.minecraft.tags.BlockTags
-import net.minecraft.world.flag.FeatureFlagSet
+import net.minecraft.tags.TagKey
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.levelgen.VerticalAnchor
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
-import net.minecraft.world.level.storage.loot.LootTable
+import net.minecraft.world.level.levelgen.VerticalAnchor.absolute
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement.triangle
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider
-import net.neoforged.fml.LogicalSide
 import net.neoforged.neoforge.client.model.generators.ModelFile
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
-import net.minecraft.world.level.levelgen.feature.Feature
-import net.minecraft.world.level.levelgen.placement.HeightRangePlacement.triangle
-import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest
-import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS
-import net.neoforged.neoforge.common.Tags.Biomes.IS_OVERWORLD
-import net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_ORES
 
 /**
  * Registers all custom blocks for the Kore Tests mod.
@@ -59,6 +45,11 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_
  */
 @Scan
 object Blocks : BlockRegister(ID) {
+
+    val myTag = TagKey.create(BLOCK, local("my_tag"))
+
+    @RegisterTemplate
+    val myTagTemplate = TagTemplate(stringRegistry) { TagKey.create(BLOCK, local("$it/my_tag")) }.include(myGroup)
 
     /**
      * Defines a custom block named "block".
@@ -104,29 +95,14 @@ object Blocks : BlockRegister(ID) {
             }
         }
 
-        val oreConfig = stoneOreConfiguration(9)
-
-        val orePlacedFeature = ResourceKey.create(PLACED_FEATURE, blockId)
-
-        PLACED_FEATURE.provider(LogicalSide.SERVER) { ctx ->
-            PlacementUtils.register(
-                ctx,
-                ResourceKey.create(PLACED_FEATURE, blockId),
-                ctx.lookup(CONFIGURED_FEATURE).getOrThrow(oreConfig),
-                commonOrePlacement(2, triangle(VerticalAnchor.absolute(16), VerticalAnchor.absolute(32)))
+        overworldOreTagBiomeModifier(
+            placedFeature(
+                stoneOreConfiguration(9),
+                commonOrePlacement(2, triangle(absolute(16), absolute(32)))
             )
-        }
+        )
 
-        BIOME_MODIFIERS.provider(LogicalSide.SERVER) { ctx ->
-            ctx.register(
-                ResourceKey.create(BIOME_MODIFIERS, blockId),
-                TagBiomeModifier(
-                    IS_OVERWORLD,
-                    HolderSet.direct(ctx.lookup(PLACED_FEATURE).getOrThrow(orePlacedFeature)),
-                    UNDERGROUND_ORES
-                )
-            )
-        }
+        tags(myTag)
     }
 
     /**
@@ -162,6 +138,8 @@ object Blocks : BlockRegister(ID) {
                     override fun getKnownBlocks() = mutableListOf(block)
                 }
             }
+
+            tags({ myTagTemplate[i]!! })
         }
     }.include(myGroup)
 

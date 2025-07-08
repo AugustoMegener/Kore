@@ -22,7 +22,7 @@ open class KRecipeType<T : Recipe<*>>(location: ResourceLocation, clazz: KClass<
 
     private val name = location.path
 
-    val type: RecipeType<T> by lazy { RecipeType.register<T>(name) }
+    val type: RecipeType<T> by lazy { RecipeType.register(name) }
 
     override fun codec() = mapCodec
 
@@ -32,7 +32,7 @@ open class KRecipeType<T : Recipe<*>>(location: ResourceLocation, clazz: KClass<
         if (!this::class.hasAnnotation<RegisterRecipeType>()) return
 
         DeferredRegister.create(RECIPE_TYPE, id).run {
-            register("${name}_type") { -> type }
+            register(name) { -> type }
             register(bus)
         }
         DeferredRegister.create(RECIPE_SERIALIZER, id).run {
