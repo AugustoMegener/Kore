@@ -70,6 +70,7 @@ import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider
 import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
+import net.neoforged.neoforge.client.model.generators.ModelProvider
 import net.neoforged.neoforge.common.Tags.Biomes.IS_OVERWORLD
 import net.neoforged.neoforge.common.conditions.ICondition
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider
@@ -188,10 +189,8 @@ abstract class DataGenHelper(private val modId: String) {
 
     fun ItemBuilder<*>.optionalDefaultModel() {
         model { loc, _ ->
-            if (existingFileHelper.exists(loc.item.texture.png, PackType.CLIENT_RESOURCES)) basicItem(loc)
-            else getBuilder(loc.toString())
-                .parent(UncheckedModelFile("item/generated"))
-                .texture("layer0", loc(ID, "placeholder").item)
+            existingFileHelper.trackGenerated(loc.item, ModelProvider.TEXTURE)
+            basicItem(loc)
         }
     }
 
