@@ -23,7 +23,7 @@ data class NiceRecipe(@Save @Slot(0) val input1: Ingredient,
         @DataGen(DataGenerator::class)
         fun registerRecipes() {
 
-            recipe(local("my_nice_recipe")) {
+            recipe(local("my_recipe")) {
                 NiceRecipe(
                     Ingredient.of(itemTemplate["nice"]),
                     SizedIngredient.of(itemTemplate["weird"]!!, 5),

@@ -5,15 +5,24 @@ import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister.BlockBuilder
 import io.kito.kore.common.registry.EntityTypeRegister.EntityTypeBuilder
+import io.kito.kore.common.registry.FluidTypeRegister
+import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeBuilder
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
+import io.kito.kore.common.world.TagBiomeModifier
 import io.kito.kore.util.UNCHECKED_CAST
+import io.kito.kore.util.minecraft.PlacedFeatureExt.commonOrePlacement
 import io.kito.kore.util.minecraft.ResourceLocationExt.item
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import io.kito.kore.util.minecraft.ResourceLocationExt.png
 import io.kito.kore.util.minecraft.ResourceLocationExt.texture
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.HolderSet
+import net.minecraft.core.Registry
+import net.minecraft.core.RegistrySetBuilder
 import net.minecraft.core.registries.BuiltInRegistries.*
+import net.minecraft.core.registries.Registries.CONFIGURED_FEATURE
+import net.minecraft.core.registries.Registries.PLACED_FEATURE
 import net.minecraft.data.DataProvider
 import net.minecraft.data.PackOutput
 import net.minecraft.data.loot.BlockLootSubProvider
@@ -22,10 +31,15 @@ import net.minecraft.data.loot.LootTableProvider
 import net.minecraft.data.loot.LootTableProvider.SubProviderEntry
 import net.minecraft.data.loot.LootTableSubProvider
 import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.data.worldgen.BootstrapContext
+import net.minecraft.data.worldgen.features.FeatureUtils
+import net.minecraft.data.worldgen.placement.PlacementUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
+import net.minecraft.tags.BlockTags
+import net.minecraft.tags.TagKey
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.flag.FeatureFlagSet
@@ -33,19 +47,41 @@ import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeInput
+import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.levelgen.GenerationStep
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_ORES
+import net.minecraft.world.level.levelgen.VerticalAnchor
+import net.minecraft.world.level.levelgen.VerticalAnchor.absolute
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
+import net.minecraft.world.level.levelgen.feature.Feature
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement.triangle
+import net.minecraft.world.level.levelgen.placement.PlacedFeature
+import net.minecraft.world.level.levelgen.placement.PlacementModifier
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
+import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.neoforged.api.distmarker.Dist
+import net.neoforged.fml.LogicalSide
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider
 import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
+import net.neoforged.neoforge.client.model.generators.ModelProvider
+import net.neoforged.neoforge.common.Tags.Biomes.IS_OVERWORLD
 import net.neoforged.neoforge.common.conditions.ICondition
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider
 import net.neoforged.neoforge.common.data.LanguageProvider
+import net.neoforged.neoforge.common.world.BiomeModifier
 import net.neoforged.neoforge.data.event.GatherDataEvent
+import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS
+import net.neoforged.neoforge.registries.NeoForgeRegistries.FLUID_TYPES
 import net.neoforged.neoforgespi.language.IModInfo
+import org.apache.http.client.entity.EntityBuilder
 import java.util.function.BiConsumer
 import net.minecraft.world.item.CreativeModeTab.Builder as TabBuilder
 
@@ -89,6 +125,13 @@ abstract class DataGenHelper(private val modId: String) {
         arrayListOf<Pair<(HolderLookup.Provider) -> LootTableSubProvider, LootContextParamSet>>()
 
     private var requiredLootTables = setOf<ResourceKey<LootTable>>()
+
+    private val builtInProviders = arrayListOf<Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>>()
+
+    private val featureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceKey<*>, TagKey<*>>>>()
+    private val optionalFeatureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceLocation, TagKey<*>>>>()
+    private val tagTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<TagKey<*>, TagKey<*>>>>()
+    private val optionalTagTagProvider = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceLocation, TagKey<*>>>>()
 
     /**
      * A list of custom data providers to be registered, along with their distribution target (client or server).
@@ -147,10 +190,8 @@ abstract class DataGenHelper(private val modId: String) {
 
     fun ItemBuilder<*>.optionalDefaultModel() {
         model { loc, _ ->
-            if (existingFileHelper.exists(loc.item.texture.png, PackType.CLIENT_RESOURCES)) basicItem(loc)
-            else getBuilder(loc.toString())
-                .parent(UncheckedModelFile("item/generated"))
-                .texture("layer0", loc(ID, "placeholder").item)
+            existingFileHelper.trackGenerated(loc.item, ModelProvider.TEXTURE)
+            basicItem(loc)
         }
     }
 
@@ -321,6 +362,184 @@ abstract class DataGenHelper(private val modId: String) {
         requiredLootTables += requiredTables
     }
 
+    @Suppress(UNCHECKED_CAST)
+    fun <T> ResourceKey<out Registry<T>>.provider(bootstrap: (BootstrapContext<T>) -> Unit) {
+        builtInProviders +=
+            ((this to bootstrap) as Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>)
+    }
+
+    fun oreConfiguration(oreState: BlockState, id: ResourceLocation, rule: RuleTest, size: Int) :
+            ResourceKey<ConfiguredFeature<*, *>>
+    {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(rule, oreState, size)
+            )
+        }
+
+        return key
+    }
+
+
+    fun BlockBuilder<*>.oreConfiguration(id: ResourceLocation, rule: RuleTest, size: Int) :
+            ResourceKey<ConfiguredFeature<*, *>>
+    {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(rule, BLOCK[blockId].defaultBlockState(), size)
+            )
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.oreConfiguration(rule: RuleTest, size: Int): ResourceKey<ConfiguredFeature<*, *>> =
+        oreConfiguration(blockId.withSuffix("_ore_config"), rule, size)
+
+    fun BlockBuilder<*>.stoneOreConfiguration(id: ResourceLocation, size: Int): ResourceKey<ConfiguredFeature<*, *>> =
+        oreConfiguration(id, TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), size)
+
+    fun BlockBuilder<*>.deepslateOreConfiguration(id: ResourceLocation, size: Int): ResourceKey<ConfiguredFeature<*, *>>
+        = oreConfiguration(id, TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES), size)
+
+    fun BlockBuilder<*>.stoneOreConfiguration(size: Int): ResourceKey<ConfiguredFeature<*, *>> =
+        stoneOreConfiguration(blockId.withSuffix("_ore_config"), size)
+
+    fun BlockBuilder<*>.deepslateOreConfiguration(size: Int): ResourceKey<ConfiguredFeature<*, *>> =
+        deepslateOreConfiguration(blockId.withSuffix("_ore_config"), size)
+
+    fun placedFeature(id: ResourceLocation,
+                      oreConfig: ResourceKey<ConfiguredFeature<*, *>>,
+                      placementModfiers: List<PlacementModifier>): ResourceKey<PlacedFeature>
+    {
+        val key = ResourceKey.create(PLACED_FEATURE, id)
+
+        PLACED_FEATURE.provider { ctx ->
+            PlacementUtils.register(ctx, key, ctx.lookup(CONFIGURED_FEATURE).getOrThrow(oreConfig), placementModfiers)
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.placedFeature(oreConfig: ResourceKey<ConfiguredFeature<*, *>>,
+                                      placementModfiers: List<PlacementModifier>): ResourceKey<PlacedFeature> =
+        placedFeature(blockId, oreConfig, placementModfiers)
+
+    fun biomeModifier(id: ResourceLocation, modifier: (BootstrapContext<BiomeModifier>) -> BiomeModifier):
+            ResourceKey<BiomeModifier>
+    {
+        val key = ResourceKey.create(BIOME_MODIFIERS, id)
+
+        BIOME_MODIFIERS.provider { ctx ->
+            ctx.register(key, modifier(ctx))
+        }
+
+        return key
+    }
+
+    fun BlockBuilder<*>.biomeModifier(modifier: (BootstrapContext<BiomeModifier>) -> BiomeModifier) =
+        biomeModifier(blockId, modifier)
+
+    fun BlockBuilder<*>.tagBiomeModifier(tag: TagKey<Biome>,
+                                         feature: ResourceKey<PlacedFeature>,
+                                         step: GenerationStep.Decoration) =
+        biomeModifier { ctx ->
+            TagBiomeModifier(
+                tag,
+                HolderSet.direct(
+                    ctx.lookup(PLACED_FEATURE).getOrThrow(feature)
+                ),
+                step
+            )
+        }
+
+    fun BlockBuilder<*>.oreTagBiomeModifier(tag: TagKey<Biome>, feature: ResourceKey<PlacedFeature>) =
+        tagBiomeModifier(tag, feature, UNDERGROUND_ORES)
+
+    fun BlockBuilder<*>.overworldOreTagBiomeModifier(feature: ResourceKey<PlacedFeature>) =
+        tagBiomeModifier(IS_OVERWORLD, feature, UNDERGROUND_ORES)
+
+    fun <T : Any> Registry<T>.addTag(feature: () -> T, vararg tags: TagKey<T>) {
+        featureTagProviders.computeIfAbsent(this) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(key(), getKey(feature())!!) to it } }
+    }
+
+    fun <T : Any> Registry<T>.addTag(tag: TagKey<T>, vararg tags: TagKey<T>) {
+        tagTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { tag to it } }
+    }
+
+    fun <T : Any> Registry<T>.addOptionalToTag(id: ResourceLocation, vararg tags: TagKey<T>) {
+        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it } }
+    }
+
+    fun <T : Any> Registry<T>.addOptionalTagToTag(id: ResourceLocation, vararg tags: TagKey<T>) {
+        optionalTagTagProvider.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it } }
+    }
+
+    fun ItemBuilder<*>.tags(vararg tags: TagKey<Item>) {
+        featureTagProviders.computeIfAbsent(ITEM) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(ITEM.key(), itemId) to it } }
+    }
+
+    fun BlockBuilder<*>.tags(vararg tags: TagKey<Block>) {
+        featureTagProviders.computeIfAbsent(BLOCK) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(BLOCK.key(), blockId) to it } }
+    }
+
+    fun EntityTypeBuilder<*>.tags(vararg tags: TagKey<EntityType<*>>) {
+        featureTagProviders.computeIfAbsent(ENTITY_TYPE) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(ENTITY_TYPE.key(), entityTypeId) to it } }
+    }
+
+    fun FluidTypeBuilder.tags(vararg tags: TagKey<FluidTypeBuilder>) {
+        featureTagProviders.computeIfAbsent(FLUID_TYPES) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(FLUID_TYPES.key(), fluidTypeId) to it } }
+    }
+
+
+    fun <T : Any> Registry<T>.addTag(feature: () -> T, vararg tags: () -> TagKey<T>) {
+        featureTagProviders.computeIfAbsent(this) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(key(), getKey(feature())!!) to it() } }
+    }
+
+    fun <T : Any> Registry<T>.addTag(tag: TagKey<T>, vararg tags: () -> TagKey<T>) {
+        tagTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { tag to it() } }
+    }
+
+    fun <T : Any> Registry<T>.addOptionalToTag(id: ResourceLocation, vararg tags: () -> TagKey<T>) {
+        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it() } }
+    }
+
+    fun <T : Any> Registry<T>.addOptionalTagToTag(id: ResourceLocation, vararg tags: () -> TagKey<T>) {
+        optionalTagTagProvider.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it() } }
+    }
+
+    fun ItemBuilder<*>.tags(vararg tags: () -> TagKey<Item>) {
+        featureTagProviders.computeIfAbsent(ITEM) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(ITEM.key(), itemId) to it() } }
+    }
+
+    fun BlockBuilder<*>.tags(vararg tags: () -> TagKey<Block>) {
+        featureTagProviders.computeIfAbsent(BLOCK) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(BLOCK.key(), blockId) to it() } }
+    }
+
+    fun EntityTypeBuilder<*>.tags(vararg tags: () -> TagKey<EntityType<*>>) {
+        featureTagProviders.computeIfAbsent(ENTITY_TYPE) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(ENTITY_TYPE.key(), entityTypeId) to it() } }
+    }
+
+    fun FluidTypeBuilder.tags(vararg tags: () -> TagKey<FluidTypeBuilder>) {
+        featureTagProviders.computeIfAbsent(FLUID_TYPES) { arrayListOf() } +=
+            tags.map { { ResourceKey.create(FLUID_TYPES.key(), fluidTypeId) to it() } }
+    }
+
     /**
      * Registers all collected data providers with the [GatherDataEvent].
      * This method is typically called by NeoForge during the data generation phase.
@@ -367,6 +586,82 @@ abstract class DataGenHelper(private val modId: String) {
                 event.lookupProvider
             )
         )
+
+
+        generator.addProvider(
+            event.includeServer(),
+            DatapackBuiltinEntriesProvider(
+                generator.packOutput,
+                event.lookupProvider,
+                RegistrySetBuilder().apply { builtInProviders.forEach { (k, s) -> add(k, s) } },
+                mutableSetOf(modId)
+            )
+        )
+
+        featureTagProviders.forEach { (registry, it) ->
+            generator.addProvider(
+                event.includeServer(),
+                DynamicTagProvider(
+                    registry.key() as ResourceKey<out Registry<Any>>,
+                    it as List<() -> Pair<ResourceKey<Any>, TagKey<Any>>>,
+                    arrayListOf(),
+                    arrayListOf(),
+                    arrayListOf(),
+                    generator.packOutput,
+                    event.lookupProvider,
+                    modId,
+                    event.existingFileHelper
+                )
+            )
+        }
+        optionalFeatureTagProviders.forEach { (registry, it) ->
+            generator.addProvider(
+                event.includeServer(),
+                DynamicTagProvider(
+                    registry.key() as ResourceKey<out Registry<Any>>,
+                    arrayListOf(),
+                    it as List<() -> Pair<ResourceLocation, TagKey<Any>>>,
+                    arrayListOf(),
+                    arrayListOf(),
+                    generator.packOutput,
+                    event.lookupProvider,
+                    modId,
+                    event.existingFileHelper
+                )
+            )
+        }
+        tagTagProviders.forEach { (registry, it) ->
+            generator.addProvider(
+                event.includeServer(),
+                DynamicTagProvider(
+                    registry.key() as ResourceKey<out Registry<Any>>,
+                    arrayListOf(),
+                    arrayListOf(),
+                    it as List<() -> Pair<TagKey<Any>, TagKey<Any>>>,
+                    arrayListOf(),
+                    generator.packOutput,
+                    event.lookupProvider,
+                    modId,
+                    event.existingFileHelper
+                )
+            )
+        }
+        optionalTagTagProvider.forEach { (registry, it) ->
+            generator.addProvider(
+                event.includeServer(),
+                DynamicTagProvider(
+                    registry.key() as ResourceKey<out Registry<Any>>,
+                    arrayListOf(),
+                    arrayListOf(),
+                    arrayListOf(),
+                    it as List<() -> Pair<ResourceLocation, TagKey<Any>>>,
+                    generator.packOutput,
+                    event.lookupProvider,
+                    modId,
+                    event.existingFileHelper
+                )
+            )
+        }
 
         // Add any custom data providers.
         providers.forEach { (d, c) ->

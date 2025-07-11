@@ -12,6 +12,7 @@ import io.kito.kore.util.minecraft.shaped
 import io.kito.kore.util.toTitle
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
+import io.kito.kore_tests.DataGenerator.optionalDefaultModel
 import io.kito.kore_tests.DataGenerator.recipe
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
@@ -64,6 +65,8 @@ object Items : ItemRegister(ID) {
                 item.defaultInstance
             )
         }
+
+        optionalDefaultModel()
     }
 }
 

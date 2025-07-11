@@ -3,29 +3,38 @@ package io.kito.kore_tests.common.registry
 import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister
+import io.kito.kore.common.template.TagTemplate
 import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
+import io.kito.kore.util.minecraft.PlacedFeatureExt.commonOrePlacement
 import io.kito.kore.util.neoforge.Capability.blockItemHandler
 import io.kito.kore.util.toTitle
 import io.kito.kore_tests.DataGenerator.blockLootTable
 import io.kito.kore_tests.DataGenerator.blockModel
+import io.kito.kore_tests.DataGenerator.defaultState
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
+import io.kito.kore_tests.DataGenerator.overworldOreTagBiomeModifier
+import io.kito.kore_tests.DataGenerator.placedFeature
 import io.kito.kore_tests.DataGenerator.state
+import io.kito.kore_tests.DataGenerator.stoneOreConfiguration
+import io.kito.kore_tests.DataGenerator.tags
 import io.kito.kore_tests.ID
+import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.Items.itemTemplate
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
 import io.kito.kore_tests.common.world.level.block.CustomBlock
 import io.kito.kore_tests.common.world.level.block.entity.CustomBlockEntity
+import net.minecraft.core.registries.Registries.BLOCK
 import net.minecraft.data.loot.BlockLootSubProvider
-import net.minecraft.world.flag.FeatureFlagSet
+import net.minecraft.tags.TagKey
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.storage.loot.LootTable
+import net.minecraft.world.level.levelgen.VerticalAnchor.absolute
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement.triangle
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider
 import net.neoforged.neoforge.client.model.generators.ModelFile
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
 
@@ -36,6 +45,11 @@ import thedarkcolour.kotlinforforge.neoforge.forge.getValue
  */
 @Scan
 object Blocks : BlockRegister(ID) {
+
+    val myTag = TagKey.create(BLOCK, local("my_tag"))
+
+    @RegisterTemplate
+    val myTagTemplate = TagTemplate(stringRegistry) { TagKey.create(BLOCK, local("$it/my_tag")) }.include(myGroup)
 
     /**
      * Defines a custom block named "block".
@@ -50,7 +64,7 @@ object Blocks : BlockRegister(ID) {
         named(EN_US to "Block",
               PT_BR to "Bloco")
 
-        state { _, b -> simpleBlock(b) }
+        defaultState()
 
         props { explosionResistance(1000f) }
 
@@ -59,13 +73,36 @@ object Blocks : BlockRegister(ID) {
             props {
                 stacksTo(1)
             }
-
-
         }
 
         blockEntity(::CustomBlockEntity) {
             withCaps { blockItemHandler { inventory } }
         }
+    }
+
+    val ore by "ore" of ::CustomBlock where {
+        named(EN_US to "Ore",
+              PT_BR to "Minério")
+
+        defaultState()
+
+        props { explosionResistance(1000f) }
+
+        defaultItem {
+            blockModel()
+            props {
+                stacksTo(1)
+            }
+        }
+
+        overworldOreTagBiomeModifier(
+            placedFeature(
+                stoneOreConfiguration(9),
+                commonOrePlacement(2, triangle(absolute(16), absolute(32)))
+            )
+        )
+
+        tags(myTag)
     }
 
     /**
@@ -101,6 +138,8 @@ object Blocks : BlockRegister(ID) {
                     override fun getKnownBlocks() = mutableListOf(block)
                 }
             }
+
+            tags({ myTagTemplate[i]!! })
         }
     }.include(myGroup)
 

@@ -6,8 +6,14 @@ import com.mojang.serialization.Dynamic
 import com.mojang.serialization.codecs.PrimitiveCodec
 import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.common.reflect.Scan
+import net.minecraft.core.HolderSet
+import net.minecraft.core.registries.Registries
+import net.minecraft.tags.TagKey
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.levelgen.GenerationStep
+import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.neoforged.neoforge.common.crafting.SizedIngredient
 import java.nio.ByteBuffer
 import java.util.stream.IntStream
@@ -142,5 +148,14 @@ object CodecSources {
      */
     @CodecSource
     fun itemStackCodec(): Codec<ItemStack> = ItemStack.CODEC
+
+    @CodecSource
+    fun placedFeatureSetCodec(): Codec<HolderSet<PlacedFeature>> = PlacedFeature.LIST_CODEC
+
+    @CodecSource
+    fun biomeTagKeyCodec(): Codec<TagKey<Biome>> = TagKey.codec(Registries.BIOME)
+
+    @CodecSource
+    fun decorationCodec(): Codec<GenerationStep.Decoration> = GenerationStep.Decoration.CODEC
 }
 

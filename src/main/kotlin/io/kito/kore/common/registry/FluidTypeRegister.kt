@@ -9,6 +9,7 @@ import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.FluidTypeProp
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.BucketItem
@@ -62,6 +63,8 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
     inner class FluidTypeBuilder(val name: String, val supplier: (FluidTypeProp) -> FluidType) {
 
         val id = this@FluidTypeRegister.id
+
+        val fluidTypeId = loc(id, name)
 
         /**
          * Lazily initialized [DeferredHolder] for the registered [FluidType].
