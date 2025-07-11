@@ -49,6 +49,7 @@ import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_ORES
 import net.minecraft.world.level.levelgen.VerticalAnchor
@@ -366,6 +367,22 @@ abstract class DataGenHelper(private val modId: String) {
         builtInProviders +=
             ((this to bootstrap) as Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>)
     }
+
+    fun oreConfiguration(oreState: BlockState, id: ResourceLocation, rule: RuleTest, size: Int) :
+            ResourceKey<ConfiguredFeature<*, *>>
+    {
+        val key = ResourceKey.create(CONFIGURED_FEATURE, id)
+
+        CONFIGURED_FEATURE.provider { ctx ->
+            FeatureUtils.register(
+                ctx, key, Feature.ORE,
+                OreConfiguration(rule, oreState, size)
+            )
+        }
+
+        return key
+    }
+
 
     fun BlockBuilder<*>.oreConfiguration(id: ResourceLocation, rule: RuleTest, size: Int) :
             ResourceKey<ConfiguredFeature<*, *>>
