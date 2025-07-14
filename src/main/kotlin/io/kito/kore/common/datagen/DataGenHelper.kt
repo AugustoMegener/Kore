@@ -576,8 +576,6 @@ abstract class DataGenHelper(private val modId: String) {
         generator.addProvider(event.includeServer(),
             DynamicRecipeProvider(generator.packOutput, event.lookupProvider, recipeBuilders))
 
-
-
         generator.addProvider(event.includeServer(),
             LootTableProvider(
                 generator.packOutput,
@@ -593,10 +591,16 @@ abstract class DataGenHelper(private val modId: String) {
             DatapackBuiltinEntriesProvider(
                 generator.packOutput,
                 event.lookupProvider,
-                RegistrySetBuilder().apply { builtInProviders.forEach { (k, s) -> add(k, s) } },
+                RegistrySetBuilder().apply {
+                    builtInProviders.groupBy { it.first }
+                        .mapValues { it.value.map { pair -> pair.second } }
+                        .forEach  { (k, s) -> add(k) { ctx -> s.forEach { it(ctx) } } }
+                },
                 mutableSetOf(modId)
             )
         )
+
+
 
         featureTagProviders.forEach { (registry, it) ->
             generator.addProvider(

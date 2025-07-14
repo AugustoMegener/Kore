@@ -139,6 +139,13 @@ object Blocks : BlockRegister(ID) {
                 }
             }
 
+            overworldOreTagBiomeModifier(
+                placedFeature(
+                    stoneOreConfiguration(9),
+                    commonOrePlacement(2, triangle(absolute(16), absolute(32)))
+                )
+            )
+
             tags({ myTagTemplate[i]!! })
         }
     }.include(myGroup)

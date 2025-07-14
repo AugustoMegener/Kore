@@ -1,0 +1,6 @@
+{
+  "type": "kore:tag_biome_modifier",
+  "features": "kore_tests:nice_block",
+  "step": "underground_ores",
+  "tag": "c:is_overworld"
+}
