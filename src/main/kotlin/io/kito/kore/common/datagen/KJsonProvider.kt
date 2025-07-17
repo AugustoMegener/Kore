@@ -7,6 +7,7 @@ import net.minecraft.data.CachedOutput
 import net.minecraft.data.DataProvider
 import net.minecraft.data.PackOutput
 import net.minecraft.data.PackOutput.Target.DATA_PACK
+import net.minecraft.resources.ResourceLocation
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -35,7 +36,7 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
     /**
      * A map to store the generated JSON elements, keyed by their file name.
      */
-    private val jsons = hashMapOf<String, JsonElement>()
+    private val jsons = hashMapOf<ResourceLocation, JsonElement>()
 
     /**
      * Abstract method that subclasses must implement to add their data to the [jsons] map.
@@ -50,7 +51,7 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
      * @receiver The file name (String) for the JSON output.
      * @param data The data object of type [T] to be serialized.
      */
-    infix fun String.by(data: T) { jsons[this] = serializer.run { data.encode(jsonOps) } }
+    infix fun ResourceLocation.by(data: T) { jsons[this] = serializer.run { data.encode(jsonOps) } }
 
     /**
      * Runs the data generation process.
@@ -62,10 +63,12 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
     override fun run(output: CachedOutput): CompletableFuture<*> {
         addData()
 
-        val path = packOutput.getOutputFolder(DATA_PACK).resolve(modiId).resolve(dir)
+        val path = packOutput.getOutputFolder(DATA_PACK)
 
         return CompletableFuture.allOf(
-            *jsons.map { (n, j) -> DataProvider.saveStable(output, j, path.resolve("${n}.json")) }.toTypedArray()
+            *jsons.map { (n, j) ->
+                DataProvider.saveStable(output, j, path.resolve(n.namespace).resolve(dir).resolve("${n.path}.json"))
+            }.toTypedArray()
         )
     }
 

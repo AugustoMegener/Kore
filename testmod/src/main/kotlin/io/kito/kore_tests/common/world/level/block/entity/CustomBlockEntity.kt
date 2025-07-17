@@ -62,7 +62,7 @@ class CustomBlockEntity(pos: BlockPos, blockState: BlockState) : KBlockEntity(po
         }
     }
 
-    override val itemDrops get() = NonNullList.copyOf((0..1).map { inventory[it] })
+    override val itemDrops: NonNullList<ItemStack> get() = NonNullList.copyOf((0..1).map { inventory[it] })
 
     override fun createMenu(containerId: Int, playerInventory: Inventory, player: Player) =
         CustomMenu(containerId, playerInventory, this)
