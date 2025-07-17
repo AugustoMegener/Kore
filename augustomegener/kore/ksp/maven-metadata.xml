@@ -3,8 +3,8 @@
   <groupId>augustomegener.kore</groupId>
   <artifactId>ksp</artifactId>
   <versioning>
-    <latest>0.1.2e</latest>
-    <release>0.1.2e</release>
+    <latest>0.1.2f</latest>
+    <release>0.1.2f</release>
     <versions>
       <version>0.1.0d</version>
       <version>0.1.1</version>
@@ -14,7 +14,8 @@
       <version>0.1.2c</version>
       <version>0.1.2d</version>
       <version>0.1.2e</version>
+      <version>0.1.2f</version>
     </versions>
-    <lastUpdated>20250714163055</lastUpdated>
+    <lastUpdated>20250717211856</lastUpdated>
   </versioning>
 </metadata>
