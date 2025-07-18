@@ -9,7 +9,7 @@ abstract class ItemHandlerRecipeInput<T: IItemHandler>(val handler: T) : IItemHa
 
     abstract val indexes: Map<Int, Int>
 
-    override fun getItem(index: Int) = get(indexes[index] ?: throw IllegalStateException("Invalid index: $index"))
+    override fun getItem(index: Int) = get(index)
 
     override fun size() = indexes.keys.max()
 
