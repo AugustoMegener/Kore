@@ -30,6 +30,8 @@ open class ItemRegister(final override val id: String) : AutoRegister {
      */
     private val register = DeferredRegister.createItems(id)
 
+    open val dataComponentRegister: DataComponentTypeRegister? = null
+
     /**
      * Infix function to define a new [Item] with a supplier for creating [Item] instances.
      * This is the first step in a chain to addEntry an item.
@@ -57,7 +59,10 @@ open class ItemRegister(final override val id: String) : AutoRegister {
      *
      * @param bus The [IEventBus] to addEntry with (typically the Mod Event Bus).
      */
-    override fun register(bus: IEventBus) = register.register(bus)
+    override fun register(bus: IEventBus)  {
+        dataComponentRegister?.register(bus)
+        register.register(bus)
+    }
 
     /**
      * Inner class to facilitate the building and registration of [Item]s.
