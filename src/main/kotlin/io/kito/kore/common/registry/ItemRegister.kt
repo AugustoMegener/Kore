@@ -2,6 +2,7 @@ package io.kito.kore.common.registry
 
 import io.kito.kore.common.capabilities.ItemCapRegister
 import io.kito.kore.common.capabilities.ItemCapRegister.ItemCapRegistry
+import io.kito.kore.util.minecraft.ItemProp
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import io.kito.kore.util.minecraft.itemProp
 import net.minecraft.world.item.Item
@@ -77,7 +78,7 @@ open class ItemRegister(final override val id: String) : AutoRegister {
 
         val itemId = loc(id, name)
 
-        private val properties = itemProp()
+        private var properties: (Properties) -> Properties = { it }
 
         private val itemCaps = ItemCaps()
 
@@ -86,7 +87,10 @@ open class ItemRegister(final override val id: String) : AutoRegister {
          * @param block A lambda that takes an [Properties] instance and applies properties to it.
          * @return This [ItemBuilder] for fluent chaining.
          */
-        fun props(block: Properties.() -> Unit) = properties.apply(block)
+        fun props(block: Properties.() -> Properties) {
+            val previous = properties
+            properties = { previous(it).block() }
+        }
 
         /**
          * Configures capabilities for this item.
@@ -131,7 +135,7 @@ open class ItemRegister(final override val id: String) : AutoRegister {
         infix fun where(builder: ItemBuilder<T>.() -> Unit): DeferredItem<T> {
             apply(builder)
 
-            val reg = register.register(name) { -> supplier(properties) }
+            val reg = register.register(name) { -> supplier(properties(ItemProp())) }
 
             ItemCapRegister.itemCaps += { reg.value() } to itemCaps.registries
 

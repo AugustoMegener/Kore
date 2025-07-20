@@ -45,15 +45,15 @@ object FluidTypes : FluidTypeRegister(ID) {
             }
 
             bucketItem {
-                props {
-                    named(EN_US to "My Fluid Bucket",
-                          PT_BR to "Meu Balde de Fluido")
+                named(EN_US to "My Fluid Bucket",
+                      PT_BR to "Meu Balde de Fluido")
 
+                props {
                     stacksTo(1)
                     craftRemainder(BUCKET)
-
-                    bucketModel()
                 }
+
+                bucketModel()
             }
         }
 
@@ -81,18 +81,18 @@ object FluidTypes : FluidTypeRegister(ID) {
                 }
 
                 bucketItem {
-                    props {
-                        named(EN_US to "${i.toTitle()} Fluid Bucket",
-                              PT_BR to "Balde de Fluido ${i.toTitle()}")
+                    named(EN_US to "${i.toTitle()} Fluid Bucket",
+                          PT_BR to "Balde de Fluido ${i.toTitle()}")
 
+                    props {
                         stacksTo(1)
                         craftRemainder(BUCKET)
+                    }
 
-                        model { loc, _ ->
-                            withExistingParent("$loc", mcLoc("item/generated"))
-                                .texture("layer0", mcLoc("bucket").item)
-                                .texture("layer1", local("my_fluid_bucket").item)
-                        }
+                    model { loc, _ ->
+                        withExistingParent("$loc", mcLoc("item/generated"))
+                            .texture("layer0", mcLoc("bucket").item)
+                            .texture("layer1", local("my_fluid_bucket").item)
                     }
                 }
             }

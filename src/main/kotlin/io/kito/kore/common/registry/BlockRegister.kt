@@ -16,12 +16,12 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.isAccessible
 import net.minecraft.world.item.Item.Properties as ItemProp
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties as BlockProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
 import io.kito.kore.common.registry.early.EarlyRegistry
 import io.kito.kore.common.registry.early.EarlyRegistryGoup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
+import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
@@ -155,7 +155,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
         private var blockEntitySupplier : BlockEntitySupplier?              =   null
         private var blockEntityBuilder  : BETBuilder<BlockEntity>.() -> Unit = {}
 
-        private val blockProp = blockProp()
+        private var props: (BlockProp) -> BlockProp = { it }
 
         private val blockCaps = BlockCaps()
 
@@ -164,7 +164,10 @@ open class BlockRegister(final override val id: String) : AutoRegister {
          * @param block A lambda that takes a [BlockProp] instance and applies properties to it.
          * @return This [BlockBuilder] for fluent chaining.
          */
-        fun props(block: BlockProp.() -> Unit) = blockProp.apply(block)
+        fun props(block: BlockProp.() -> BlockProp) {
+            val previous = props
+            props = { previous(it).block() }
+        }
 
 
         /**
@@ -247,7 +250,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
         infix fun where(builder: BlockBuilder<B>.() -> Unit) : BlockRegistry<B> {
             apply(builder)
 
-            val reg = register.register(blockName) { -> supplier(blockProp) }
+            val reg = register.register(blockName) { -> supplier(props(blockProp())) }
 
             BlockCapRegister.blockCaps += { reg.value() } to blockCaps.registries
 

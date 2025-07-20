@@ -161,6 +161,7 @@ open class FluidTypeRegister(final override val id: String) : AutoRegister {
             FlowingFluidRegister.FlowingFluidTemplate<T, B, I>(registry) { registeredEntries[it]!!.flowingRegistry!! }
 
 
+
         /**
          * Retrieves a [FluidType] by its index.
          * @param idx The index of the fluid type.
