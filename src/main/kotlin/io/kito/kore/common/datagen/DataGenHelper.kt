@@ -170,7 +170,7 @@ abstract class DataGenHelper(private val modId: String) {
      */
     fun BlockBuilder<*>.named(vararg entries: Pair<String, String>)
         { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(BLOCK[loc(modId, this@named.blockName)], it.second) } } }
+            { add(BLOCK[blockId], it.second) } } }
 
 
     /**
@@ -222,7 +222,16 @@ abstract class DataGenHelper(private val modId: String) {
      */
     fun ItemBuilder<*>.named(vararg entries: Pair<String, String>)
         { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(ITEM[loc(modId, this@named.name)], it.second) } } }
+            { add(ITEM[itemId], it.second) } } }
+
+
+    fun EntityTypeBuilder<*>.named(vararg entries: Pair<String, String>)
+        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+            { add(ENTITY_TYPE[entityTypeId], it.second) } } }
+
+    fun FluidTypeBuilder.named(vararg entries: Pair<String, String>)
+        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+            { add(fluidTypeId.toLanguageKey("fluid_type"), it.second) } } }
 
 
     /**

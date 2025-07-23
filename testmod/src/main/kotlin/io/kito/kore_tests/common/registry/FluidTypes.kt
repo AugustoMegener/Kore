@@ -94,6 +94,8 @@ object FluidTypes : FluidTypeRegister(ID) {
                             .texture("layer0", mcLoc("bucket").item)
                             .texture("layer1", local("my_fluid_bucket").item)
                     }
+
+
                 }
             }
 
