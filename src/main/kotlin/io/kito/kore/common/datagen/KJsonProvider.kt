@@ -1,6 +1,7 @@
 package io.kito.kore.common.datagen
 
 import com.google.gson.JsonElement
+import com.mojang.serialization.Codec
 import io.kito.kore.common.data.codec.KCodecSerializer
 import io.kito.kore.util.minecraft.jsonOps
 import net.minecraft.data.CachedOutput
@@ -20,13 +21,13 @@ import java.util.concurrent.CompletableFuture
  * @param target The [PackOutput.Target] indicating where the JSON files should be saved (e.g., [DATA_PACK]).
  * @param modiId The mod ID for which data is being generated.
  * @param dir The subdirectory within the mod's data folder where the JSON files will be saved.
- * @param serializer A lambda that provides a [KCodecSerializer] instance for the data type [T].
+ * @param serializer A lambda that provides a [Codec] instance for the data type [T].
  */
 abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
                                       private val target     : PackOutput.Target,
                                       private val modiId      : String,
                                       private val dir        : String,
-                                      serializer: () -> KCodecSerializer<T>) : DataProvider
+                                      serializer: () -> Codec<T>) : DataProvider
 {
     /**
      * Lazily initialized [KCodecSerializer] instance for the data type [T].
@@ -51,7 +52,7 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
      * @receiver The file name (String) for the JSON output.
      * @param data The data object of type [T] to be serialized.
      */
-    infix fun ResourceLocation.by(data: T) { jsons[this] = serializer.run { data.encode(jsonOps) } }
+    infix fun ResourceLocation.by(data: T) { jsons[this] = serializer.encodeStart(jsonOps, data).getOrThrow() }
 
     /**
      * Runs the data generation process.
