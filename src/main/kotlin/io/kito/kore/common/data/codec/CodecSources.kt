@@ -99,7 +99,7 @@ object CodecSources {
      * @param type The [KType] of the list, e.g., `typeOf<List<String>>()`.
      */
     @CodecSource
-    fun listCodec(type: KType) = Codec.list(type.arguments[0].type!!.codec)
+    fun listCodec(type: KType): Codec<out List<Any>> = Codec.list(type.arguments[0].type!!.codec)
 
     /**
      * Provides a [Codec] for `Pair` types.
