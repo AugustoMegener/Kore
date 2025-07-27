@@ -12,7 +12,7 @@ import net.neoforged.api.distmarker.Dist
 
 @RegisterDataProvider(DataGenerator::class, Dist.CLIENT)
 class NiceDataProvider(packOutput : PackOutput) :
-    KJsonProvider<NiceData>(packOutput, DATA_PACK, ID, "nice_data", { NiceData })
+    KJsonProvider<NiceData>(packOutput, DATA_PACK, ID, "nice_data", { NiceData.codec })
 {
     override fun addData() {
         local("marx")   by NiceData("Marx",   64, listOf("he", "him"))
