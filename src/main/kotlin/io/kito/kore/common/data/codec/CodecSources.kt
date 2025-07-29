@@ -6,6 +6,7 @@ import com.mojang.serialization.Dynamic
 import com.mojang.serialization.codecs.PrimitiveCodec
 import io.kito.kore.common.data.codec.CodecSource.Companion.codec
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.core.HolderSet
 import net.minecraft.core.registries.Registries
 import net.minecraft.tags.TagKey
@@ -98,8 +99,9 @@ object CodecSources {
      * This is a generic codec that takes the [KType] of the list and retrieves the codec for its elements.
      * @param type The [KType] of the list, e.g., `typeOf<List<String>>()`.
      */
+    @Suppress(UNCHECKED_CAST)
     @CodecSource
-    fun listCodec(type: KType): Codec<out List<Any>> = Codec.list(type.arguments[0].type!!.codec)
+    fun listCodec(type: KType) = Codec.list(type.arguments[0].type!!.codec)
 
     /**
      * Provides a [Codec] for `Pair` types.
@@ -157,5 +159,8 @@ object CodecSources {
 
     @CodecSource
     fun decorationCodec(): Codec<GenerationStep.Decoration> = GenerationStep.Decoration.CODEC
+
+    @CodecSource
+    fun carvingCodec(): Codec<GenerationStep.Carving> = GenerationStep.Carving.CODEC
 }
 
