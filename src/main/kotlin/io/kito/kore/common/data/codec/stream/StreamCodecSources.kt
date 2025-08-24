@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.PropertyMap
 import io.kito.kore.common.data.codec.stream.StreamCodecSource.Companion.streamCodec
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.UNCHECKED_CAST
 import io.netty.buffer.ByteBuf
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
@@ -100,11 +101,12 @@ object StreamCodecSources {
         ByteBufCodecs.optional(type.arguments[0].type!!.streamCodec<ByteBuf, Any>())
 
     @StreamCodecSource
+    @Suppress(UNCHECKED_CAST)
     fun mapCodec(type: KType) =
-        ByteBufCodecs.map(
-            ::LinkedHashMap,
-            type.arguments[0].type!!.streamCodec,
-            type.arguments[1].type!!.streamCodec
+        ByteBufCodecs.map<ByteBuf, Any, Any, Map<Any, Any>>(
+            ::HashMap,
+            type.arguments[0].type!!.streamCodec as StreamCodec<ByteBuf, Any>,
+            type.arguments[1].type!!.streamCodec as StreamCodec<ByteBuf, Any>
         )
 
     @StreamCodecSource

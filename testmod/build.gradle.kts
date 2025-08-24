@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `maven-publish`
     idea
-    id("net.neoforged.gradle.userdev") version "7.0.170"
+    id("net.neoforged.gradle.userdev") version "7.0.+"
 
     kotlin("jvm") version "2.1.0"
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"

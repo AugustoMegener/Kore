@@ -9,7 +9,7 @@ plugins {
     `maven-publish`
     signing
     idea
-    id("net.neoforged.gradle.userdev") version "7.0.170"
+    id("net.neoforged.gradle.userdev") version "7.0.+"
 
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"

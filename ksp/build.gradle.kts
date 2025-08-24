@@ -5,7 +5,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
 
-    id("net.neoforged.gradle.userdev") version "7.0.170"
+    id("net.neoforged.gradle.userdev") version "7.0.+"
 }
 
 group = "mod_group_id".prop + ".kore"

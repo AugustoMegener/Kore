@@ -9,6 +9,7 @@ Kore is a comprehensive Minecraft modding framework designed to optimize and sim
 - **Data Generation**: Tools for automated data generation (e.g., recipes, block states, item models and custom data) help  reduce manual effort.
 - **Capability Integration**: Tweaked integration with NeoForge capabilities for handling inventories, energy, fluids, and other interactions.
 - **Tweaked serialization:** Automatic generation of codecs and INBTSerializables.
+- **And More!**
 
 ## Depending on Kore
 
@@ -34,8 +35,8 @@ Add the following to your `build.gradle.kts` file
    dependencies {
        implementation("thedarkcolour:kotlinforforge-neoforge:5.3.0")
    
-       implementation("augustomegener:Kore:0.1.0c")
-       ksp("augustomegener.kore:ksp:0.1.0")
+       implementation("augustomegener:Kore:<Lastest Version>")
+       ksp("augustomegener.kore:ksp:<Lastest Version>")
    }
    ```
 
@@ -50,7 +51,7 @@ fun init() {
 }
 
 // generated code
-const val ID: String = "mod_name"
+const val ID: String = "kore_tests" 
 
 val logger: Logger = LogManager.getLogger(ID)
 
@@ -69,14 +70,14 @@ object KoreTests : ModUtil(ID) {
 object Items : ItemRegister(ID) {
 
     val exampleItem: Item by "example_item" of ::Item where {
-        // Datagenerate the item locale
+        // Datagenerate item locale
         named(EN_US to "Example Item")
        
         props { 
             stackTo(1) 
         }
        
-        // Datagenerate the item model
+        // Datagenerate item model
         defaultModel()
 
        // Datagenerate recipe
@@ -95,6 +96,24 @@ object Items : ItemRegister(ID) {
 ## Templates
 
 ```kotlin
+@Scan
+object Registries {
+
+   @RegisterEarlyRegistry
+   val stringRegistry = EarlyRegistry<String>()
+}
+
+@Scan
+object Strings : EarlyRegister<String>(ID, stringRegistry) {
+
+   val myGroup = EarlyRegistryGoup(local("my_group"))
+
+   val nice by "nice" of { "nice" } onGroup myGroup
+   val fool by "fool" of { "fool" } onGroup myGroup
+   val cute by "cute" of { "cute" } onGroup myGroup
+   val weird by "weird" of { "weird" } onGroup myGroup
+}
+
 object Items : ItemRegister(ID) {
     val itemTemplate = RegistryTemplate<String, Item> { i: String ->
         "${i}_item" of ::Item where {
@@ -103,16 +122,12 @@ object Items : ItemRegister(ID) {
                 PT_BR to "Item ${i.toTitle()}"
             )
         }
-    }.on(
-        "foo",
-        "bar",
-        "baz"
-    )
+    }.include(myGroup)
 }
 
-val fooItem: Item? = itemTemplate["foo"] // mod_name:foo
-val barItem: Item? = itemTemplate["bar"] // mod_name:bar
-val bazItem: Item? = itemTemplate["baz"] // mod_name:baz
+val fooItem: Item? = itemTemplate["foo"] // kore_tests:foo
+val barItem: Item? = itemTemplate["bar"] // kore_tests:bar
+val bazItem: Item? = itemTemplate["baz"] // kore_tests:baz
 ```
 
 ### Handling Events
