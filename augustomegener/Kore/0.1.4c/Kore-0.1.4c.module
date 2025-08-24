@@ -1,0 +1,102 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "augustomegener",
+    "module": "Kore",
+    "version": "0.1.4c",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.13"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.1.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "Kore-0.1.4c.jar",
+          "url": "Kore-0.1.4c.jar",
+          "size": 575555,
+          "sha512": "fda1b4688303d9ab8ce698f060fafa036f95eaba4d6eee1b8dd9a8a7c9121c0700fbff5dbd3427a2cdea4debb031640f0088493f6edc20d3ee461ee662fde398",
+          "sha256": "1c8e187ce60a7d1ff67f8806bccbdb364ded348ba4b7b424d3f9d116f12b8c82",
+          "sha1": "0269d45e2a40bf620503f19c01cc0ca1d0ab9c06",
+          "md5": "f30394b482458372ba4f568a76bed3ae"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect"
+        },
+        {
+          "group": "thedarkcolour",
+          "module": "kotlinforforge-neoforge",
+          "version": {
+            "requires": "5.5.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.1.0"
+          }
+        }
+      ],
+      "dependencyConstraints": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "2.1.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "Kore-0.1.4c-all.jar",
+          "url": "Kore-0.1.4c-all.jar",
+          "size": 575555,
+          "sha512": "dfbf08f5e0e247335eb13b274f00982d443784ced9277dec4eb7081bb27f61ed9ab43c770109989ea800d1b36efe9532e868d236351b934d0b013db28f0d3a32",
+          "sha256": "f305aaf70143a048f5dda634094ddf92ca5ceaee1676218fed2face023eeaf90",
+          "sha1": "4f6c097340a0ae6fc87bc9671ee0085a3084a887",
+          "md5": "40fd1f5958cbe97fbd7348608f1fa421"
+        }
+      ]
+    }
+  ]
+}
