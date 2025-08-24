@@ -36,7 +36,8 @@ object Mods {
      * Iterates over each [IModFile] in the [ModList] and applies the given action.
      * @param action A lambda that takes an [IModFile].
      */
-    fun forEachModFile(action: IModFile.() -> Unit) { modList.forEachModFile { it.apply(action) } }
+    fun <T> forEachModFile(action: IModFile.() -> T) =
+        arrayListOf<T>().apply { modList.forEachModFile { add(it.action()) } }
 
     /**
      * Iterates over each [IModFile] that either is the Kore mod itself or depends on Kore, and applies the given action.

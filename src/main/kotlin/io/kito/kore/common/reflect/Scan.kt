@@ -4,9 +4,11 @@ import io.kito.kore.util.clazz
 import io.kito.kore.util.klass
 import io.kito.kore.util.neoforge.Mods.forEachModFile
 import io.kito.kore.util.neoforge.Mods.modContainer
+import io.kito.kore.util.neoforge.Mods.modId
 import org.jetbrains.annotations.ApiStatus.Internal
 import java.lang.annotation.ElementType
 import kotlin.reflect.KClass
+import kotlin.streams.asSequence
 
 /**
  * Annotation used to mark classes or annotations for automatic scanning by Kore.
@@ -37,16 +39,15 @@ annotation class Scan {
          */
         val scaneables by lazy {
             buildMap<String, List<KClass<*>>> {
-                forEachModFile {
 
-                    put(modContainer.modId, scanResult.getAnnotatedBy(Scan::class.java, ElementType.ANNOTATION_TYPE)
-                        .map { it.clazz.clazz as? Class<out Annotation>? }
-                        .filter { it != null }
-                        .flatMap { scanResult.getAnnotatedBy(it!!, ElementType.TYPE) }
-                        .map { it.clazz.klass }
-                        .filter { it != null }
-                        .map { it!! }.toList()
-                    )
+                val annotations = forEachModFile {
+                    scanResult.getAnnotatedBy(Scan::class.java, ElementType.TYPE).toList()
+                }.flatten().mapNotNull { it.clazz.clazz }.filter { Annotation::class.java.isAssignableFrom(it) }
+
+                forEachModFile {
+                    put(modId, annotations.flatMap {
+                        scanResult.getAnnotatedBy(it as Class<out Annotation>, ElementType.TYPE).toList()
+                    }.mapNotNull { it.clazz.klass })
                 }
             }
         }
