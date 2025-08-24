@@ -52,11 +52,12 @@ fun String.snakeCased() = replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase(Lo
 /**
  * Extension property to get the [Class] object from an ASM [Type].
  */
-val Type.clazz: Class<*> get() = Class.forName(className, false, classLoader)
+val Type.clazz: Class<*>? get() =
+    try { Class.forName(className, false, classLoader) } catch(_: ClassNotFoundException) { null }
 /**
  * Extension property to get the [KClass] object from an ASM [Type].
  */
-inline val Type.klass           get() = clazz.kotlin
+inline val Type.klass           get() = clazz?.kotlin
 
 /**
  * Recursively finds all nested classes within a given list of [KClass]es.

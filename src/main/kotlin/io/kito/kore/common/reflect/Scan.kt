@@ -1,15 +1,12 @@
 package io.kito.kore.common.reflect
 
-import io.kito.kore.common.reflect.Scan.ScanType.CASCADING
-import io.kito.kore.common.reflect.Scan.ScanType.ISOLATED
-import io.kito.kore.util.getAllNestedClasses
+import io.kito.kore.util.clazz
 import io.kito.kore.util.klass
 import io.kito.kore.util.neoforge.Mods.forEachModFile
 import io.kito.kore.util.neoforge.Mods.modContainer
 import org.jetbrains.annotations.ApiStatus.Internal
+import java.lang.annotation.ElementType
 import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.hasAnnotation
 
 /**
  * Annotation used to mark classes or annotations for automatic scanning by Kore.
@@ -23,12 +20,7 @@ import kotlin.reflect.full.hasAnnotation
 @Scan
 @Target(AnnotationTarget.CLASS, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Scan(val type: ScanType = ISOLATED) {
-
-    /**
-     * Enum defining the scanning behavior for nested classes.
-     */
-    enum class ScanType { CASCADING, ISOLATED }
+annotation class Scan {
 
     /**
      * Companion object responsible for collecting all scannable classes within the mod environment.
@@ -46,13 +38,15 @@ annotation class Scan(val type: ScanType = ISOLATED) {
         val scaneables by lazy {
             buildMap<String, List<KClass<*>>> {
                 forEachModFile {
-                    put(modContainer.modId, scanResult.annotations
-                        .filter { it.annotationType.klass.hasAnnotation<Scan>() }
-                        .map { it.clazz.klass.findAnnotation<Scan>()?.let { annotation ->
-                            when (annotation.type) {
-                                ISOLATED  -> listOf(it.clazz.klass)
-                                CASCADING -> getAllNestedClasses(listOf(it.clazz.klass)) } } ?: listOf(it.clazz.klass) }
-                        .flatten())
+
+                    put(modContainer.modId, scanResult.getAnnotatedBy(Scan::class.java, ElementType.ANNOTATION_TYPE)
+                        .map { it.clazz.clazz as? Class<out Annotation>? }
+                        .filter { it != null }
+                        .flatMap { scanResult.getAnnotatedBy(it!!, ElementType.TYPE) }
+                        .map { it.clazz.klass }
+                        .filter { it != null }
+                        .map { it!! }.toList()
+                    )
                 }
             }
         }
