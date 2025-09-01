@@ -7,6 +7,7 @@ import net.neoforged.fml.ModContainer
 import net.neoforged.neoforgespi.language.IModInfo
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSubclassOf
 
 @Scan
 @Target(AnnotationTarget.CLASS)
@@ -24,7 +25,8 @@ annotation class RegisterNBTSerializable(val clazz: KClass<*>) {
         }
 
         @Suppress(UNCHECKED_CAST)
-        val <T : Any> KClass<T>.nbtSerializer get() = nbtSerializerRegistry[this] as NBTSerializer<T>?
+        val <T : Any> KClass<T>.nbtSerializer get() =
+            nbtSerializerRegistry.firstNotNullOfOrNull { (it, _) -> isSubclassOf(it) } as NBTSerializer<T>?
         @Suppress(UNCHECKED_CAST)
         val <T : Any> T.nbtSerializer get() = this::class.nbtSerializer as NBTSerializer<T>?
     }
