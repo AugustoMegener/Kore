@@ -15,6 +15,7 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.neoforged.neoforge.common.util.INBTSerializable
 import kotlin.reflect.KType
+import kotlin.reflect.full.isSubclassOf
 
 /**
  * An implementation of [SerializationStrategy] that handles serialization and deserialization
@@ -53,7 +54,8 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
                     lst.addAll((value as List<*>).map { i -> i?.let { encode(it, valueType.arguments.first().type!!) } })
                 }
             else -> when {
-                value::class in nbtSerializerRegistry.keys -> value.nbtSerializer!!.serialize(value, provider)
+                nbtSerializerRegistry.keys.any { value::class.isSubclassOf(it) } ->
+                    value.nbtSerializer!!.serialize(value, provider)
                 else -> nbtCodecSerializer.encode(value, valueType)
             }
         }
@@ -110,7 +112,7 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
                 }
 
             else -> when {
-                oldValue?.let { it::class in nbtSerializerRegistry.keys } == true ->
+                oldValue?.let { v -> nbtSerializerRegistry.keys.any { v::class.isSubclassOf(it) }} == true ->
                     when(val serializer = oldValue.nbtSerializer!!) {
                         is NBTStatefullSerializer ->
                             Statefull { serializer.deserialize(provider, data as CompoundTag, this) }
