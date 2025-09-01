@@ -39,10 +39,10 @@
           "name": "ksp-0.1.4c.jar",
           "url": "ksp-0.1.4c.jar",
           "size": 8372,
-          "sha512": "f948f574d70820494f461b5621234a6958de774999c2db1d2f9babf39736f50052fb9a21b134bca0c160aee25a2dbbbe3381496492cc75e9911624220d24f99c",
-          "sha256": "4294632c9669bd129572411e37754633d51799895ff96ab127ac2a4a4a116cf2",
-          "sha1": "eeb92ab6b77b909d4310199c780a32bba92f8f6e",
-          "md5": "f032a95cbde0050c589c42f426083f7c"
+          "sha512": "f93ad8f7ee4f98afc2b90e0a2382aa3cffbe9eb0a665df6b2713880ac0c14ace37dc8bf838deb1b4b5a3ef38dc61b9008c583e429dddaabb49d2cd2cb2283186",
+          "sha256": "898b29ae8768d8071d1ef94b0c3d27d373869646ba118d9b7831df0e702ad9f9",
+          "sha1": "a2d688a03d5d083892cc3a299769568d753b99dd",
+          "md5": "1b0c98eb5fbad81d15e89e4171b3d47e"
         }
       ]
     },
@@ -106,10 +106,10 @@
           "name": "ksp-0.1.4c.jar",
           "url": "ksp-0.1.4c.jar",
           "size": 8372,
-          "sha512": "f948f574d70820494f461b5621234a6958de774999c2db1d2f9babf39736f50052fb9a21b134bca0c160aee25a2dbbbe3381496492cc75e9911624220d24f99c",
-          "sha256": "4294632c9669bd129572411e37754633d51799895ff96ab127ac2a4a4a116cf2",
-          "sha1": "eeb92ab6b77b909d4310199c780a32bba92f8f6e",
-          "md5": "f032a95cbde0050c589c42f426083f7c"
+          "sha512": "f93ad8f7ee4f98afc2b90e0a2382aa3cffbe9eb0a665df6b2713880ac0c14ace37dc8bf838deb1b4b5a3ef38dc61b9008c583e429dddaabb49d2cd2cb2283186",
+          "sha256": "898b29ae8768d8071d1ef94b0c3d27d373869646ba118d9b7831df0e702ad9f9",
+          "sha1": "a2d688a03d5d083892cc3a299769568d753b99dd",
+          "md5": "1b0c98eb5fbad81d15e89e4171b3d47e"
         }
       ]
     }
