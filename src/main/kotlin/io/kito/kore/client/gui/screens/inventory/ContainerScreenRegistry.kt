@@ -1,10 +1,7 @@
 package io.kito.kore.client.gui.screens.inventory
 
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
-import net.minecraft.client.gui.screens.inventory.MenuAccess
 import net.minecraft.network.chat.Component
-import net.minecraft.world.MenuProvider
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.MenuType
@@ -22,7 +19,7 @@ import net.minecraft.world.inventory.MenuType
  *                    [AbstractContainerScreen]. It takes the menu, player inventory, and title component
  *                    as arguments, consistent with Minecraft's container screen constructors.
  */
-abstract class ContainerScreenRegistry<T : AbstractContainerMenu, S>(
-    val menuType: () -> MenuType<T>, val supplier: (T, Inventory, Component) -> S
-) where S : Screen, S: MenuAccess<T>
+abstract class ContainerScreenRegistry<T : AbstractContainerMenu>(
+    val menuType: () -> MenuType<T>, val supplier: (T, Inventory, Component) -> AbstractContainerScreen<T>
+)
 

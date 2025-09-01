@@ -19,5 +19,5 @@ class CustomScreen(menu: CustomMenu, playerInventory: Inventory, title: Componen
     override val backgroundTexture = local("custom_screen").container.gui.texture.png
 
     @RegisterContainerScreen
-    companion object : ContainerScreenRegistry<CustomMenu, CustomScreen>({ menuType(CustomMenu::class) }, ::CustomScreen)
+    companion object : ContainerScreenRegistry<CustomMenu>({ menuType(CustomMenu::class) }, ::CustomScreen)
 }
