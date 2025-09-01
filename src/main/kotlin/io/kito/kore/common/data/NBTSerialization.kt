@@ -2,19 +2,19 @@ package io.kito.kore.common.data
 
 import io.kito.kore.common.data.DecodeResult.Statefull
 import io.kito.kore.common.data.DecodeResult.Stateless
+import io.kito.kore.common.data.nbt.NBTStatefullSerializer
+import io.kito.kore.common.data.nbt.NBTStatelessSerializer
+import io.kito.kore.common.data.nbt.RegisterNBTSerializable.Companion.nbtSerializer
+import io.kito.kore.common.data.nbt.RegisterNBTSerializable.Companion.nbtSerializerRegistry
 import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.nbtOps
 import net.minecraft.core.HolderLookup.Provider
 import net.minecraft.core.NonNullList
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.neoforged.neoforge.common.util.INBTSerializable
 import kotlin.reflect.KType
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.isSupertypeOf
-import kotlin.reflect.jvm.jvmErasure
-import kotlin.reflect.typeOf
 
 /**
  * An implementation of [SerializationStrategy] that handles serialization and deserialization
@@ -52,7 +52,10 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
                 ListTag().also { lst ->
                     lst.addAll((value as List<*>).map { i -> i?.let { encode(it, valueType.arguments.first().type!!) } })
                 }
-            else -> nbtCodecSerializer.encode(value, valueType)
+            else -> when {
+                value::class in nbtSerializerRegistry.keys -> value.nbtSerializer!!.serialize(value, provider)
+                else -> nbtCodecSerializer.encode(value, valueType)
+            }
         }
 
 
@@ -106,7 +109,16 @@ class NBTSerialization(val provider: Provider) : SerializationStrategy<Tag> {
                     }
                 }
 
-            else -> nbtCodecSerializer.decode(data, oldValue, valueType)
+            else -> when {
+                oldValue?.let { it::class in nbtSerializerRegistry.keys } == true ->
+                    when(val serializer = oldValue.nbtSerializer!!) {
+                        is NBTStatefullSerializer ->
+                            Statefull { serializer.deserialize(provider, data as CompoundTag, this) }
+                        is NBTStatelessSerializer ->
+                            Stateless(serializer.deserialize(provider, data as CompoundTag))
+                    }
+                else -> nbtCodecSerializer.decode(data, oldValue, valueType)
+            }
         }
 
 }
