@@ -3,8 +3,8 @@
   <groupId>augustomegener</groupId>
   <artifactId>Kore</artifactId>
   <versioning>
-    <latest>0.1.5c</latest>
-    <release>0.1.5c</release>
+    <latest>0.1.5d</latest>
+    <release>0.1.5d</release>
     <versions>
       <version>0.1.0</version>
       <version>0.1.0d</version>
@@ -30,7 +30,8 @@
       <version>0.1.5</version>
       <version>0.1.5b</version>
       <version>0.1.5c</version>
+      <version>0.1.5d</version>
     </versions>
-    <lastUpdated>20250901230821</lastUpdated>
+    <lastUpdated>20250902000908</lastUpdated>
   </versioning>
 </metadata>
