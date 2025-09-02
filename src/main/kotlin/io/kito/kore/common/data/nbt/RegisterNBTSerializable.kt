@@ -26,7 +26,7 @@ annotation class RegisterNBTSerializable(val clazz: KClass<*>) {
 
         @Suppress(UNCHECKED_CAST)
         val <T : Any> KClass<T>.nbtSerializer get() =
-            nbtSerializerRegistry.firstNotNullOfOrNull { (it, _) -> isSubclassOf(it) } as NBTSerializer<T>?
+            nbtSerializerRegistry.filter { (it, _) -> isSubclassOf(it) }.values.first() as NBTSerializer<T>?
         @Suppress(UNCHECKED_CAST)
         val <T : Any> T.nbtSerializer get() = this::class.nbtSerializer as NBTSerializer<T>?
     }
