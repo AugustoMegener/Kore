@@ -12,6 +12,7 @@ import io.kito.kore_tests.common.world.item.crafting.NiceRecipe
 import io.kito.kore_tests.common.world.item.crafting.NiceRecipeInput
 import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
+import net.minecraft.network.chat.Component
 import net.minecraft.world.MenuProvider
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
@@ -44,6 +45,8 @@ class CustomBlockEntity(pos: BlockPos, blockState: BlockState) : KBlockEntity(po
 
             if (slot != outputSlot) updateOutput()
         }
+
+        @Save val component = Component.literal("Hello")
 
         override fun extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack {
             if (slot == outputSlot && !simulate) {

@@ -32,9 +32,8 @@ object BlockExt {
      * @param setter A lambda that takes a [DefaultStateSetter] and applies property changes.
      * @return The modified [BlockState].
      */
-    fun Block.stateOf(setter: DefaultStateSetter.() -> Unit) {
+    fun Block.stateOf(setter: DefaultStateSetter.() -> Unit) =
         DefaultStateSetter(stateDefinition.any()).apply(setter).state
-    }
 
     /**
      * Operator function to get the value of a [Property] from a [BlockState].
