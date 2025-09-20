@@ -128,7 +128,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
      * @throws IllegalStateException if the property does not provide a block entity of the specified type.
      */
     @Suppress(UNCHECKED_CAST)
-    fun <B : BlockEntity> KProperty0<Block>.blockEntity() = blockEntity as? B
+    fun <B : BlockEntity> KProperty0<Block>.blockEntity() = blockEntity as? DeferredBET<B>
         ?: throw IllegalStateException("Property does not provide a BE from the specified type")
 
 
