@@ -111,7 +111,7 @@ open class ItemRegister(final override val id: String) : AutoRegister {
              * @param C The type of the context object.
              * @param getter A lambda that takes an [ItemStack] and an optional context object, and returns the capability object.
              */
-            operator fun <O, C> ItemCapability<O, C>.invoke(getter: (ItemStack, C?) -> O) {
+            operator fun <O, C> ItemCapability<O, C>.invoke(getter: (ItemStack, C?) -> O?) {
                 registries += ItemCapRegistry(this, getter)
 
                 /**
@@ -119,7 +119,7 @@ open class ItemRegister(final override val id: String) : AutoRegister {
                  * @param O The type of the capability object.
                  * @param getter A lambda that takes an [ItemStack] and returns the capability object.
                  */
-                operator fun <O> ItemCapability<O, C>.invoke(getter: (ItemStack) -> O) {
+                operator fun <O> ItemCapability<O, C>.invoke(getter: (ItemStack) -> O?) {
                     registries += ItemCapRegistry(this) { it, _ -> getter(it) }
                 }
             }

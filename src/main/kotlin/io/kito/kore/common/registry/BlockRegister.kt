@@ -228,7 +228,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
              * @param C The type of the context object.
              * @param getter A lambda that takes [Level], [BlockPos], [BlockState], optional [BlockEntity], and context object, and returns the capability object.
              */
-            operator fun <O, C> BlockCapability<O, C>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?, C?) -> O)
+            operator fun <O, C> BlockCapability<O, C>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?, C?) -> O?)
             { registries += BlockCapRegistry(this, getter) }
 
             /**
@@ -236,7 +236,7 @@ open class BlockRegister(final override val id: String) : AutoRegister {
              * @param O The type of the capability object.
              * @param getter A lambda that takes [Level], [BlockPos], [BlockState], and optional [BlockEntity], and returns the capability object.
              */
-            operator fun <O   > BlockCapability<O, Void?>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?) -> O)
+            operator fun <O   > BlockCapability<O, Void?>.invoke(getter: Level.(BlockPos, BlockState, BlockEntity?) -> O?)
             { registries += BlockCapRegistry(this) { lvl, pos, state, be, _ -> getter(lvl, pos, state, be) } }
         }
 

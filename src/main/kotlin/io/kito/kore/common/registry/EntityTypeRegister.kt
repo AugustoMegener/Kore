@@ -158,7 +158,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
              * @param C The type of the context object.
              * @param getter A lambda that takes an [Entity] and an optional context object, and returns the capability object.
              */
-            operator fun <O, C> EntityCapability<O, C>.invoke(getter: (Entity, C?) -> O) {
+            operator fun <O, C> EntityCapability<O, C>.invoke(getter: (Entity, C?) -> O?) {
                 registries += EntityCapRegistry(this, getter)
             }
 
@@ -167,7 +167,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
              * @param O The type of the capability object.
              * @param getter A lambda that takes an [Entity] and returns the capability object.
              */
-            operator fun <O> EntityCapability<O, Void?>.invoke(getter: (Entity) -> O) {
+            operator fun <O> EntityCapability<O, Void?>.invoke(getter: (Entity) -> O?) {
                 registries += EntityCapRegistry(this) { it, _ -> getter(it) }
             }
         }
