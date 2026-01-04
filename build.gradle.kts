@@ -72,9 +72,17 @@ runs {
         systemProperty("forge.enabledGameTestNamespaces", modId)
     }
 
-    create("data") {
+    create("clientData") {
         arguments.addAll(
-            "--mod", modId,
+            "--mod", project.findProperty("mod_id") as String,
+            "--all", "--output", file("src/generated/resources/").absolutePath,
+            "--existing", file("src/main/resources/").absolutePath
+        )
+    }
+
+    create("serverData") {
+        arguments.addAll(
+            "--mod", project.findProperty("mod_id") as String,
             "--all", "--output", file("src/generated/resources/").absolutePath,
             "--existing", file("src/main/resources/").absolutePath
         )
@@ -87,13 +95,7 @@ dependencies {
     implementation(kotlin("reflect"))
 
     implementation("net.neoforged:neoforge:${"neo_version".prop}")
-    implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
-
-    /*libraries("org.jetbrains.kotlin:kotlin-scripting-jvm:2.1.0")
-    libraries("org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.1.0")
-    libraries("org.jetbrains.kotlin:kotlin-scripting-common:2.1.0")
-    libraries("org.jetbrains.kotlin:kotlin-scripting-dependencies:2.1.0")
-    libraries("org.jetbrains.kotlin:kotlin-scripting-dependencies-maven:2.1.0")*/
+    implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
 }
 
 tasks.withType<ProcessResources>().configureEach {

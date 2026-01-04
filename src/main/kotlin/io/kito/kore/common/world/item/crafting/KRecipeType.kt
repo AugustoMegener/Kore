@@ -10,6 +10,8 @@ import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeSerializer
 import net.minecraft.world.item.crafting.RecipeType
 import net.neoforged.bus.api.IEventBus
+import net.neoforged.fml.LogicalSide
+import net.neoforged.fml.util.thread.EffectiveSide
 import net.neoforged.neoforge.registries.DeferredRegister
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
@@ -29,7 +31,7 @@ open class KRecipeType<T : Recipe<*>>(location: ResourceLocation, clazz: KClass<
     override fun streamCodec() = streamCodec
 
     override fun register(bus: IEventBus) {
-        if (!this::class.hasAnnotation<RegisterRecipeType>()) return
+        if (!this::class.hasAnnotation<RegisterRecipeType>() || EffectiveSide.get() != LogicalSide.SERVER) return
 
         DeferredRegister.create(RECIPE_TYPE, id).run {
             register(name) { -> type }

@@ -10,6 +10,8 @@ import io.kito.kore_tests.common.registry.FluidTypes.fluidTemplate
 import io.kito.kore_tests.common.registry.Items.itemTemplate
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.PlacementInfo
+import net.minecraft.world.item.crafting.RecipeBookCategory
 import net.neoforged.neoforge.common.crafting.SizedIngredient
 
 data class NiceRecipe(@Save @Slot(0) val input1: Ingredient,
@@ -17,17 +19,22 @@ data class NiceRecipe(@Save @Slot(0) val input1: Ingredient,
                       @Save @Result  val result: ItemStack) :
     KRecipeItemHandler<NiceRecipeInput>()
 {
+    override fun placementInfo(): PlacementInfo = PlacementInfo.create(listOf(input1, input2.ingredient()))
+
+
     @RegisterRecipeType
     companion object : KRecipeType<NiceRecipe>(local("my_nice_recipe"), NiceRecipe::class) {
 
         @DataGen(DataGenerator::class)
         fun registerRecipes() {
 
-            recipe(local("my_recipe")) {
-                NiceRecipe(
-                    Ingredient.of(itemTemplate["nice"]),
-                    SizedIngredient.of(itemTemplate["weird"]!!, 5),
-                    ItemStack(fluidTemplate.flowingFluid.bucketItem["fool"]!!)
+            recipe(local("template_recipe")) {
+                KRecipeBuilder(
+                    NiceRecipe(
+                        Ingredient.of(itemTemplate["nice"]),
+                        SizedIngredient.of(itemTemplate["weird"]!!, 5),
+                        ItemStack(fluidTemplate.flowingFluid.bucketItem["fool"]!!)
+                    )
                 )
             }
         }

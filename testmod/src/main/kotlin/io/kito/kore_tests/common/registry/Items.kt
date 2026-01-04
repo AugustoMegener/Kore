@@ -1,5 +1,6 @@
 package io.kito.kore_tests.common.registry
 
+import io.kito.kore.common.datagen.DynamicRecipeProvider.Companion.has
 import io.kito.kore.common.event.RegisterTemplate
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.ItemRegister
@@ -8,24 +9,28 @@ import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.minecraft.ResourceLocationExt.item
-import io.kito.kore.util.minecraft.shaped
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import io.kito.kore.util.toTitle
+import io.kito.kore_tests.DataGenerator.defaultModel
+import io.kito.kore_tests.DataGenerator.flatModel
 import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
-import io.kito.kore_tests.DataGenerator.optionalDefaultModel
 import io.kito.kore_tests.DataGenerator.recipe
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.data.models.model.ItemModelUtils
+import net.minecraft.client.data.models.model.ModelTemplates.FLAT_ITEM
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.core.registries.BuiltInRegistries.ITEM
+import net.minecraft.data.recipes.RecipeCategory
+import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items.STICK
-import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.crafting.Ingredient
-import net.minecraft.world.item.crafting.ShapedRecipe
-import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
+import java.util.*
 
 /**
  * Registers custom item types for the Kore Tests mod.
@@ -47,26 +52,21 @@ object Items : ItemRegister(ID) {
             named(EN_US to "${i.toTitle()} Item",
                   PT_BR to "Item ${i.toTitle()}")
 
-            model { loc, _ ->
-                getBuilder(loc.toString())
-                    .parent(UncheckedModelFile("item/generated"))
-                    .texture("layer0", local("item/item"))
-            }
+            flatModel(local("item"))
         }
     }.include(myGroup)
 
     val exampleItem: Item by "example_item" of ::Item where {
-        recipe(local("gro")) { _, item ->
-            ShapedRecipe(ID, CraftingBookCategory.MISC,
-                shaped("###",
-                    "###",
-                    "###")
-                    .by('#' to Ingredient.of(STICK)),
-                item.defaultInstance
-            )
+        recipe { item, _ ->
+            ShapedRecipeBuilder.shaped(lookupOrThrow(ITEM.key()), RecipeCategory.MISC, item.defaultInstance)
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', Ingredient.of(STICK))
+                .unlockedBy("stick", has { STICK })
         }
 
-        optionalDefaultModel()
+        flatModel(local("item"))
     }
 }
 

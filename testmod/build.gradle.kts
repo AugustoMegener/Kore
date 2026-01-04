@@ -45,11 +45,19 @@ runs {
         systemProperty("forge.enabledGameTestNamespaces", project.findProperty("mod_id") as String)
     }
 
-    create("data") {
+    create("clientData") {
         arguments.addAll(
                 "--mod", project.findProperty("mod_id") as String,
                 "--all", "--output", file("src/generated/resources/").absolutePath,
                 "--existing", file("src/main/resources/").absolutePath
+        )
+    }
+
+    create("serverData") {
+        arguments.addAll(
+            "--mod", project.findProperty("mod_id") as String,
+            "--all", "--output", file("src/generated/resources/").absolutePath,
+            "--existing", file("src/main/resources/").absolutePath
         )
     }
 }
@@ -62,7 +70,7 @@ configurations {
 
 dependencies {
     implementation("net.neoforged:neoforge:${project.findProperty("neo_version")}")
-    implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
+    implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
 
     implementation(project(":"))
     ksp(project(":ksp"))

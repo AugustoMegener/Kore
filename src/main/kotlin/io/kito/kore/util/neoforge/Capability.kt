@@ -11,10 +11,11 @@ import net.neoforged.neoforge.capabilities.BlockCapability
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.capabilities.EntityCapability
 import net.neoforged.neoforge.capabilities.ItemCapability
-import net.neoforged.neoforge.energy.IEnergyStorage
-import net.neoforged.neoforge.fluids.capability.IFluidHandler
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem
-import net.neoforged.neoforge.items.IItemHandler
+import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.access.ItemAccess
+import net.neoforged.neoforge.transfer.energy.EnergyHandler
+import net.neoforged.neoforge.transfer.fluid.FluidResource
+import net.neoforged.neoforge.transfer.item.ItemResource
 
 /**
  * Utility object for accessing common NeoForge capabilities.
@@ -23,64 +24,64 @@ import net.neoforged.neoforge.items.IItemHandler
  */
 object Capability {
     /**
-     * Provides the [BlockCapability] for [IItemHandler] on blocks.
+     * Provides the [BlockCapability] for [BlockCapability<ResourceHandler<ItemResource>] on blocks.
      */
-    inline val blockItemHandler: BlockCapability<IItemHandler, Direction?>
-        get() = Capabilities.ItemHandler.BLOCK
+    inline val blockItemHandler: BlockCapability<ResourceHandler<ItemResource>, Direction?>
+        get() = Capabilities.Item.BLOCK
 
     /**
      * Provides the [ItemCapability] for [IItemHandler] on item stacks.
      */
-    inline val stackItemHandler: ItemCapability<IItemHandler, Void?>
-        get() = Capabilities.ItemHandler.ITEM
+    inline val stackItemHandler: ItemCapability<ResourceHandler<ItemResource>, ItemAccess?>
+        get() = Capabilities.Item.ITEM
 
     /**
      * Provides the [EntityCapability] for [IItemHandler] on entities.
      */
-    inline val entityItemHandler: EntityCapability<IItemHandler, Void?>
-        get() = Capabilities.ItemHandler.ENTITY
+    inline val entityItemHandler: EntityCapability<ResourceHandler<ItemResource>, Void?>
+        get() = Capabilities.Item.ENTITY
 
     /**
      * Provides the [EntityCapability] for [IItemHandler] for automated entity interactions.
      */
-    inline val autoEntityItemHandler: EntityCapability<IItemHandler, Direction?>
-        get() = Capabilities.ItemHandler.ENTITY_AUTOMATION
+    inline val autoEntityItemHandler: EntityCapability<ResourceHandler<ItemResource>, Direction?>
+        get() = Capabilities.Item.ENTITY_AUTOMATION
 
     /**
      * Provides the [BlockCapability] for [IFluidHandler] on blocks.
      */
-    inline val blockFluidHandler: BlockCapability<IFluidHandler, Direction?>
-        get() = Capabilities.FluidHandler.BLOCK
+    inline val blockFluidHandler: BlockCapability<ResourceHandler<FluidResource>, Direction?>
+        get() = Capabilities.Fluid.BLOCK
 
     /**
      * Provides the [ItemCapability] for [IFluidHandlerItem] on item stacks.
      */
-    inline val stackFluidHandler: ItemCapability<IFluidHandlerItem, Void?>
-        get() = Capabilities.FluidHandler.ITEM
+    inline val stackFluidHandler: ItemCapability<ResourceHandler<FluidResource>, ItemAccess?>
+        get() = Capabilities.Fluid.ITEM
 
     /**
      * Provides the [EntityCapability] for [IFluidHandler] on entities.
      */
-    inline val entityFluidHandler: EntityCapability<IFluidHandler, Direction?>
-        get() = Capabilities.FluidHandler.ENTITY
+    inline val entityFluidHandler: EntityCapability<ResourceHandler<FluidResource>, Direction?>
+        get() = Capabilities.Fluid.ENTITY
 
     /**
      * Provides the [BlockCapability] for [IEnergyStorage] on blocks.
      */
-    inline val blockEnergyStorage: BlockCapability<IEnergyStorage, Direction?>
-        get() = Capabilities.EnergyStorage.BLOCK
+    inline val blockEnergyStorage: BlockCapability<EnergyHandler, Direction?>
+        get() = Capabilities.Energy.BLOCK
 
     /**
      * Provides the [ItemCapability] for [IEnergyStorage] on item stacks.
      */
-    inline val stackEnergyStorage: ItemCapability<IEnergyStorage, Void?>
-        get() = Capabilities.EnergyStorage.ITEM
+    inline val stackEnergyStorage: ItemCapability<EnergyHandler, ItemAccess>
+        get() = Capabilities.Energy.ITEM
 
     /**
      * Provides the [EntityCapability] for [IEnergyStorage] on entities.
      */
-    inline val entityEnergyStorage: EntityCapability<IEnergyStorage, Direction?>
-        get() = Capabilities.EnergyStorage.ENTITY
+    inline val entityEnergyStorage: EntityCapability<EnergyHandler, Direction?>
+        get() = Capabilities.Energy.ENTITY
 
 
     /**

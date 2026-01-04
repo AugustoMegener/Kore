@@ -10,12 +10,14 @@ import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.RenderPipelines
 
 @Scan
 object GuiLayers {
 
     @RegisterLayer("$ID:my_hud", ABOVE)
     fun GuiGraphics.myHud(delta: DeltaTracker) {
-        blit(local("block_top").block.texture.png, 50, 50, 0f, 0f, 16, 16, 16, 16)
+        //blit(RenderPipelines.GUI, local("block_top").block.texture.png, 16, 16, 50, 50)
+
     }
 }

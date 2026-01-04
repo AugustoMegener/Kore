@@ -24,7 +24,8 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
-    implementation("net.neoforged:neoforge:${project.findProperty("neo_version")}")
+    implementation("net.neoforged:neoforge:${property("neo_version")}")
+    ksp("net.neoforged:neoforge:${property("neo_version")}")
     implementation("thedarkcolour:kotlinforforge-neoforge:5.5.0")
 
     implementation(project(":"))
@@ -34,6 +35,9 @@ dependencies {
     ksp("com.google.dagger:dagger-compiler:2.51.1")
 
     implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")
+
+    implementation("org.apache.logging.log4j:log4j-core:2.22.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.22.0")
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

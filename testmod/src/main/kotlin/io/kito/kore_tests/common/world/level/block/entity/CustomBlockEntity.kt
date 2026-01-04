@@ -1,6 +1,8 @@
 package io.kito.kore_tests.common.world.level.block.entity
 
 import io.kito.kore.common.data.Save
+import io.kito.kore.common.data.strategy.NBTSerialization
+import io.kito.kore.common.data.strategy.SerializationStrategy
 import io.kito.kore.common.world.level.block.entity.KBlockEntity
 import io.kito.kore.util.minecraft.literal
 import io.kito.kore.util.neoforge.BlockEntityExt.AutoDirt
@@ -12,20 +14,24 @@ import io.kito.kore_tests.common.world.item.crafting.NiceRecipe
 import io.kito.kore_tests.common.world.item.crafting.NiceRecipeInput
 import net.minecraft.core.BlockPos
 import net.minecraft.core.NonNullList
-import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.MenuProvider
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.state.BlockState
-import net.neoforged.neoforge.items.ItemStackHandler
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
+import net.neoforged.neoforge.transfer.item.ItemResource
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler
+import net.neoforged.neoforge.transfer.transaction.TransactionContext
 import kotlin.jvm.optionals.getOrNull
 
 class CustomBlockEntity(pos: BlockPos, blockState: BlockState) : KBlockEntity(pos, blockState), MenuProvider {
 
     @Save var name by AutoDirt("nothing")
 
-    @Save val inventory = object : ItemStackHandler(3) {
+    @Save val inventory = object : ItemStacksResourceHandler(3) {
 
         private val input1Slot = 0
         private val input2Slot = 1
@@ -34,41 +40,46 @@ class CustomBlockEntity(pos: BlockPos, blockState: BlockState) : KBlockEntity(po
         val recipeInput = NiceRecipeInput(this, input1Slot, input2Slot)
 
         val actualRecipe
-            get() = beLvl.recipeManager.getRecipeFor(NiceRecipe.type, recipeInput, beLvl).getOrNull()?.value
+            get() = (beLvl as ServerLevel).recipeAccess().getRecipeFor(NiceRecipe.type, recipeInput, beLvl).getOrNull()?.value
 
-        override fun isItemValid(slot: Int, stack: ItemStack) =
-            when(slot) { outputSlot -> get(slot).isEmpty
-                         else -> true }
 
-        override fun onContentsChanged(slot: Int) {
+
+        override fun isValid(index: Int, resource: ItemResource) = when(index) { outputSlot -> get(index).isEmpty
+            else -> true }
+
+        override fun onContentsChanged(index: Int, previousContents: ItemStack) {
             setChanged()
 
-            if (slot != outputSlot) updateOutput()
+            if (index != outputSlot) updateOutput(actualRecipe?.result!!)
         }
 
-        @Save val component = Component.literal("Hello")
+        override fun extract(index: Int, resource: ItemResource, amount: Int, transaction: TransactionContext): Int {
+            if (index == outputSlot) {
+                val result = actualRecipe?.assemble(recipeInput, beLvl.registryAccess()) ?: return 0
 
-        override fun extractItem(slot: Int, amount: Int, simulate: Boolean): ItemStack {
-            if (slot == outputSlot && !simulate) {
-                actualRecipe?.assemble(recipeInput, beLvl.registryAccess())
-
-                val stack = super.extractItem(slot, amount, false)
-                updateOutput()
+                val stack = super.extract(index, resource, amount, transaction)
+                updateOutput(result)
                 return stack
             }
 
-            return super.extractItem(slot, amount, simulate)
+            return super.extract(index, resource, amount, transaction)
         }
 
-        fun updateOutput() {
-            setStackInSlot(outputSlot, actualRecipe?.getResultItem(beLvl.registryAccess()) ?: ItemStack.EMPTY)
+        fun updateOutput(result: ItemStack) {
+
+            set(outputSlot, ItemResource.of(result), result.count)
         }
     }
 
-    override val itemDrops: NonNullList<ItemStack> get() = NonNullList.copyOf((0..1).map { inventory[it] })
+    override val itemDrops: NonNullList<ItemStack> get() = NonNullList.copyOf((0..1).map {
+        inventory[it].toStack(inventory.getAmountAsInt(it))
+    })
 
     override fun createMenu(containerId: Int, playerInventory: Inventory, player: Player) =
         CustomMenu(containerId, playerInventory, this)
 
     override fun getDisplayName() = name.toTitle().literal
+
+
+    override val strategy by lazy { NBTSerialization(beLvl.registryAccess()) }
 }

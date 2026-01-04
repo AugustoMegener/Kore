@@ -12,6 +12,10 @@ import io.kito.kore_tests.common.registry.Items
 import io.kito.kore_tests.common.registry.Items.itemTemplate
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
+import net.minecraft.core.registries.BuiltInRegistries.ITEM
+import net.minecraft.data.recipes.RecipeCategory
+import net.minecraft.data.recipes.ShapedRecipeBuilder
+import net.minecraft.world.item.Items.STICK
 
 import net.minecraft.world.item.crafting.CraftingBookCategory
 import net.minecraft.world.item.crafting.Ingredient
@@ -21,13 +25,13 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 object Recipes {
     val recipeTemplate = ActionTemplate(stringRegistry) { i: String ->
         recipe(local("${i}_recipe")) {
-            ShapedRecipe(ID, CraftingBookCategory.MISC,
-                shaped("###",
-                       "###",
-                       "###")
-                    .by('#' to Ingredient.of(itemTemplate[i]!!)),
-                blockTemplate.item[i]!!.defaultInstance
+            ShapedRecipeBuilder.shaped(
+                lookupOrThrow(ITEM.key()), RecipeCategory.MISC, blockTemplate.item[i]!!.defaultInstance
             )
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', Ingredient.of(itemTemplate[i]!!))
         }
     }.include(myGroup)
 }

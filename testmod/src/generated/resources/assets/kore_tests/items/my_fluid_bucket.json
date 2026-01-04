@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "kore_tests:item/my_fluid_bucket"
+  }
+}

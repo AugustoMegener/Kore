@@ -6,7 +6,9 @@ import net.minecraft.advancements.Criterion
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
 import net.minecraft.data.recipes.RecipeBuilder
 import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.crafting.Recipe
 
 abstract class KRecipeBuilderBase<R: KRecipe<*>, T : KRecipeBuilderBase<R, T>> : RecipeBuilder {
 
@@ -29,15 +31,15 @@ abstract class KRecipeBuilderBase<R: KRecipe<*>, T : KRecipeBuilderBase<R, T>> :
 
     override fun getResult() = recipe.itemResult
 
-    override fun save(recipeOutput: RecipeOutput, id: ResourceLocation) {
+    override fun save(recipeOutput: RecipeOutput, resourceKey: ResourceKey<Recipe<*>>) {
         val advancement = recipeOutput.advancement()
-            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-            .rewards(AdvancementRewards.Builder.recipe(id))
+            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(resourceKey))
+            .rewards(AdvancementRewards.Builder.recipe(resourceKey))
             .requirements(AdvancementRequirements.Strategy.OR)
 
         criteria.forEach(advancement::addCriterion)
 
-        recipeOutput.accept(id, recipe, advancement.build(id.withPrefix("recipes/$prefix")))
+        recipeOutput.accept(resourceKey, recipe, advancement.build(resourceKey.location().withPrefix("recipes/$prefix")))
     }
 
     abstract fun createRecipe(): R

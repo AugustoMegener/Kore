@@ -6,23 +6,20 @@ import com.google.gson.JsonElement
 import com.mojang.serialization.Codec
 import io.kito.kore.common.data.codec.KCodecSerializer
 import io.kito.kore.util.minecraft.jsonOps
+import net.minecraft.resources.FileToIdConverter
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
 
-abstract class KJsonResourceReloadListener<T : Any>(val dir: String, val serializerProvider: () -> Codec<T>) :
-    SimpleJsonResourceReloadListener(GsonBuilder().setPrettyPrinting().create(), dir)
+abstract class KJsonResourceReloadListener<T : Any>(dir: FileToIdConverter, serializerProvider: () -> Codec<T>) :
+    SimpleJsonResourceReloadListener<T>(serializerProvider(), dir)
 {
-    private val serializer by lazy { serializerProvider() }
 
     lateinit var entries: ImmutableMap<ResourceLocation, T> private set
     val values get() = entries.values
 
-    override fun apply(obj: MutableMap<ResourceLocation, JsonElement>,
-                       resourceManager: ResourceManager,
-                       profiler: ProfilerFiller)
-    {
-        entries = ImmutableMap.copyOf(obj.mapValues { (_, json) -> serializer.parse(jsonOps, json).getOrThrow() })
+    override fun apply(`object`: Map<ResourceLocation, T>, resourceManager: ResourceManager, profiler: ProfilerFiller) {
+        entries = ImmutableMap.copyOf(`object`)
     }
 }

@@ -2,10 +2,12 @@ package io.kito.kore.client.renderer
 
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.neoforged.fml.ModContainer
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent
 import net.neoforged.neoforgespi.language.IModInfo
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 
 /**
@@ -17,7 +19,7 @@ import kotlin.reflect.full.hasAnnotation
 @Scan
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class RegisterClientReloadListener {
+annotation class RegisterClientReloadListener(val id: String) {
 
     /**
      * Companion object responsible for scanning and registering client-side reload listeners.
@@ -38,11 +40,13 @@ annotation class RegisterClientReloadListener {
         @ObjectScanner(PreparableReloadListener::class)
         fun collectScanners(info: IModInfo, container: ModContainer, data: PreparableReloadListener) {
             // Ensure the PreparableReloadListener instance itself is annotated with @RegisterClientReloadListener
-            if (!data::class.hasAnnotation<RegisterClientReloadListener>()) return
+            val id = data::class.findAnnotation<RegisterClientReloadListener>()?.id ?: return
 
             // Add a listener to the mod's event bus for registering client reload listeners
-            container.eventBus?.addListener { event: RegisterClientReloadListenersEvent ->
-                event.registerReloadListener(data)
+
+
+            container.eventBus?.addListener { event: AddClientReloadListenersEvent ->
+                event.addListener(loc(info.modId, id), data)
             }
         }
     }

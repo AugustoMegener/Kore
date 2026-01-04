@@ -31,9 +31,9 @@ object EventScanner : FunScanner<Unit> {
     /**
      * Reference to NeoForge's base [Event] class for type checking.
      */
-    private val neoEvent = net.neoforged.bus.api.Event::class.java
+    private val neoEvent = Event::class.java
 
-    override val bound = FunScanner.globalBound
+    override val bound = globalBound
     override val annotation = KSubscribe::class
     override val returnType =       Unit::class
 

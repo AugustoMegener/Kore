@@ -1,21 +1,23 @@
 package io.kito.kore.common.datagen
 
-import io.kito.kore.Kore.ID
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.BlockRegister.BlockBuilder
 import io.kito.kore.common.registry.EntityTypeRegister.EntityTypeBuilder
-import io.kito.kore.common.registry.FluidTypeRegister
 import io.kito.kore.common.registry.FluidTypeRegister.FluidTypeBuilder
 import io.kito.kore.common.registry.ItemRegister.ItemBuilder
 import io.kito.kore.common.world.TagBiomeModifier
 import io.kito.kore.util.UNCHECKED_CAST
-import io.kito.kore.util.minecraft.PlacedFeatureExt.commonOrePlacement
 import io.kito.kore.util.minecraft.ResourceLocationExt.item
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
-import io.kito.kore.util.minecraft.ResourceLocationExt.png
-import io.kito.kore.util.minecraft.ResourceLocationExt.texture
-import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.ItemModelGenerators
+import net.minecraft.client.data.models.model.ItemModelUtils
+import net.minecraft.client.data.models.model.ModelLocationUtils
+import net.minecraft.client.data.models.model.ModelTemplates.FLAT_ITEM
+import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.data.models.model.TexturedModel
+import net.minecraft.client.data.models.model.TexturedModel.createAllSame
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.HolderSet
 import net.minecraft.core.Registry
@@ -28,67 +30,48 @@ import net.minecraft.data.PackOutput
 import net.minecraft.data.loot.BlockLootSubProvider
 import net.minecraft.data.loot.EntityLootSubProvider
 import net.minecraft.data.loot.LootTableProvider
-import net.minecraft.data.loot.LootTableProvider.SubProviderEntry
 import net.minecraft.data.loot.LootTableSubProvider
+import net.minecraft.data.recipes.RecipeBuilder
 import net.minecraft.data.recipes.RecipeOutput
+import net.minecraft.data.recipes.RecipeProvider
 import net.minecraft.data.worldgen.BootstrapContext
 import net.minecraft.data.worldgen.features.FeatureUtils
 import net.minecraft.data.worldgen.placement.PlacementUtils
-import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Component.translatable
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.packs.PackType
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
+import net.minecraft.util.context.ContextKeySet
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.flag.FeatureFlagSet
-import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.crafting.Recipe
-import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration.UNDERGROUND_ORES
-import net.minecraft.world.level.levelgen.VerticalAnchor
-import net.minecraft.world.level.levelgen.VerticalAnchor.absolute
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
-import net.minecraft.world.level.levelgen.placement.HeightRangePlacement.triangle
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest
 import net.minecraft.world.level.storage.loot.LootTable
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.fml.LogicalSide
 import net.neoforged.fml.ModContainer
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider
-import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
-import net.neoforged.neoforge.client.model.generators.ModelProvider
 import net.neoforged.neoforge.common.Tags.Biomes.IS_OVERWORLD
-import net.neoforged.neoforge.common.conditions.ICondition
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider
 import net.neoforged.neoforge.common.data.LanguageProvider
 import net.neoforged.neoforge.common.world.BiomeModifier
 import net.neoforged.neoforge.data.event.GatherDataEvent
-import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS
 import net.neoforged.neoforge.registries.NeoForgeRegistries.FLUID_TYPES
+import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS
 import net.neoforged.neoforgespi.language.IModInfo
-import org.apache.http.client.entity.EntityBuilder
-import java.util.function.BiConsumer
+import kotlin.reflect.KClass
 import net.minecraft.world.item.CreativeModeTab.Builder as TabBuilder
 
 
-typealias   ItemModelBuilder<T> =  ItemModelProvider.(ResourceLocation, T) -> Unit
-typealias  BlockStateBuilder<T> = BlockStateProvider.(ResourceLocation, T) -> Unit
-typealias      RecipeBuilder<T> = (HolderLookup.Provider) -> Recipe<T>
 typealias TranslationBuilder = LanguageProvider.() -> Unit
 
 /**
@@ -102,41 +85,31 @@ typealias TranslationBuilder = LanguageProvider.() -> Unit
  */
 abstract class DataGenHelper(private val modId: String) {
 
-    /**
-     * A list of item model builders, each consisting of a [ResourceLocation] and a lambda for building the item model.
-     */
-    private val  itemModelBuilders = arrayListOf<Pair<ResourceLocation, ItemModelBuilder<Item>>>()
-    /**
-     * A list of block state builders, each consisting of a [ResourceLocation] and a lambda for building the block state.
-     */
-    private val blockModelBuilders = arrayListOf<Pair<ResourceLocation, BlockStateBuilder<Block>>>()
-    /**
-     * A list of recipe builders, each a lambda that takes a [RecipeOutput] and [HolderLookup.Provider] to generate recipes.
-     */
-    private val     recipeBuilders = arrayListOf<RecipeOutput.(HolderLookup.Provider) -> Unit>()
+    private val tagRegistries = hashMapOf<KClass<*>, Registry<Any>>()
 
-    /**
-     * A map storing translation entries, keyed by locale (e.g., "en_us").
-     * Each value is a list of [TranslationBuilder] lambdas for adding translations to a [LanguageProvider].
-     */
-    private val translationEntries = hashMapOf<String, ArrayList<TranslationBuilder>>()
+    private val blockGenerators = arrayListOf<Pair<ResourceLocation, BlockModelGenerators.(Block) -> Unit>>()
+    private val itemGenerators = arrayListOf<Pair<ResourceLocation, ItemModelGenerators.(Item) -> Unit>>()
 
-    private val lootTableSubProviders =
-        arrayListOf<Pair<(HolderLookup.Provider) -> LootTableSubProvider, LootContextParamSet>>()
+    private val     recipeBuilders = arrayListOf<(RecipeOutput, HolderLookup.Provider, RecipeProvider) -> Unit>()
 
     private var requiredLootTables = setOf<ResourceKey<LootTable>>()
 
+    private val lootTableSubProviders =
+        arrayListOf<Pair<(HolderLookup.Provider) -> LootTableSubProvider, ContextKeySet>>()
+
     private val builtInProviders = arrayListOf<Pair<ResourceKey<out Registry<Any>>, (BootstrapContext<Any>) -> Unit>>()
 
-    private val featureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceKey<*>, TagKey<*>>>>()
-    private val optionalFeatureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceLocation, TagKey<*>>>>()
+    private val featureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<Any, TagKey<*>>>>()
+    private val optionalFeatureTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<Any, TagKey<*>>>>()
     private val tagTagProviders = hashMapOf<Registry<*>, ArrayList<() -> Pair<TagKey<*>, TagKey<*>>>>()
-    private val optionalTagTagProvider = hashMapOf<Registry<*>, ArrayList<() -> Pair<ResourceLocation, TagKey<*>>>>()
+    private val optionalTagTagProvider = hashMapOf<Registry<*>, ArrayList<() -> Pair<TagKey<*>, TagKey<*>>>>()
+
+    private val translationEntries = hashMapOf<String, ArrayList<TranslationBuilder>>()
 
     /**
      * A list of custom data providers to be registered, along with their distribution target (client or server).
      */
-    val providers = arrayListOf<Pair<Dist, (PackOutput) -> DataProvider>>()
+    val providers = arrayListOf<(PackOutput) -> DataProvider>()
 
     /**
      * Internal list of data generation blocks (lambdas) collected from functions annotated with [DataGen].
@@ -144,176 +117,114 @@ abstract class DataGenHelper(private val modId: String) {
      */
     internal val blocks = arrayListOf<() -> Unit>()
 
-    /**
-     * Extension function for [BlockBuilder] to define a custom block state for a block.
-     * @param T The type of the [Block].
-     * @param builder A lambda that takes a [BlockStateProvider], [ResourceLocation], and [Block] to define the block state.
-     */
-    @Suppress(UNCHECKED_CAST)
-    fun <T : Block> BlockBuilder<T>.state(builder: BlockStateBuilder<T>)
-        { blockModelBuilders += loc(modId, blockName) to (builder as BlockStateBuilder<Block>) }
 
-    /**
-     * Extension function for [BlockBuilder] to define a default simple block state for a block.
-     * This uses [BlockStateProvider.simpleBlock].
-     */
-    fun BlockBuilder<*>.defaultState() { state { _, it -> simpleBlock(it) } }
-    /**
-     * Extension function for [BlockBuilder] to define a default simple block state with an item model for a block.
-     * This uses [BlockStateProvider.simpleBlockWithItem] and [BlockStateProvider.cubeAll].
-     */
-    fun BlockBuilder<*>.defaultStateAndItemModel() { state { _, it -> simpleBlockWithItem(it, cubeAll(it)) } }
+    fun BlockBuilder<*>.model(mappings: BlockModelGenerators.(Block) -> Unit) {
+        blockGenerators += blockId to mappings
+    }
 
-    /**
-     * Extension function for [BlockBuilder] to add named translation entries for a block.
-     * @param entries A vararg of pairs, where each pair is a locale string and the translated name.
-     */
-    fun BlockBuilder<*>.named(vararg entries: Pair<String, String>)
-        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(BLOCK[blockId], it.second) } } }
+    fun ItemBuilder<*>.model(mappings: ItemModelGenerators.(Item) -> Unit) {
+        itemGenerators += itemId to mappings
+    }
 
+    fun ItemBuilder<*>.flatModel() {
+        model { generateFlatItem(it, FLAT_ITEM) }
+    }
 
-    /**
-     * Extension function for [ItemBuilder] to define a custom item model for an item.
-     * @param T The type of the [Item].
-     * @param builder A lambda that takes an [ItemModelProvider], [ResourceLocation], and [Item] to define the item model.
-     */
-    @Suppress(UNCHECKED_CAST)
-    fun <T : Item> ItemBuilder<T>.model(builder: ItemModelBuilder<T>)
-        { itemModelBuilders += loc(modId, name)  to (builder as ItemModelBuilder<Item>) }
-
-    /**
-     * Extension function for [ItemBuilder] to define a default basic item model.
-     * This uses [ItemModelProvider.basicItem].
-     */
-    fun ItemBuilder<*>.defaultModel() { model { loc, _ -> basicItem(loc) } }
-
-    fun ItemBuilder<*>.optionalDefaultModel() {
-        model { loc, _ ->
-            existingFileHelper.trackGenerated(loc.item, ModelProvider.TEXTURE)
-            basicItem(loc)
+    fun ItemBuilder<*>.flatModel(location: ResourceLocation) {
+        model {
+            itemModelOutput.accept(
+                it,
+                ItemModelUtils.plainModel(
+                    FLAT_ITEM.create(
+                        ModelLocationUtils.getModelLocation(it), TextureMapping.layer0(location.item), modelOutput
+                    )
+                )
+            )
         }
     }
 
-    /**
-     * Extension function for [ItemBuilder] to define a simple block item model.
-     * This uses [ItemModelProvider.simpleBlockItem].
-     */
-    fun ItemBuilder<*>.blockModel() { model { loc, _ -> simpleBlockItem(loc) } }
-    /**
-     * Extension function for [ItemBuilder] to define a spawn egg item model.
-     * This uses [ItemModelProvider.spawnEggItem].
-     */
-    fun ItemBuilder<*>.spawnEggModel() { model { loc, _ -> spawnEggItem(loc) } }
 
-    /**
-     * Extension function for [ItemBuilder] to define a bucket item model.
-     * This sets up the model to use a generic bucket texture with a custom fluid layer.
-     */
-    fun ItemBuilder<*>.bucketModel() { model { loc, _ ->
-        withExistingParent("$loc", mcLoc("item/generated"))
-            .texture("layer0", mcLoc("bucket").item)
-            .texture("layer1", loc.item)
-    } }
 
-    /**
-     * Extension function for [ItemBuilder] to add named translation entries for an item.
-     * @param entries A vararg of pairs, where each pair is a locale string and the translated name.
-     */
+    fun BlockBuilder<*>.cubeAllModel() {
+        model { createTrivialCube(it) }
+    }
+
+    fun BlockBuilder<*>.cubeAllModel(location: ResourceLocation) {
+        model { block ->
+            blockStateOutput.accept(
+                BlockModelGenerators.createSimpleBlock(
+                    block,
+                    BlockModelGenerators.plainVariant(createAllSame(location).create(block, modelOutput))
+                )
+            )
+        }
+    }
+
+    fun BlockBuilder<*>.cubeModel() {
+        model { createGenericCube(it) }
+    }
+
+    fun BlockBuilder<*>.logModel(provider: TexturedModel.Provider) {
+        model { createAxisAlignedPillarBlock(it, provider) }
+    }
+
+    fun ItemBuilder<*>.defaultModel() {
+        model { generateFlatItem(it, FLAT_ITEM); }
+    }
+
+
+    fun BlockBuilder<*>.named(vararg entries: Pair<String, String>)
+    { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+        { add(BLOCK[blockId].get().value(), it.second) } } }
+
     fun ItemBuilder<*>.named(vararg entries: Pair<String, String>)
-        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(ITEM[itemId], it.second) } } }
+    { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+        { add(ITEM[itemId].get().value(), it.second) } } }
 
 
     fun EntityTypeBuilder<*>.named(vararg entries: Pair<String, String>)
-        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(ENTITY_TYPE[entityTypeId], it.second) } } }
+    { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+        { add(ENTITY_TYPE[entityTypeId].get().value(), it.second) } } }
 
     fun FluidTypeBuilder.named(vararg entries: Pair<String, String>)
-        { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
-            { add(fluidTypeId.toLanguageKey("fluid_type"), it.second) } } }
+    { entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } +=
+        { add(fluidTypeId.toLanguageKey("fluid_type"), it.second) } } }
 
 
-    /**
-     * Extension function for [TabBuilder] (CreativeModeTab.Builder) to add named translation entries for a creative tab.
-     * @param name The name of the creative tab, used to form the resource location.
-     * @param entries A vararg of pairs, where each pair is a locale string and the translated name.
-     */
     fun TabBuilder.named(name: String, vararg entries: Pair<String, String>)
     { loc(modId, name).toLanguageKey("itemGroup").let { key ->
-        title(Component.translatable(key))
+        title(translatable(key))
         entries.forEach { translationEntries.computeIfAbsent(it.first) { arrayListOf() } += { add(key, it.second) } }
     } }
 
-    /**
-     * Registers a recipe with a given [ResourceLocation] and a [RecipeBuilder].
-     * @param T The type of [RecipeInput] for the recipe.
-     * @param loc The [ResourceLocation] for the recipe.
-     * @param builder A lambda that takes a [HolderLookup.Provider] and returns a [Recipe].
-     */
-    fun <T : RecipeInput> recipe(loc: ResourceLocation, builder: RecipeBuilder<T>) {
-        recipeBuilders += { accept(loc, builder(it), null) }
+    fun recipe(id: ResourceLocation, builder: HolderLookup.Provider.(RecipeProvider) -> RecipeBuilder) {
+        recipeBuilders += { output, provider, rProvider -> builder(provider, rProvider).save(output, id.toString()) }
     }
 
-    /**
-     * Registers a recipe with a given [ResourceLocation], an [AdvancementHolder], and a [RecipeBuilder].
-     * @param T The type of [RecipeInput] for the recipe.
-     * @param loc The [ResourceLocation] for the recipe.
-     * @param advancement The [AdvancementHolder] associated with this recipe.
-     * @param builder A lambda that takes a [HolderLookup.Provider] and returns a [Recipe].
-     */
-    fun <T : RecipeInput> recipe(loc: ResourceLocation, advancement: AdvancementHolder, builder: RecipeBuilder<T>) {
-        recipeBuilders += { accept(loc, builder(it), advancement) }
+    fun <T : Item> ItemBuilder<T>.recipe(id: ResourceLocation, builder: HolderLookup.Provider.(T, RecipeProvider) -> RecipeBuilder) {
+        recipeBuilders += { output, provider, rProvider ->
+            builder(provider, ITEM[itemId].get().value() as T, rProvider).save(output, id.toString())
+        }
     }
 
-    /**
-     * Registers a recipe with a given [ResourceLocation], an [AdvancementHolder], optional [ICondition]s, and a [RecipeBuilder].
-     * @param T The type of [RecipeInput] for the recipe.
-     * @param loc The [ResourceLocation] for the recipe.
-     * @param advancement The [AdvancementHolder] associated with this recipe.
-     * @param conditions A vararg of [ICondition]s that must be met for the recipe to be active.
-     * @param builder A lambda that takes a [HolderLookup.Provider] and returns a [Recipe].
-     */
-    fun <T : RecipeInput> recipe(loc: ResourceLocation,
-                                 advancement: AdvancementHolder,
-                                 vararg conditions: ICondition,
-                                 builder: RecipeBuilder<T>)
-    { recipeBuilders += { accept(loc, builder(it), advancement, *conditions) } }
-
-
-    @Suppress(UNCHECKED_CAST)
-    fun <T : RecipeInput, I : Item> ItemBuilder<I>.recipe(loc: ResourceLocation,
-                                                          builder: (HolderLookup.Provider, I) -> Recipe<T>)
-    { recipeBuilders += { accept(loc, builder(it, ITEM[itemId] as I), null) } }
-
-    @Suppress(UNCHECKED_CAST)
-    fun <T : RecipeInput, I: Item> ItemBuilder<I>.recipe(loc: ResourceLocation,
-                                                         advancement: AdvancementHolder,
-                                                         builder: (HolderLookup.Provider, I) -> Recipe<T>)
-    { recipeBuilders += { accept(loc, builder(it, ITEM[itemId] as I), advancement) } }
-
-    @Suppress(UNCHECKED_CAST)
-    fun <T : RecipeInput, I: Item>  ItemBuilder<I>.recipe(loc: ResourceLocation,
-                                                          advancement: AdvancementHolder,
-                                                          vararg conditions: ICondition,
-                                                          builder: (HolderLookup.Provider, I) -> Recipe<T>)
-    { recipeBuilders += { accept(loc, builder(it, ITEM[itemId] as I), advancement, *conditions) } }
-
+    fun <T : Item> ItemBuilder<T>.recipe(builder: HolderLookup.Provider.(T, RecipeProvider) -> RecipeBuilder) {
+        recipeBuilders += { output, provider, rProvider -> builder(provider, ITEM[itemId].get().value() as T, rProvider).save(output) }
+    }
 
     fun blockLootTable(block: (HolderLookup.Provider) -> BlockLootSubProvider) {
-        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to LootContextParamSets.BLOCK
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to ContextKeySet.EMPTY
     }
 
     @Suppress(UNCHECKED_CAST)
     fun <T : Block> BlockBuilder<T>.blockLootTable(block: (HolderLookup.Provider, T) -> BlockLootSubProvider) {
-        lootTableSubProviders += { it: HolderLookup.Provider -> block(it, BLOCK[blockId] as T) } to
-                LootContextParamSets.BLOCK
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it, BLOCK[blockId].get().value() as T) } to
+                ContextKeySet.EMPTY
     }
 
     fun blockLootTable(block: (HolderLookup.Provider) -> BlockLootSubProvider,
                        requiredTables: Set<ResourceKey<LootTable>>)
     {
-        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to LootContextParamSets.BLOCK
+        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to ContextKeySet.EMPTY
         requiredLootTables += requiredTables
     }
 
@@ -322,13 +233,13 @@ abstract class DataGenHelper(private val modId: String) {
                                                    requiredTables: Set<ResourceKey<LootTable>>)
     {
         lootTableSubProviders += { it: HolderLookup.Provider -> block(it, BLOCK[blockId] as T) } to
-                LootContextParamSets.BLOCK
+                ContextKeySet.EMPTY
 
         requiredLootTables += requiredTables
     }
 
     fun entityLootTable(block: (HolderLookup.Provider) -> EntityLootSubProvider) {
-        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to LootContextParamSets.ENTITY
+        lootTableSubProviders += { it: HolderLookup.Provider ->  block(it) } to ContextKeySet.EMPTY
     }
 
     @Suppress(UNCHECKED_CAST)
@@ -336,14 +247,14 @@ abstract class DataGenHelper(private val modId: String) {
         block: (HolderLookup.Provider, EntityType<T>) -> EntityLootSubProvider
     ) {
         lootTableSubProviders += { it: HolderLookup.Provider ->
-            block(it, ENTITY_TYPE[entityTypeId] as EntityType<T>)
-        } to LootContextParamSets.ENTITY
+            block(it, ENTITY_TYPE[entityTypeId].get().value() as EntityType<T>)
+        } to ContextKeySet.EMPTY
     }
 
     fun entityLootTable(block: (HolderLookup.Provider) -> EntityLootSubProvider,
                         requiredTables: Set<ResourceKey<LootTable>>)
     {
-        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to LootContextParamSets.ENTITY
+        lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to ContextKeySet.EMPTY
         requiredLootTables += requiredTables
     }
 
@@ -354,16 +265,16 @@ abstract class DataGenHelper(private val modId: String) {
     ) {
         lootTableSubProviders += { it: HolderLookup.Provider ->
             block(it, ENTITY_TYPE[entityTypeId] as EntityType<T>)
-        } to LootContextParamSets.ENTITY
+        } to ContextKeySet.EMPTY
 
         requiredLootTables += requiredTables
     }
 
-    fun lootTable(ctx: LootContextParamSet,
+    fun lootTable(ctx: ContextKeySet,
                   block: (HolderLookup.Provider) -> LootTableSubProvider)
     { lootTableSubProviders += { it: HolderLookup.Provider -> block(it) } to ctx }
 
-    fun lootTable(ctx: LootContextParamSet,
+    fun lootTable(ctx: ContextKeySet,
                   requiredTables: Set<ResourceKey<LootTable>>,
                   block: (HolderLookup.Provider) -> LootTableSubProvider)
     {
@@ -392,7 +303,6 @@ abstract class DataGenHelper(private val modId: String) {
         return key
     }
 
-
     fun BlockBuilder<*>.oreConfiguration(id: ResourceLocation, rule: RuleTest, size: Int) :
             ResourceKey<ConfiguredFeature<*, *>>
     {
@@ -401,7 +311,7 @@ abstract class DataGenHelper(private val modId: String) {
         CONFIGURED_FEATURE.provider { ctx ->
             FeatureUtils.register(
                 ctx, key, Feature.ORE,
-                OreConfiguration(rule, BLOCK[blockId].defaultBlockState(), size)
+                OreConfiguration(rule, BLOCK[blockId].orElseThrow().value().defaultBlockState(), size)
             )
         }
 
@@ -476,77 +386,77 @@ abstract class DataGenHelper(private val modId: String) {
 
     fun <T : Any> Registry<T>.addTag(feature: () -> T, vararg tags: TagKey<T>) {
         featureTagProviders.computeIfAbsent(this) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(key(), getKey(feature())!!) to it } }
+            tags.map { { feature() to it } }
     }
 
     fun <T : Any> Registry<T>.addTag(tag: TagKey<T>, vararg tags: TagKey<T>) {
         tagTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { tag to it } }
     }
 
-    fun <T : Any> Registry<T>.addOptionalToTag(id: ResourceLocation, vararg tags: TagKey<T>) {
-        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it } }
+    fun <T : Any> Registry<T>.addOptionalToTag(thing: () -> T, vararg tags: TagKey<T>) {
+        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { thing() to it } }
     }
 
-    fun <T : Any> Registry<T>.addOptionalTagToTag(id: ResourceLocation, vararg tags: TagKey<T>) {
+    fun <T : Any> Registry<T>.addOptionalTagToTag(id: TagKey<T>, vararg tags: TagKey<T>) {
         optionalTagTagProvider.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it } }
     }
 
     fun ItemBuilder<*>.tags(vararg tags: TagKey<Item>) {
         featureTagProviders.computeIfAbsent(ITEM) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(ITEM.key(), itemId) to it } }
+            tags.map { { ITEM[itemId].get().value() to it } }
     }
 
     fun BlockBuilder<*>.tags(vararg tags: TagKey<Block>) {
         featureTagProviders.computeIfAbsent(BLOCK) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(BLOCK.key(), blockId) to it } }
+            tags.map { { BLOCK[blockId].get().value() to it } }
     }
 
     fun EntityTypeBuilder<*>.tags(vararg tags: TagKey<EntityType<*>>) {
         featureTagProviders.computeIfAbsent(ENTITY_TYPE) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(ENTITY_TYPE.key(), entityTypeId) to it } }
+            tags.map { { ENTITY_TYPE[entityTypeId].get().value() to it } }
     }
 
     fun FluidTypeBuilder.tags(vararg tags: TagKey<FluidTypeBuilder>) {
         featureTagProviders.computeIfAbsent(FLUID_TYPES) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(FLUID_TYPES.key(), fluidTypeId) to it } }
+            tags.map { { FLUID_TYPES[fluidTypeId].get().value() to it } }
     }
 
 
     fun <T : Any> Registry<T>.addTag(feature: () -> T, vararg tags: () -> TagKey<T>) {
         featureTagProviders.computeIfAbsent(this) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(key(), getKey(feature())!!) to it() } }
+            tags.map { { feature() to it() } }
     }
 
     fun <T : Any> Registry<T>.addTag(tag: TagKey<T>, vararg tags: () -> TagKey<T>) {
         tagTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { tag to it() } }
     }
 
-    fun <T : Any> Registry<T>.addOptionalToTag(id: ResourceLocation, vararg tags: () -> TagKey<T>) {
-        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it() } }
+    fun <T : Any> Registry<T>.addOptionalToTag(feature: () -> T, vararg tags: () -> TagKey<T>) {
+        optionalFeatureTagProviders.computeIfAbsent(this) { arrayListOf() } += tags.map { { feature() to it() } }
     }
 
-    fun <T : Any> Registry<T>.addOptionalTagToTag(id: ResourceLocation, vararg tags: () -> TagKey<T>) {
-        optionalTagTagProvider.computeIfAbsent(this) { arrayListOf() } += tags.map { { id to it() } }
+    fun <T : Any> Registry<T>.addOptionalTagToTag(id: () -> TagKey<T>, vararg tags: () -> TagKey<T>) {
+        optionalTagTagProvider.computeIfAbsent(this) { arrayListOf() } += tags.map { { id() to it() } }
     }
 
     fun ItemBuilder<*>.tags(vararg tags: () -> TagKey<Item>) {
         featureTagProviders.computeIfAbsent(ITEM) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(ITEM.key(), itemId) to it() } }
+            tags.map { { ITEM[itemId].get().value() to it() } }
     }
 
     fun BlockBuilder<*>.tags(vararg tags: () -> TagKey<Block>) {
         featureTagProviders.computeIfAbsent(BLOCK) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(BLOCK.key(), blockId) to it() } }
+            tags.map { { BLOCK[blockId].get().value() to it() } }
     }
 
     fun EntityTypeBuilder<*>.tags(vararg tags: () -> TagKey<EntityType<*>>) {
         featureTagProviders.computeIfAbsent(ENTITY_TYPE) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(ENTITY_TYPE.key(), entityTypeId) to it() } }
+            tags.map { { ENTITY_TYPE[entityTypeId].get().value() to it() } }
     }
 
     fun FluidTypeBuilder.tags(vararg tags: () -> TagKey<FluidTypeBuilder>) {
         featureTagProviders.computeIfAbsent(FLUID_TYPES) { arrayListOf() } +=
-            tags.map { { ResourceKey.create(FLUID_TYPES.key(), fluidTypeId) to it() } }
+            tags.map { { FLUID_TYPES[fluidTypeId].get().value() to it() } }
     }
 
     /**
@@ -555,134 +465,108 @@ abstract class DataGenHelper(private val modId: String) {
      *
      * @param event The [GatherDataEvent] provided by NeoForge.
      */
-    fun register(event: GatherDataEvent) {
-        // Execute all collected data generation blocks.
-        blocks.forEach { it() }
+    fun registerClient(event: GatherDataEvent.Client) {
 
-        val generator = event.generator
+        event.createProvider { DynamicItemModelProvider(modId, it, blockGenerators, itemGenerators) }
 
-        // Add DynamicBlockStateProvider for block states.
-        generator.addProvider(
-            event.includeClient(),
-            DynamicBlockStateProvider(generator.packOutput, modId, event.existingFileHelper,
-                blockModelBuilders.map { { p -> it.second(p, it.first, BLOCK[it.first]) } })
-        )
-        // Add DynamicItemModelProvider for item models.
-        generator.addProvider(
-            event.includeClient(),
-            DynamicItemModelProvider(generator.packOutput, modId, event.existingFileHelper,
-                                     itemModelBuilders.map { { p -> it.second(p, it.first, ITEM[it.first]) } })
-        )
-
-        // Add DynamicLanguageProvider for each locale with collected translation entries.
-        translationEntries.forEach { (locale, entries) ->
-            generator.addProvider(event.includeClient(),
-                                  DynamicLanguageProvider(generator.packOutput, modId, locale, entries)
+        event.createProvider {
+            LootTableProvider(
+                it,
+                requiredLootTables,
+                lootTableSubProviders.map { (s, ctx) -> LootTableProvider.SubProviderEntry(s, ctx) },
+                event.lookupProvider
             )
         }
 
-        // Add DynamicRecipeProvider for recipes.
-        generator.addProvider(event.includeServer(),
-            DynamicRecipeProvider(generator.packOutput, event.lookupProvider, recipeBuilders))
+        translationEntries.forEach { (locale, entries) ->
+            event.createProvider {
+                DynamicLanguageProvider(it, modId, locale, entries)
+            }
+        }
 
-        generator.addProvider(event.includeServer(),
-            LootTableProvider(
-                generator.packOutput,
-                requiredLootTables,
-                lootTableSubProviders.map { (s, ctx) -> SubProviderEntry(s, ctx) },
-                event.lookupProvider
-            )
-        )
+        event.createProvider { output, provider -> DynamicRecipeProvider(output, provider, recipeBuilders) }
 
-
-        generator.addProvider(
-            event.includeServer(),
+        event.createProvider {
             DatapackBuiltinEntriesProvider(
-                generator.packOutput,
+                it,
                 event.lookupProvider,
                 RegistrySetBuilder().apply {
-                    builtInProviders.groupBy { it.first }
-                        .mapValues { it.value.map { pair -> pair.second } }
-                        .forEach  { (k, s) -> add(k) { ctx -> s.forEach { it(ctx) } } }
+                    builtInProviders.groupBy { u -> u.first }
+                        .mapValues { u -> u.value.map { pair -> pair.second } }
+                        .forEach { (k, s) -> add(k) { ctx -> s.forEach { u -> u(ctx) } } }
                 },
                 mutableSetOf(modId)
             )
-        )
+        }
 
 
 
-        featureTagProviders.forEach { (registry, it) ->
-            generator.addProvider(
-                event.includeServer(),
+        featureTagProviders.forEach { (registry, u) ->
+            event.createProvider {
                 DynamicTagProvider(
+                    registry as Registry<Any>,
                     registry.key() as ResourceKey<out Registry<Any>>,
-                    it as List<() -> Pair<ResourceKey<Any>, TagKey<Any>>>,
+                    u as List<() -> Pair<ResourceKey<Any>, TagKey<Any>>>,
                     arrayListOf(),
                     arrayListOf(),
                     arrayListOf(),
-                    generator.packOutput,
+                    it,
+                    event.lookupProvider,
+                    modId
+                )
+            }
+        }
+        optionalFeatureTagProviders.forEach { (registry, u) ->
+            event.createProvider {
+                DynamicTagProvider(
+                    registry as Registry<Any>,
+                    registry.key() as ResourceKey<out Registry<Any>>,
+                    arrayListOf(),
+                    u as List<() -> Pair<ResourceLocation, TagKey<Any>>>,
+                    arrayListOf(),
+                    arrayListOf(),
+                    it,
                     event.lookupProvider,
                     modId,
-                    event.existingFileHelper
                 )
-            )
+            }
         }
-        optionalFeatureTagProviders.forEach { (registry, it) ->
-            generator.addProvider(
-                event.includeServer(),
+        tagTagProviders.forEach { (registry, u) ->
+            event.createProvider {
                 DynamicTagProvider(
-                    registry.key() as ResourceKey<out Registry<Any>>,
-                    arrayListOf(),
-                    it as List<() -> Pair<ResourceLocation, TagKey<Any>>>,
-                    arrayListOf(),
-                    arrayListOf(),
-                    generator.packOutput,
-                    event.lookupProvider,
-                    modId,
-                    event.existingFileHelper
-                )
-            )
-        }
-        tagTagProviders.forEach { (registry, it) ->
-            generator.addProvider(
-                event.includeServer(),
-                DynamicTagProvider(
+                    registry as Registry<Any>,
                     registry.key() as ResourceKey<out Registry<Any>>,
                     arrayListOf(),
                     arrayListOf(),
-                    it as List<() -> Pair<TagKey<Any>, TagKey<Any>>>,
+                    u as List<() -> Pair<TagKey<Any>, TagKey<Any>>>,
                     arrayListOf(),
-                    generator.packOutput,
+                    it,
                     event.lookupProvider,
-                    modId,
-                    event.existingFileHelper
+                    modId
                 )
-            )
+            }
         }
-        optionalTagTagProvider.forEach { (registry, it) ->
-            generator.addProvider(
-                event.includeServer(),
+        optionalTagTagProvider.forEach { (registry, u) ->
+            event.createProvider {
                 DynamicTagProvider(
+                    registry as Registry<Any>,
                     registry.key() as ResourceKey<out Registry<Any>>,
                     arrayListOf(),
                     arrayListOf(),
                     arrayListOf(),
-                    it as List<() -> Pair<ResourceLocation, TagKey<Any>>>,
-                    generator.packOutput,
+                    u as List<() -> Pair<TagKey<Any>, TagKey<Any>>>,
+                    it,
                     event.lookupProvider,
                     modId,
-                    event.existingFileHelper
                 )
-            )
+            }
         }
 
-        // Add any custom data providers.
-        providers.forEach { (d, c) ->
-            generator.addProvider(when (d) {
-                Dist.CLIENT -> event.includeClient()
-                Dist.DEDICATED_SERVER -> event.includeServer()
-            }, c(generator.packOutput))
-        }
+        providers.forEach { event.createProvider(it) }
+    }
+
+    fun registerServer(event: GatherDataEvent.Server) {
+
     }
 
     /**
@@ -708,7 +592,8 @@ abstract class DataGenHelper(private val modId: String) {
             if (info.modId != data.modId) return
 
             // Add a listener to the mod's event bus for the GatherDataEvent.
-            container.eventBus?.addListener(data::register)
+            container.eventBus?.addListener(data::registerClient)
+            container.eventBus?.addListener(data::registerServer)
         }
     }
 }

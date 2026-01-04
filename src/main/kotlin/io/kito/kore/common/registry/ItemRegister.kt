@@ -5,6 +5,9 @@ import io.kito.kore.common.capabilities.ItemCapRegister.ItemCapRegistry
 import io.kito.kore.util.minecraft.ItemProp
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import io.kito.kore.util.minecraft.itemProp
+import net.minecraft.core.registries.BuiltInRegistries.ITEM
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -135,9 +138,11 @@ open class ItemRegister(final override val id: String) : AutoRegister {
         infix fun where(builder: ItemBuilder<T>.() -> Unit): DeferredItem<T> {
             apply(builder)
 
-            val reg = register.register(name) { -> supplier(properties(ItemProp())) }
+            val reg = register.registerItem(name) {
+                supplier(properties(ItemProp().setId(ResourceKey.create(Registries.ITEM, loc(id, name)))))
+            }
 
-            ItemCapRegister.itemCaps += { reg.value() } to itemCaps.registries
+            ItemCapRegister.itemCaps += reg::value to itemCaps.registries
 
             return reg
         }

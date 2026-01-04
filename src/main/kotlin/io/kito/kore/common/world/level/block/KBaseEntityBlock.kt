@@ -5,6 +5,7 @@ import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.createBE
 import io.kito.kore.common.world.level.block.entity.KBlockEntity
 import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Containers
 import net.minecraft.world.InteractionResult
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.BaseEntityBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.block.entity.ChestBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import kotlin.jvm.optionals.getOrNull
@@ -45,23 +47,13 @@ abstract class KBaseEntityBlock<T : BlockEntity>(properties: Properties) : BaseE
         if (player is ServerPlayer) state.getMenuProvider(level, pos)
             ?.let { p -> player.openMenu(p) { it.writeBlockPos(pos) } }
 
-        return InteractionResult.sidedSuccess(level.isClientSide)
+        return InteractionResult.SUCCESS
     }
 
-    override fun onRemove(state: BlockState,
-                          level: Level,
-                          pos: BlockPos,
-                          newState: BlockState,
-                          movedByPiston: Boolean)
-    {
-        val be = level.getBlockEntity(pos, bet(this::class)).getOrNull()
-
-        if (be != null && be is KBlockEntity && !level.isClientSide) {
-            Containers.dropContents(level, pos, be.itemDrops)
-        }
-
-        super.onRemove(state, level, pos, newState, movedByPiston)
+    override fun affectNeighborsAfterRemoval(state: BlockState, level: ServerLevel, pos: BlockPos, bool: Boolean) {
+        Containers.updateNeighboursAfterDestroy(state, level, pos)
     }
+
 
     @Suppress(UNCHECKED_CAST)
     fun blockEntity(level: Level, pos: BlockPos) = level.getBlockEntity(pos) as T

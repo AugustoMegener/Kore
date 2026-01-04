@@ -171,5 +171,75 @@ object MobExt {
     var AttributeSupplier.Builder.luck: Double
         get() = throw IllegalStateException("Can\'t get a set-only var")
         set(value) { add(LUCK, value) }
+
+    var AttributeSupplier.Builder.waypointTransmitRange: Double
+        get() = throw IllegalStateException("Can\'t get a set-only var")
+        set(value) { add(WAYPOINT_TRANSMIT_RANGE, value) }
+
+    var AttributeSupplier.Builder.waypointReceiveRange: Double
+        get() = throw IllegalStateException("Can\'t get a set-only var")
+        set(value) { add(WAYPOINT_RECEIVE_RANGE, value) }
+
+    var AttributeSupplier.Builder.blockBreakSpeed: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(BLOCK_BREAK_SPEED, value) }
+
+    var AttributeSupplier.Builder.blockInteractionRange: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(BLOCK_INTERACTION_RANGE, value) }
+
+    var AttributeSupplier.Builder.burningTime: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(BURNING_TIME, value) }
+
+    var AttributeSupplier.Builder.cameraDistance: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(CAMERA_DISTANCE, value) }
+
+    var AttributeSupplier.Builder.entityInteractionRange: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(ENTITY_INTERACTION_RANGE, value) }
+
+    var AttributeSupplier.Builder.fallDamageMultiplier: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(FALL_DAMAGE_MULTIPLIER, value) }
+
+    var AttributeSupplier.Builder.miningEfficiency: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(MINING_EFFICIENCY, value) }
+
+    var AttributeSupplier.Builder.oxygenBonus: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(OXYGEN_BONUS, value) }
+
+    var AttributeSupplier.Builder.safeFallDistance: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(SAFE_FALL_DISTANCE, value) }
+
+    var AttributeSupplier.Builder.sneakingSpeed: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(SNEAKING_SPEED, value) }
+
+    var AttributeSupplier.Builder.spawnReinforcementsChance: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(SPAWN_REINFORCEMENTS_CHANCE, value) }
+
+    var AttributeSupplier.Builder.submergedMiningSpeed: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(SUBMERGED_MINING_SPEED, value) }
+
+    var AttributeSupplier.Builder.sweepingDamageRatio: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(SWEEPING_DAMAGE_RATIO, value) }
+
+    var AttributeSupplier.Builder.temptRange: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(TEMPT_RANGE, value) }
+
+    var AttributeSupplier.Builder.waterMovementEfficiency: Double
+        get() = throw IllegalStateException("Can't get a set-only var")
+        set(value) { add(WATER_MOVEMENT_EFFICIENCY, value) }
+
+
 }
 

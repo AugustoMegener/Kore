@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "kore_tests:block/block"
+      "model": "kore_tests:block/cute_block"
     }
   }
 }

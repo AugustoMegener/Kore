@@ -1,51 +1,68 @@
 package io.kito.kore.common.world.level.block.entity
 
 
-import io.kito.kore.common.data.nbt.KNBTSerializable
+import io.kito.kore.common.data.nbt.KValueIOSerializable
 import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.bet
+import io.kito.kore.util.minecraft.nbtOps
 import io.kito.kore.util.minecraft.set
+import io.kito.kore.util.neoforge.BlockEntityExt.beLvl
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.Connection
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.util.ProblemReporter
+import net.minecraft.world.Containers
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.TagValueInput
+import net.minecraft.world.level.storage.TagValueOutput
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
+import kotlin.jvm.optionals.getOrNull
 
 abstract class KBlockEntity(pos: BlockPos, blockState: BlockState, type: BlockEntityType<*>? = null)
-    : BlockEntity(type ?: bet(blockState.block::class), pos, blockState), KNBTSerializable
+    : BlockEntity(type ?: bet(blockState.block::class), pos, blockState), KValueIOSerializable
 {
     open val itemDrops = NonNullList.create<ItemStack>()
 
-    override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider)
-        { tag["data"] = serializeNBT(registries)
-          super.saveAdditional(tag, registries) }
+    override fun saveAdditional(output: ValueOutput)
+        { serialize(output.child("data"))
+          super.saveAdditional(output) }
 
-    override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider)
-        { deserializeNBT(registries, tag["data"] as CompoundTag)
-          super.loadAdditional(tag, registries) }
+    override fun loadAdditional(input: ValueInput)
+        { deserialize(input.childOrEmpty("data"))
+          super.loadAdditional(input) }
 
-    override fun getUpdateTag(registries: HolderLookup.Provider) =
-         CompoundTag().also { it["data"] = serializeNBT(registries) }
+    override fun getUpdateTag(registries: HolderLookup.Provider): CompoundTag =
+         super.getUpdateTag(registries).also { tag -> 
+             tag["data"] = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, registries)
+                 .also { serialize(it) }.buildResult()
+         }
 
-    override fun handleUpdateTag(tag: CompoundTag, registries: HolderLookup.Provider)
-        { deserializeNBT(registries, tag["data"] as CompoundTag)
-          super.handleUpdateTag(tag, registries) }
+    override fun handleUpdateTag(input: ValueInput)
+        { deserialize(input.childOrEmpty("data"))
+          super.handleUpdateTag(input) }
 
     override fun getUpdatePacket(): ClientboundBlockEntityDataPacket = ClientboundBlockEntityDataPacket.create(this)
 
-    override fun onDataPacket(net: Connection, pkt: ClientboundBlockEntityDataPacket, registries: HolderLookup.Provider)
-        { deserializeNBT(registries, pkt.tag["data"] as CompoundTag)
-          super.onDataPacket(net, pkt, registries) }
+    override fun onDataPacket(net: Connection, valueInput: ValueInput)
+        { deserialize(valueInput.childOrEmpty("data"))
+          super.onDataPacket(net, valueInput) }
 
-    final override fun   serializeNBT(provider: HolderLookup.Provider) = super.serializeNBT(provider)
-    final override fun deserializeNBT(provider: HolderLookup.Provider, nbt: CompoundTag)
-        { super.deserializeNBT(provider, nbt) }
 
     open fun tick() {}
 
 
+    override fun preRemoveSideEffects(pos: BlockPos, state: BlockState) {
+
+        Containers.dropContents(beLvl, pos, itemDrops)
+
+
+        super.preRemoveSideEffects(pos, state)
+    }
 }

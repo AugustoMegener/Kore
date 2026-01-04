@@ -17,6 +17,7 @@ import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.Config.inputMsg
 import io.kito.kore_tests.common.network.PACKETS_VERSION
 import net.minecraft.client.KeyMapping
+import net.minecraft.network.chat.Component
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
 @Scan
@@ -35,7 +36,7 @@ object KeyMappings {
 
         override fun invoke(ctx: IPayloadContext?) {
             ctx.main {
-                ctx!!.player().sendSystemMessage("Key pressed! $inputMsg".literal)
+                ctx!!.player().displayClientMessage("Key pressed! $inputMsg".literal, false)
             }
         }
 

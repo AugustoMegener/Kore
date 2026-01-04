@@ -1,13 +1,16 @@
 package io.kito.kore.common.network
 
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
+import net.neoforged.neoforge.client.network.ClientPacketDistributor
 import net.neoforged.neoforge.network.PacketDistributor
 import net.neoforged.neoforge.network.handling.IPayloadContext
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
 import java.util.concurrent.CompletableFuture
 
-abstract class Packet(type: PacketType<*>) : CustomPacketPayload by type {
+abstract class Packet(val type: PacketType<*>) : CustomPacketPayload by type {
 
     open var targetPlayer: ServerPlayer? = null
 
@@ -15,7 +18,7 @@ abstract class Packet(type: PacketType<*>) : CustomPacketPayload by type {
 
     fun send() {
         runForDist(
-            { PacketDistributor.sendToServer(this) },
+            { ClientPacketDistributor.sendToServer(this) },
             {
                 if (targetPlayer != null) PacketDistributor.sendToPlayer(targetPlayer!!, this)
                 else PacketDistributor.sendToAllPlayers(this)
@@ -31,4 +34,10 @@ abstract class Packet(type: PacketType<*>) : CustomPacketPayload by type {
         }
         else return enqueueWork(block)
     }
+
+    override fun toVanillaClientbound(): ClientboundCustomPayloadPacket? = type.toVanillaClientbound()
+
+
+    override fun toVanillaServerbound(): ServerboundCustomPayloadPacket? = type.toVanillaServerbound()
+
 }

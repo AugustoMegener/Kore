@@ -7,9 +7,16 @@ import io.kito.kore_tests.common.world.level.entity.KMob
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.MobRenderer
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.resources.ResourceLocation
 
-class KMobRenderer(ctx: EntityRendererProvider.Context) : MobRenderer<KMob, KMobModel>(ctx, KMobModel(ctx), 0f) {
+class Foo : EntityRenderState()
 
-    override fun getTextureLocation(entity: KMob) = local("kmob.png").entity.texture
+class KMobRenderer(ctx: EntityRendererProvider.Context) :
+    MobRenderer<KMob, LivingEntityRenderState, KMobModel>(ctx, KMobModel(ctx), 0f)
+{
+    override fun createRenderState() = LivingEntityRenderState()
+
+    override fun getTextureLocation(renderState: LivingEntityRenderState) = local("kmob.png").entity.texture
 }

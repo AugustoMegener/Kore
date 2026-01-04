@@ -52,16 +52,14 @@ abstract class KRecipe<T : RecipeInput>(private val type: RecipeType<*>? = null,
 
     override fun assemble(input: T, registries: HolderLookup.Provider): ItemStack {
         slots.forEach { (s, i) -> assembleInput(s.slot, i, input, registries) }
-        return getResultItem(registries)
+        return result.copy()
     }
 
-    override fun canCraftInDimensions(width: Int, height: Int) = true
+    override fun getSerializer(): RecipeSerializer<out Recipe<T>> =
+        (recipeSerializer ?: this::class.companionObject!!.objectInstance) as RecipeSerializer<out Recipe<T>>
 
-    override fun getResultItem(registries: HolderLookup.Provider) = result.copy()
-
-    override fun getSerializer() = recipeSerializer ?: this::class.companionObject!!.objectInstance as RecipeSerializer<*>
-
-    override fun getType() = type ?: (this::class.companionObject!!.objectInstance as KRecipeType<*>).type
+    override fun getType(): RecipeType<out Recipe<T>> =
+        (type ?: (this::class.companionObject!!.objectInstance as KRecipeType<*>).type) as RecipeType<out Recipe<T>>
 
     fun checkInput(slot: Int, ingredient: Either<SizedIngredient, ICustomIngredient>, input: T, level: Level): Boolean =
         ingredient.map({ checkInput(slot, it, input, level) }, { checkInput(slot, it, input, level)  })
@@ -92,4 +90,6 @@ abstract class KRecipe<T : RecipeInput>(private val type: RecipeType<*>? = null,
                            ingredient: ICustomIngredient,
                            input: T,
                            registries: HolderLookup.Provider) {}
+
+    override fun recipeBookCategory() = RecipeBookCategory()
 }

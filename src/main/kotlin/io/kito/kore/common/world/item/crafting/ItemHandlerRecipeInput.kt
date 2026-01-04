@@ -3,31 +3,39 @@ package io.kito.kore.common.world.item.crafting
 import io.kito.kore.util.neoforge.ItemHandlerExt.get
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.RecipeInput
-import net.neoforged.neoforge.items.IItemHandler
+import net.neoforged.neoforge.transfer.ResourceHandler
+import net.neoforged.neoforge.transfer.item.ItemResource
+import net.neoforged.neoforge.transfer.transaction.TransactionContext
 
-abstract class ItemHandlerRecipeInput<T: IItemHandler>(val handler: T) : IItemHandler, RecipeInput {
+abstract class ItemHandlerRecipeInput<T: ResourceHandler<ItemResource>>(val handler: T) :
+    ResourceHandler<ItemResource>, RecipeInput
+{
 
     abstract val indexes: Map<Int, Int>
 
-    override fun getItem(index: Int) = get(index)
+    override fun getItem(index: Int): ItemStack = handler[index].toStack(handler.getAmountAsInt(index))
 
     override fun size() = indexes.keys.max()
 
 
-    override fun getStackInSlot(slot: Int) =
+    override fun getResource(slot: Int): ItemResource =
         handler[indexes[slot] ?: throw IllegalStateException("Invalid index: $slot")]
 
-    override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean) =
-        handler.insertItem(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), stack, simulate)
 
-    override fun extractItem(slot: Int, amount: Int, simulate: Boolean) =
-        handler.extractItem(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), amount, simulate)
+    override fun insert(index: Int, resource: ItemResource, amount: Int, transaction: TransactionContext) =
+        handler.insert(indexes[index] ?: throw IllegalStateException("Invalid index: $index"), resource, amount, transaction)
 
-    override fun getSlots() = size()
 
-    override fun getSlotLimit(slot: Int) =
-        handler.getSlotLimit(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"))
+    override fun extract(slot: Int, resource: ItemResource, amount: Int, transaction: TransactionContext): Int =
+        handler.extract(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), resource, amount, transaction)
 
-    override fun isItemValid(slot: Int, stack: ItemStack) =
-        handler.isItemValid(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), stack)
+    override fun getCapacityAsInt(slot: Int, resource: ItemResource): Int =
+        handler.getCapacityAsInt(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), resource)
+
+    override fun isValid(slot: Int, resource: ItemResource): Boolean =
+        handler.isValid(indexes[slot] ?: throw IllegalStateException("Invalid index: $slot"), resource)
+
+    override fun getAmountAsLong(index: Int) = getAmountAsInt(index).toLong()
+
+    override fun getCapacityAsLong(index: Int, resource: ItemResource) = getCapacityAsInt(index, resource).toLong()
 }

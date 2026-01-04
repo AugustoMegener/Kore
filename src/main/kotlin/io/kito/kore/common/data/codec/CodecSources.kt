@@ -143,7 +143,7 @@ object CodecSources {
      * Provides a [Codec] for NeoForge's `SizedIngredient` class.
      */
     @CodecSource
-    fun sizedIngredientCodec(): Codec<SizedIngredient> = SizedIngredient.FLAT_CODEC
+    fun sizedIngredientCodec(): Codec<SizedIngredient> = SizedIngredient.NESTED_CODEC
 
     /**
      * Provides a [Codec] for Minecraft's `ItemStack` class.
@@ -160,7 +160,7 @@ object CodecSources {
     @CodecSource
     fun decorationCodec(): Codec<GenerationStep.Decoration> = GenerationStep.Decoration.CODEC
 
-    @CodecSource
-    fun carvingCodec(): Codec<GenerationStep.Carving> = GenerationStep.Carving.CODEC
+    /*@CodecSource
+    fun carvingCodec(): Codec<GenerationStep.Carving> = GenerationStep.Carving.CODEC*/
 }
 

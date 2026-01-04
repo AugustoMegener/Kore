@@ -110,7 +110,7 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
         private var liquidBlockBuilder: BlockBuilder<out LiquidBlock>.() -> Unit = {
             props {
                 replaceable()
-                noCollission()
+                //noCollission()
                 strength(100.0F)
                 pushReaction(PushReaction.DESTROY)
                 noLootTable()
@@ -124,11 +124,11 @@ open class FlowingFluidRegister(final override val id: String) : AutoRegister {
          */
         var makeBucketItem = true
 
-        /**
-         * Lazily initialized [DeferredItem] for the [BucketItem] associated with this fluid.
-         */
+        var bucketItemName = "${name}_bucket"
+
+
         val bucketItem by lazy {
-            with(itemRegister) { "${name}_bucket" of { bucketItemSupplier(sourceRegistry.get(), it) } where bucketItemBuilder }
+            with(itemRegister) { bucketItemName of { bucketItemSupplier(sourceRegistry.get(), it) } where bucketItemBuilder }
         }
 
         private var bucketItemSupplier: (FlowingFluid, ItemProp) -> BucketItem = ::BucketItem

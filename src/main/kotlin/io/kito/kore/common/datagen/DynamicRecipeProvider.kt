@@ -1,37 +1,66 @@
 package io.kito.kore.common.datagen
 
+import net.minecraft.advancements.CriteriaTriggers
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.critereon.InventoryChangeTrigger
+import net.minecraft.advancements.critereon.ItemPredicate
+import net.minecraft.advancements.critereon.MinMaxBounds
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.RecipeOutput
 import net.minecraft.data.recipes.RecipeProvider
-import net.neoforged.neoforge.common.data.LanguageProvider
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.ItemLike
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
-/**
- * A dynamic [RecipeProvider] that allows for registering recipes
- * using a list of lambda functions. This provides flexibility in defining recipes
- * programmatically during data generation.
- *
- * @param output The [PackOutput] for writing generated data.
- * @param registries A [CompletableFuture] that provides a [HolderLookup.Provider] for accessing registries.
- * @param entries A list of lambda functions, each taking a [RecipeOutput] and a [HolderLookup.Provider]
- *                and applying recipe definitions to it. These lambdas encapsulate
- *                the logic for generating specific recipes.
- */
 class DynamicRecipeProvider(output: PackOutput,
                             registries: CompletableFuture<HolderLookup.Provider>,
-                            private val entries : List<(RecipeOutput, HolderLookup.Provider) -> Unit>) :
-    RecipeProvider(output, registries)
+                            private val entries : List<(RecipeOutput, HolderLookup.Provider, RecipeProvider) -> Unit>) :
+    RecipeProvider.Runner(output, registries)
 {
-    /**
-     * Builds all recipes by iterating through the provided [entries]
-     * and applying each lambda function to the given [RecipeOutput] and [HolderLookup.Provider].
-     *
-     * @param recipeOutput The [RecipeOutput] to addEntry recipes with.
-     * @param holderLookup The [HolderLookup.Provider] for accessing registries.
-     */
-    override fun buildRecipes(recipeOutput: RecipeOutput, holderLookup: HolderLookup.Provider) {
-        entries.forEach { it(recipeOutput, holderLookup) }
+
+
+    override fun createRecipeProvider(registries: HolderLookup.Provider, output: RecipeOutput) =
+        object : RecipeProvider(registries, output) {
+            override fun buildRecipes() {
+                entries.forEach { it(output, registries, this) }
+
+            }
+        }
+
+
+    override fun getName() = ""
+
+    companion object {
+
+        fun HolderLookup.Provider.has(count: MinMaxBounds.Ints, item: ItemLike) =
+            inventoryTrigger(ItemPredicate.Builder.item().of(lookupOrThrow(Registries.ITEM), item).withCount(count))
+
+        fun HolderLookup.Provider.has(itemLike: ItemLike) =
+            inventoryTrigger(ItemPredicate.Builder.item().of(lookupOrThrow(Registries.ITEM), itemLike))
+
+
+        fun HolderLookup.Provider.has(tag: TagKey<Item>)=
+             inventoryTrigger(ItemPredicate.Builder.item().of(lookupOrThrow(Registries.ITEM), tag))
+
+
+        fun inventoryTrigger(vararg items: ItemPredicate.Builder) =
+            inventoryTrigger(*items.map(ItemPredicate.Builder::build).toTypedArray())
+
+
+        fun inventoryTrigger(vararg predicates: ItemPredicate): Criterion<InventoryChangeTrigger.TriggerInstance> =
+            CriteriaTriggers.INVENTORY_CHANGED
+                .createCriterion(
+                    InventoryChangeTrigger.TriggerInstance(
+                        Optional.empty(),
+                        InventoryChangeTrigger.TriggerInstance.Slots.ANY,
+                        listOf(*predicates)
+                    )
+                )
     }
 }
+
 

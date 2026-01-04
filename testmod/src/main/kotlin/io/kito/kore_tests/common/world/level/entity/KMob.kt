@@ -14,8 +14,4 @@ class KMob(entityType: EntityType<out Mob>, level: Level) : Mob(entityType, leve
     override fun registerGoals() {
         onGoalSelector(goal(0, ::FloatGoal))
     }
-
-    override fun getDefaultLootTable(): ResourceKey<LootTable> {
-        return super.getDefaultLootTable()
-    }
 }

@@ -4,8 +4,10 @@ import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.util.UNCHECKED_CAST
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -26,14 +28,14 @@ object RendererRegistry {
      * Renderers added to this list will be registered with NeoForge.
      */
     val entityRenderers =
-        arrayListOf<Pair<() -> EntityType<out Entity>, (EntityRendererProvider.Context) -> EntityRenderer<out Entity>>>()
+        arrayListOf<Pair<() -> EntityType<out Entity>, (EntityRendererProvider.Context) -> EntityRenderer<out Entity, out EntityRenderState>>>()
 
     /**
      * A list of pairs, where each pair consists of a supplier for a [BlockEntityType] and its corresponding [BlockEntityRenderer].
      * Renderers added to this list will be registered with NeoForge.
      */
     val blockEntityRenderers =
-        arrayListOf<Pair<() -> BlockEntityType<out BlockEntity>, BlockEntityRenderer<out BlockEntity>>>()
+        arrayListOf<Pair<() -> BlockEntityType<out BlockEntity>, BlockEntityRenderer<out BlockEntity, out BlockEntityRenderState>>>()
 
 
     /**
@@ -48,11 +50,11 @@ object RendererRegistry {
     fun EntityRenderersEvent.RegisterRenderers.onRegisterRenderers() {
         // Register all collected entity renderers
         entityRenderers.forEach { (et, er) ->
-            registerEntityRenderer(et()) { er(it) as EntityRenderer<Entity> }
+            registerEntityRenderer(et()) { er(it) as EntityRenderer<Entity, out BlockEntityRenderState> }
         }
         // Register all collected block entity renderers
         blockEntityRenderers.forEach { (bet, ber) ->
-            registerBlockEntityRenderer(bet()) { ber as BlockEntityRenderer<BlockEntity> }
+            registerBlockEntityRenderer(bet()) { ber as BlockEntityRenderer<BlockEntity, out EntityRenderState> }
         }
     }
 }

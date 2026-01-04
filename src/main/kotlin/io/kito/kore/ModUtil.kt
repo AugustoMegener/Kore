@@ -1,6 +1,7 @@
 package io.kito.kore
 
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
+import net.minecraft.client.KeyMapping
 
 /**
  * An abstract utility class providing common functionalities for mods within the Kore framework.
@@ -35,6 +36,6 @@ abstract class ModUtil(private val modId: String) {
      * @param name The name of the keybinding category (e.g., "my_mod_category").
      * @return A string representing the localized key category.
      */
-    fun keyCategoryLocale(name: String) = "key.category.$name"
+    fun keyCategoryLocale(name: String) = KeyMapping.Category(local(name))
 }
 

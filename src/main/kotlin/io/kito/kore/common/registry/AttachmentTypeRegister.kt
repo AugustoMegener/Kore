@@ -1,10 +1,12 @@
 package io.kito.kore.common.registry
 
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.nbt.Tag
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.attachment.AttachmentType
-import net.neoforged.neoforge.common.util.INBTSerializable
+import net.neoforged.neoforge.common.util.ValueIOSerializable
+import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.NeoForgeRegistries.ATTACHMENT_TYPES
 
@@ -54,7 +56,7 @@ open class AttachmentTypeRegister(final override val id: String) : AutoRegister 
      * @param value A lambda that supplies the default value for the attachment.
      * @return A [DeferredRegister.DeferredHolder] for the registered [AttachmentType].
      */
-    infix fun <S : Tag, T : INBTSerializable<S>> String.on(value: () -> T) =
+    infix fun <T : ValueIOSerializable> String.on(value: () -> T): DeferredHolder<AttachmentType<*>, AttachmentType<T>> =
         register.register(this) { -> AttachmentType.serializable(value).build() }
 
     /**
@@ -71,7 +73,7 @@ open class AttachmentTypeRegister(final override val id: String) : AutoRegister 
          * @param codec The [Codec] for the attachment data type.
          * @return A [DeferredRegister.DeferredHolder] for the registered [AttachmentType].
          */
-        infix fun with(codec: Codec<T>) =
+        infix fun with(codec: MapCodec<T>): DeferredHolder<AttachmentType<*>, AttachmentType<T?>> =
             register.register(name) { -> AttachmentType.builder(value).serialize(codec).build() }
     }
 

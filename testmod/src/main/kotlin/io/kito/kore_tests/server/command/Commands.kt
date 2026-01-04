@@ -6,6 +6,7 @@ import io.kito.kore.server.command.RegisterCommand
 import io.kito.kore.util.minecraft.*
 import io.kito.kore.util.minecraft.ResourceLocationExt.toLoc
 import io.kito.kore_tests.common.resource.NiceDataReloadListener
+import io.kito.kore_tests.common.resource.NiceDataReloadListener.Companion.niceDataReloadListener
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands.argument
 import net.minecraft.commands.Commands.literal
@@ -26,7 +27,7 @@ object Commands {
                     runs {
                         source.sendSuccess({
                             "".literal.apply {
-                                NiceDataReloadListener.values.forEach { data ->
+                                niceDataReloadListener.values.forEach { data ->
                                     append(data.toString() + "\n")
                                 }
                             }
@@ -36,7 +37,7 @@ object Commands {
                 then(argument("id", message()) + {
                     runs {
                         source.sendSuccess(
-                            { NiceDataReloadListener.entries[arg<Message>("id").text.toLoc()]!!.toString().literal },
+                            { niceDataReloadListener.entries[arg<Message>("id").text.toLoc()]!!.toString().literal },
                             true
                         )
                         1

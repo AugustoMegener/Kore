@@ -15,6 +15,8 @@ import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -28,7 +30,6 @@ import net.minecraft.world.item.SpawnEggItem
 import net.minecraft.world.level.Level
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.neoforge.capabilities.EntityCapability
-import net.neoforged.neoforge.common.DeferredSpawnEggItem
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
@@ -121,7 +122,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
 
         val entityCaps = EntityCaps()
 
-        var renderer: ((EntityRendererProvider.Context) -> EntityRenderer<T>)? = null
+        var renderer: ((EntityRendererProvider.Context) -> EntityRenderer<T, *>)? = null
 
         var attributes: AttributeSupplier? = null
 
@@ -135,7 +136,7 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
          * Sets the [EntityRenderer] for this entity type.
          * @param builder A lambda that takes an [EntityRendererProvider.Context] and returns an [EntityRenderer].
          */
-        fun renderer(builder: (EntityRendererProvider.Context) -> EntityRenderer<T>) {
+        fun renderer(builder: (EntityRendererProvider.Context) -> EntityRenderer<T, *>) {
             renderer = builder
         }
 
@@ -182,8 +183,11 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
         open infix fun where(builder: EntityTypeBuilder<T>.() -> Unit): DeferredHolder<EntityType<*>, EntityType<T>> {
             apply(builder)
 
-            val reg = register.register(name)
-                { -> etBulderOf(supplier, category).apply(etBuilder).build(loc(id, name).toString()) }
+            val reg = register.register(name) { ->
+                etBulderOf(supplier, category).apply(etBuilder).build(
+                    ResourceKey.create(Registries.ENTITY_TYPE, loc(id, name))
+                )
+            }
 
             attributes?.let { livingAttributes += (reg::value as () -> EntityType<out LivingEntity>) to it }
 
@@ -202,47 +206,33 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
     inner class MobTypeBuilder<T : Mob>(name: String, supplier: EntityFactory<T>, category: MobCategory) :
         EntityTypeBuilder<T>(name, supplier, category)
     {
-        private var spawnEggColor1 : Int = 0
-        private var spawnEggColor2 : Int = 0
 
-        private var spawnEggSupplier : (() -> EntityType<T>, Int, Int, ItemProp) -> SpawnEggItem =
-            { t, c1, c2, p -> DeferredSpawnEggItem(t, c1, c2, p) }
+        private var spawnEggName = "${name}_spawn_egg"
+
+        private var spawnEggSupplier : (() -> EntityType<T>, ItemProp) -> SpawnEggItem =
+            { t, p -> SpawnEggItem(p.spawnEgg(t())) }
         private var spawnEggBuilder  : ItemRegister.ItemBuilder<out SpawnEggItem>.() -> Unit = {}
 
         /**
          * Lazily initialized supplier for the [SpawnEggItem] associated with this mob entity.
          */
         val spawnerEgg by lazy { { b: () -> EntityType<T> ->
-            itemRegister.ItemBuilder(name) { spawnEggSupplier(b, spawnEggColor1, spawnEggColor2, it) }
+            itemRegister.ItemBuilder(spawnEggName) { spawnEggSupplier(b, it) }
         } }
 
-        /**
-         * Configures the spawn egg for this mob entity.
-         * @param c1 The primary color of the spawn egg.
-         * @param c2 The secondary color of the spawn egg.
-         * @param builder A lambda that takes an [ItemBuilder] for [SpawnEggItem] and applies configurations.
-         */
-        fun spawnEgg(c1: Int, c2: Int, builder: ItemRegister.ItemBuilder<out SpawnEggItem>.() -> Unit = {}) {
-            spawnEggColor1 = c1
-            spawnEggColor2 = c2
+
+        fun spawnEgg(builder: ItemRegister.ItemBuilder<out SpawnEggItem>.() -> Unit = {}) {
             spawnEggBuilder = builder
         }
 
-        /**
-         * Configures the spawn egg for this mob entity with a custom supplier.
-         * @param I The type of the custom [SpawnEggItem].
-         * @param c1 The primary color of the spawn egg.
-         * @param c2 The secondary color of the spawn egg.
-         * @param supplier A lambda that supplies a new instance of the custom [SpawnEggItem].
-         * @param builder A lambda that takes an [ItemBuilder] for the custom [SpawnEggItem] and applies configurations.
-         */
-        fun <I : SpawnEggItem> spawnEgg(c1: Int,
-                                        c2: Int,
-                                        supplier: (() -> EntityType<T>, Int, Int, ItemProp) -> I,
+        fun spawnEgg(name: String, builder: ItemRegister.ItemBuilder<out SpawnEggItem>.() -> Unit = {}) {
+            spawnEggName = name
+            spawnEggBuilder = builder
+        }
+
+        fun <I : SpawnEggItem> spawnEgg(supplier: (() -> EntityType<T>, ItemProp) -> I,
                                         builder: ItemRegister.ItemBuilder<I>.() -> Unit)
         {
-            spawnEggColor1 = c1
-            spawnEggColor2 = c2
             spawnEggSupplier = supplier
             spawnEggBuilder = builder as ItemRegister.ItemBuilder<out SpawnEggItem>.() -> Unit
         }
@@ -258,8 +248,11 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
         infix fun that(builder: MobTypeBuilder<T>.() -> Unit): EntityRegistry<T> {
             apply(builder)
 
-            val reg = register.register(name)
-            { -> etBulderOf(supplier, category).apply(etBuilder).build(loc(id, name).toString()) }
+            val reg = register.register(name) { ->
+                etBulderOf(supplier, category).apply(etBuilder).build(
+                    ResourceKey.create(Registries.ENTITY_TYPE, loc(id, name))
+                )
+            }
 
             EntityCapRegister.entityCaps += reg::value to entityCaps.registries
 

@@ -9,7 +9,6 @@ import io.kito.kore.util.minecraft.ResourceLocationExt.png
 import io.kito.kore.util.minecraft.ResourceLocationExt.texture
 import net.minecraft.server.packs.PackType
 import net.minecraft.world.item.Item
-import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile
 
 open class ItemPreset<V, T : Item>(val preset: ItemBuilder<T>.(V) -> Unit,
                                    parents: Array<out Preset<V, ItemBuilder<T>>> = arrayOf()) :
@@ -18,6 +17,6 @@ open class ItemPreset<V, T : Item>(val preset: ItemBuilder<T>.(V) -> Unit,
     override fun ItemBuilder<T>.action(value: V) { preset(value) }
 
     companion object {
-        fun <T, I : Item> DataGenHelper.optionalDefaultModelPreset() = ItemPreset<T, I>({ optionalDefaultModel() })
+        fun <T, I : Item> DataGenHelper.optionalDefaultModelPreset() = ItemPreset<T, I>({ defaultModel() })
     }
 }

@@ -58,20 +58,17 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
     inner class BETBuilder<T : BlockEntity>(val name: String,
                                             val supplier: (BlockPos, BlockState) -> T)
     {
-        private var type: Type<*>? = null
         private val caps = BECaps()
 
-        private var renderer: BlockEntityRenderer<T>? = null
+        private var renderer: BlockEntityRenderer<T, *>? = null
 
-        /**
-         * Specifies the blocks that this [BlockEntityType] is valid for.
-         * This method registers the block entity type with NeoForge and associates it with the given blocks.
-         *
-         * @param blocks A lambda that supplies an array of [Block]s that this block entity type can be associated with.
-         * @return A [DeferredHolder] for the registered [BlockEntityType].
-         */
-        infix fun onAll(blocks: () -> Array<out Block>): DeferredHolder<BlockEntityType<*>, BlockEntityType<T>> =
-            registry.register(name) { -> BlockEntityType(supplier, blocks().toMutableSet(), type) }
+        infix fun onAll(blocks: Collection<() -> Block>): DeferredHolder<BlockEntityType<*>, BlockEntityType<T>> =
+            registry.register(name) { ->
+                BlockEntityType(
+                    supplier,
+                    blocks.map { it() }.toSet()
+                )
+            }
                 .also {
                     bets += blocks to it::get
                     beCaps += it::get to caps.registries
@@ -84,14 +81,7 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
          * @param block A lambda that supplies the [Block] that this block entity type can be associated with.
          * @return A [DeferredHolder] for the registered [BlockEntityType].
          */
-        infix fun on(block: () -> Block) = onAll { arrayOf(block()) }
-
-        /**
-         * Sets the [Type] for data fixing for this block entity type.
-         * @param value The [Type] for data fixing.
-         * @return This [BETBuilder] for fluent chaining.
-         */
-        infix fun withType(value: Type<*>?) = also { type = value }
+        infix fun on(block: () -> Block) = onAll(listOf(block))
 
         /**
          * Configures capabilities for this block entity type.
@@ -105,7 +95,7 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
          * @param beRenderer The [BlockEntityRenderer] for this block entity type.
          * @return This [BETBuilder] for fluent chaining.
          */
-        infix fun withRenderer(beRenderer: BlockEntityRenderer<T>) = also { renderer = beRenderer }
+        infix fun withRenderer(beRenderer: BlockEntityRenderer<T, *>) = also { renderer = beRenderer }
 
         /**
          * Inner class for defining and collecting block entity capabilities.
@@ -151,14 +141,14 @@ open class BlockEntityTypeRegister(final override val id: String) : AutoRegister
          * A list of pairs, where each pair consists of a supplier for an array of [Block]s
          * and a supplier for their corresponding [BlockEntityType].
          */
-        private val bets = arrayListOf<Pair<() -> Array<out Block>, () -> BlockEntityType<*>>>()
+        private val bets = arrayListOf<Pair<Collection<() -> Block>, () -> BlockEntityType<*>>>()
 
         /**
          * A lazily initialized immutable map that maps [KClass] of [Block] to a supplier for its [BlockEntityType].
          * This provides a quick lookup for the block entity type associated with a given block class.
          */
         val blockEntityTypes: ImmutableMap<KClass<out Block>, () -> BlockEntityType<*>> by lazy {
-            ImmutableMap.copyOf(bets.flatMap { (bks, bet) -> bks().map { it::class to bet } }. toMap())
+            ImmutableMap.copyOf(bets.flatMap { (bks, bet) -> bks.map { it()::class to bet } }. toMap())
         }
 
         /**

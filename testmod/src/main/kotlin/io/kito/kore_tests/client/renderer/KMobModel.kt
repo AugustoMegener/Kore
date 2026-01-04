@@ -15,26 +15,15 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder
 import net.minecraft.client.model.geom.builders.LayerDefinition
 import net.minecraft.client.model.geom.builders.MeshDefinition
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.state.EntityRenderState
 
-class KMobModel(root: ModelPart) : EntityModel<KMob>() {
+class KMobModel(root: ModelPart) : EntityModel<EntityRenderState>(root) {
 
     private val bbMain: ModelPart = root.getChild("bb_main")
 
     constructor(ctx: EntityRendererProvider.Context) : this(ctx.bakeLayer(layerLocation))
 
-    override fun setupAnim(entity: KMob,
-                           limbSwing: Float,
-                           limbSwingAmount: Float,
-                           ageInTicks: Float,
-                           netHeadYaw: Float,
-                           headPitch: Float) {}
 
-    override fun renderToBuffer(poseStack: PoseStack,
-                                buffer: VertexConsumer,
-                                packedLight: Int,
-                                packedOverlay: Int,
-                                color: Int)
-    { bbMain.render(poseStack, buffer, packedLight, packedOverlay, color) }
 
     @Scan
     companion object : ModelLayer {

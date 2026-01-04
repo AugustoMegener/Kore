@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "kore_tests:item/example_item"
+    "layer0": "kore_tests:item/item"
   }
 }

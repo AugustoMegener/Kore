@@ -24,6 +24,9 @@ import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
+import net.minecraft.core.registries.Registries.BLOCK
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
@@ -250,14 +253,23 @@ open class BlockRegister(final override val id: String) : AutoRegister {
         infix fun where(builder: BlockBuilder<B>.() -> Unit) : BlockRegistry<B> {
             apply(builder)
 
-            val reg = register.register(blockName) { -> supplier(props(blockProp())) }
+            val reg = register.registerBlock(blockName) {
+                supplier(props(blockProp().setId(ResourceKey.create(BLOCK, loc(id, blockName)))))
+            }
 
             BlockCapRegister.blockCaps += { reg.value() } to blockCaps.registries
 
             return BlockRegistry(
                 reg, blockItem { reg.value() } where blockItemBuilder,
                 blockEntitySupplier
-                    ?.let { be -> with(beRegister) { (blockName of be).apply(blockEntityBuilder) on { reg.value() } } })
+                    ?.let { be ->
+                        with(beRegister) {
+                            (blockName of be)
+                                .apply(blockEntityBuilder) on
+                                    reg::get
+                        }
+                    }
+            )
         }
     }
 

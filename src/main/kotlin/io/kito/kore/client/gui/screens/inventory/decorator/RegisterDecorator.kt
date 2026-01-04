@@ -2,7 +2,6 @@ package io.kito.kore.client.gui.screens.inventory.decorator
 
 import io.kito.kore.common.reflect.ObjectScanner
 import io.kito.kore.common.reflect.Scan
-import net.minecraft.client.gui.LayeredDraw
 import net.neoforged.fml.ModContainer
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent
 import net.neoforged.neoforgespi.language.IModInfo
