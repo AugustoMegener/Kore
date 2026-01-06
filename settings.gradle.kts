@@ -1,6 +1,7 @@
 pluginManagement {
     repositories {
         mavenLocal()
+        maven("https://central.sonatype.com/repository/maven-snapshots/")
         gradlePluginPortal()
         maven("https://maven.neoforged.net/releases")
     }

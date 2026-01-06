@@ -11,10 +11,10 @@ plugins {
     idea
     id("net.neoforged.gradle.userdev") version "7.0.+"
 
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.serialization") version "2.1.0"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
 
-    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    id("com.google.devtools.ksp") version "2.2.21-2.0.4"
 }
 
 jarJar.enable()

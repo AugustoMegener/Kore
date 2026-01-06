@@ -2,8 +2,8 @@ inline val String.prop get() = project.findProperty(this) as String
 
 plugins {
     `maven-publish`
-    kotlin("jvm") version "2.1.0"
-    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    kotlin("jvm") version "2.2.0"
+    id("com.google.devtools.ksp") version "2.2.21-2.0.4"
 
     id("net.neoforged.gradle.userdev") version "7.0.+"
 }
