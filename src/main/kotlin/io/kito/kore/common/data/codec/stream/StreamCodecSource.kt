@@ -74,7 +74,7 @@ annotation class StreamCodecSource {
 
         /**
          * Retrieves the [StreamCodec] for a given [KType], or `null` if no stream codec source is found.
-         * It first tries to find an exact match, then falls back to a superclass match.
+         * It first tries to find an exact match, that falls back to a superclass match.
          * @receiver The [KType] for which to retrieve the stream codec.
          * @return The [StreamCodec] for the given type, or `null`.
          */

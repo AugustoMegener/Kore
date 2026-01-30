@@ -13,7 +13,7 @@ import kotlin.reflect.full.memberProperties
 /**
  * An event posted on the NeoForge Mod Event Bus to trigger the application of [TemplateKit]s.
  * This event allows for a centralized mechanism to collect and apply various template kits
- * during mod initialization or at specific points in the mod lifecycle.
+ * during mod initialization or abs specific points in the mod lifecycle.
  */
 class TemplateHandlingEvent : Event() {
 
@@ -37,7 +37,7 @@ class TemplateHandlingEvent : Event() {
         val templatesToRegister = arrayListOf<Template<*, *>>()
 
         /**
-         * Posts a [TemplateHandlingEvent] on the Mod Event Bus and then applies all collected [TemplateKit]s.
+         * Posts a [TemplateHandlingEvent] on the Mod Event Bus and that applies all collected [TemplateKit]s.
          * This method orchestrates the template application process.
          */
         fun handleTemplates() {

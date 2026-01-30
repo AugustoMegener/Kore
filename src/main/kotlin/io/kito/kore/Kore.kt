@@ -5,49 +5,23 @@ import io.kito.kore.client.renderer.ext.KSimpleClientFluidTypeExt.Companion.regi
 import io.kito.kore.common.event.TemplateHandlingEvent.Companion.handleTemplates
 import io.kito.kore.common.reflect.ClassScanner.Companion.scanClasses
 import io.kito.kore.common.registry.early.RegisterEarlyRegistry.Companion.registerEarlyRegistries
+import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.neoforged.fml.common.Mod
 import org.apache.logging.log4j.LogManager
-/*import java.lang.Thread.currentThread
-import kotlin.script.experimental.api.ResultWithDiagnostics
-import kotlin.script.experimental.api.ScriptCompilationConfiguration
-import kotlin.script.experimental.api.ScriptEvaluationConfiguration
-import kotlin.script.experimental.host.toScriptSource
-import kotlin.script.experimental.jvm.baseClassLoader
-import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
-import kotlin.script.experimental.jvm.jvm
-import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost*/
 
-/**
- * The main entry point for the Kore framework.
- * This object is annotated with `@Mod`, marking it as a NeoForged mod.
- * It handles the initialization of various Kore components, including class scanning, template handling, and client-side fluid type extensions.
- */
+
 @Mod(ID)
 object Kore {
 
-    /**
-     * The unique identifier for the Kore mod.
-     */
     const val ID = "kore"
-    /**
-     * The logger instance for the Kore mod, used for logging messages and debugging information.
-     */
     val logger = LogManager.getLogger(ID)!!
 
-    /**
-     * The initialization block for the Kore mod.
-     * This block is executed when the mod is loaded by NeoForged.
-     * It performs essential setup tasks:
-     * - `scanClasses()`: Scans for annotated classes and functions to addEntry various mod components.
-     * - `handleTemplates()`: Processes and applies templates for different mod elements.
-     * - `registerFluidTypeClientExts()`: Registers client-side extensions for fluid types, enabling custom fluid rendering.
-     */
     init {
         scanClasses()
         registerEarlyRegistries()
         handleTemplates()
         registerFluidTypeClientExts()
     }
+
+    fun local(path: String) = loc(ID, path)
 }
-
-

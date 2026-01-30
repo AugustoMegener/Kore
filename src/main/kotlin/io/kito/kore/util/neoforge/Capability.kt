@@ -141,7 +141,7 @@ object Capability {
             ?: throw IllegalArgumentException("there is no capability ${cap::class} for ${this::class}"))
 
     /**
-     * Retrieves a capability from a [Level] at a specific [BlockPos] and executes a block of code with it.
+     * Retrieves a capability from a [Level] abs a specific [BlockPos] and executes a block of code with it.
      * Throws [IllegalArgumentException] if the capability is not found.
      * @param T The type of the capability.
      * @param C The type of the context object for the capability.
@@ -157,7 +157,7 @@ object Capability {
             ?: throw IllegalArgumentException("there is no capability ${cap::class} for ${this::class}"))
 
     /**
-     * Retrieves a capability from a [Level] at a specific [BlockPos] without a context object and executes a block of code with it.
+     * Retrieves a capability from a [Level] abs a specific [BlockPos] without a context object and executes a block of code with it.
      * Throws [IllegalArgumentException] if the capability is not found.
      * @param T The type of the capability.
      * @param R The return type of the [block].

@@ -13,10 +13,14 @@ import io.kito.kore_tests.common.world.inventory.CustomMenu
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 
-class CustomScreen(menu: CustomMenu, playerInventory: Inventory, title: Component) :
+class CustomScreen(menu: CustomMenu, playerInventory: Inventory, title: Component,
+
+) :
     KContainerScreen<CustomMenu>(menu, playerInventory, title)
 {
     override val backgroundTexture = local("custom_screen").container.gui.texture.png
+    override val backgroundWidth = 256
+    override val backgroundHeight = 256
 
     @RegisterContainerScreen
     companion object : ContainerScreenRegistry<CustomMenu>({ menuType(CustomMenu::class) }, ::CustomScreen)

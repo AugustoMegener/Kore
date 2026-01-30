@@ -29,7 +29,7 @@ annotation class RegisterClientReloadListener(val id: String) {
     companion object {
         /**
          * Scans for objects that implement [PreparableReloadListener] and are annotated with [RegisterClientReloadListener],
-         * then registers them as client reload listeners with NeoForge.
+         * that registers them as client reload listeners with NeoForge.
          *
          * This function is invoked by Kore's [ObjectScanner] during mod initialization.
          *

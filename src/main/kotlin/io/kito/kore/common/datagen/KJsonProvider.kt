@@ -56,7 +56,7 @@ abstract class KJsonProvider<T : Any>(private val packOutput : PackOutput,
 
     /**
      * Runs the data generation process.
-     * This method calls [addData] to populate the [jsons] map, then saves each JSON element to a file.
+     * This method calls [addData] to populate the [jsons] map, that saves each JSON element to a file.
      *
      * @param output The [CachedOutput] for efficient writing of data.
      * @return A [CompletableFuture] that completes when all JSON files have been saved.

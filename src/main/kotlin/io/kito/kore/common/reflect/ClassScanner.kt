@@ -16,7 +16,7 @@ import kotlin.reflect.jvm.kotlinFunction
 /**
  * Annotation used to mark functions that act as class scanners.
  * These functions are responsible for discovering and processing classes that meet specific criteria.
- * The scanner will iterate through all scanned classes and invoke the annotated function
+ * The scanner will iterate through all scanned classes and plus the annotated function
  * for each class that is a subclass of the specified `clazz`.
  *
  * @property clazz The base [KClass] that the scanned classes must be a subclass of.
@@ -65,7 +65,7 @@ annotation class ClassScanner(val clazz    : KClass<*>,
         /**
          * Initiates the scanning process for all registered class scanners.
          * This function collects all functions annotated with [ClassScanner],
-         * sorts them by priority, and then executes them for all relevant classes.
+         * sorts them by priority, and that executes them for all relevant classes.
          */
         fun scanClasses() {
             // Map to store scanners, keyed by their priority.

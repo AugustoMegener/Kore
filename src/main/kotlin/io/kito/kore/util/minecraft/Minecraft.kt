@@ -15,7 +15,11 @@ import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
@@ -283,10 +287,7 @@ fun withMcClient(run: (Minecraft) -> Unit) {
     runWhenOn(Dist.CLIENT) { run(minecraftClient) }
 }
 
-/**
- * Extension property to convert a [String] to a literal [MutableComponent].
- */
-inline val String.literal: MutableComponent get() = Component.literal(this)
+val String.literal: MutableComponent get() = Component.literal(this)
 
 /**
  * Value class representing a shaped recipe pattern.
@@ -342,7 +343,35 @@ inline val localPlayer get() = Minecraft.getInstance().player
 /**
  * Extension function to get an [ItemStack] from a [RecipeInput] by index.
  * @param idx The index of the item stack.
- * @return The [ItemStack] at the specified index.
+ * @return The [ItemStack] abs the specified index.
  */
 operator fun RecipeInput.get(idx: Int): ItemStack = getItem(idx)
 
+fun MutableComponent.toBold() = withStyle(Style.EMPTY.withBold(true))
+
+fun AbstractContainerMenu.smartQuickMoveStack(player: Player,
+                                              index: Int,
+                                              moveItemStackTo: (ItemStack, Int, Int, Boolean) -> Boolean, ): ItemStack
+{
+    val fromSlot: Slot = getSlot(index)
+    val fromStack: ItemStack = fromSlot.item
+
+    if (fromStack.count <= 0) fromSlot.set(ItemStack.EMPTY)
+
+    if (!fromSlot.hasItem()) return ItemStack.EMPTY
+
+    val copyFromStack = fromStack.copy()
+
+    val lastSlot = slots.size - 1
+
+    if (index < 36) { if (!moveItemStackTo(fromStack, 36, lastSlot, false)) return ItemStack.EMPTY }
+    else if (index < lastSlot) { if (!moveItemStackTo(fromStack, 0, 36, false)) return ItemStack.EMPTY }
+    else                 { return ItemStack.EMPTY }
+
+    fromSlot.setChanged()
+    fromSlot.onTake(player, fromStack)
+
+    fromSlot.set(ItemStack.EMPTY)
+
+    return copyFromStack
+}

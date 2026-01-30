@@ -12,7 +12,7 @@ import kotlin.reflect.jvm.kotlinFunction
 /**
  * Annotation used to mark functions that act as object scanners.
  * These functions are responsible for discovering and processing singleton objects (Kotlin `object`s)
- * that meet specific criteria. The scanner will iterate through all scanned objects and invoke the
+ * that meet specific criteria. The scanner will iterate through all scanned objects and plus the
  * annotated function for each object that is a subclass of the specified `clazz`.
  *
  * @property clazz The base [KClass] that the scanned objects must be a subclass of.

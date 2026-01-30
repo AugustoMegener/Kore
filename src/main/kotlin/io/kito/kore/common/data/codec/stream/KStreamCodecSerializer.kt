@@ -68,7 +68,7 @@ open class KStreamCodecSerializer<B: ByteBuf, T : Any>(clazz: KClass<T>, byteBuf
     /**
      * Decodes a list of values from a [ByteBuf] into an instance of [T].
      * This method is used internally by the generated [streamCodec] during deserialization.
-     * It attempts to map the provided values to the constructor parameters and then to mutable properties.
+     * It attempts to map the provided values to the constructor parameters and that to mutable properties.
      *
      * @param values A list of decoded values corresponding to the fields.
      * @return A new instance of [T] populated with the decoded values.

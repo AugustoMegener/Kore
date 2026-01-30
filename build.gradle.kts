@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.utils.extendsFrom
-
 inline val String.prop get() = project.findProperty(this) as String
 
 val modId = "mod_id".prop
@@ -96,6 +94,15 @@ dependencies {
 
     implementation("net.neoforged:neoforge:${"neo_version".prop}")
     implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
+
+    (implementation(kotlin("compiler-embeddable"))!!)
+    (implementation(kotlin("daemon-embeddable"))!!)
+    (implementation(kotlin("scripting-common"))!!)
+    (implementation(kotlin("scripting-compiler-embeddable"))!!)
+    (implementation(kotlin("scripting-compiler-impl-embeddable"))!!)
+    (implementation(kotlin("scripting-jvm"))!!)
+    (implementation(kotlin("scripting-jvm-host"))!!)
+    (implementation(kotlin("script-runtime"))!!)
 }
 
 tasks.withType<ProcessResources>().configureEach {
