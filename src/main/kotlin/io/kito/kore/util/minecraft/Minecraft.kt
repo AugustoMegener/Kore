@@ -347,7 +347,7 @@ inline val localPlayer get() = Minecraft.getInstance().player
  */
 operator fun RecipeInput.get(idx: Int): ItemStack = getItem(idx)
 
-fun MutableComponent.toBold() = withStyle(Style.EMPTY.withBold(true))
+fun MutableComponent.toBold(): MutableComponent = withStyle(Style.EMPTY.withBold(true))
 
 fun AbstractContainerMenu.smartQuickMoveStack(player: Player,
                                               index: Int,

@@ -92,6 +92,8 @@ sourceSets["main"].resources.srcDir("src/generated/resources")
 dependencies {
     implementation(kotlin("reflect"))
 
+    jarJar(implementation(project(":scripts"))!!)
+
     implementation("net.neoforged:neoforge:${"neo_version".prop}")
     implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
 
@@ -119,6 +121,8 @@ val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
 }
+
+
 
 publishing {
     publications {

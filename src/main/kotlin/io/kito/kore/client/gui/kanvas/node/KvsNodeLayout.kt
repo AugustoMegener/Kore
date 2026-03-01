@@ -1,9 +1,9 @@
-package io.kito.kore.client.gui.kanvas.obj
+package io.kito.kore.client.gui.kanvas.node
 
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.height
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.width
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.x
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.y
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.height
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.width
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.x
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.y
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Absolute.Companion.px
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Compound.Companion.xy
 import net.minecraft.client.gui.GuiGraphics

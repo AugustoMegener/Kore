@@ -1,4 +1,4 @@
-package io.kito.kore.client.gui.kanvas.obj
+package io.kito.kore.client.gui.kanvas.node
 
 import io.kito.kore.client.gui.kanvas.transform.KvsTransform
 import io.kito.kore.client.gui.kanvas.transform.KvsTransform.Companion.margin

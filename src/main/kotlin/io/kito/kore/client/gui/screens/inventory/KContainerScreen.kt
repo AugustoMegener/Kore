@@ -1,5 +1,6 @@
 package io.kito.kore.client.gui.screens.inventory
 
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import io.kito.kore.common.world.inventory.KMenu
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -18,7 +19,8 @@ abstract class KContainerScreen<T : KMenu>(menu: T, playerInventory: Inventory, 
 
     override fun renderBg(guiGraphics: GuiGraphics, partialTick: Float, mouseX: Int, mouseY: Int) {
         guiGraphics.blit(
-            RenderPipelines.GUI_TEXTURED, backgroundTexture, guiLeft, guiTop, 0f, 0f,
+            RenderPipelines.GUI_TEXTURED,
+            backgroundTexture, guiLeft, guiTop, 0f, 0f,
             imageWidth, imageHeight, backgroundWidth, backgroundHeight
         )
     }
@@ -26,9 +28,6 @@ abstract class KContainerScreen<T : KMenu>(menu: T, playerInventory: Inventory, 
     override fun render(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick)
         renderTooltip(pGuiGraphics, pMouseX, pMouseY)
-
-
-        renderSlots()
     }
 }
 

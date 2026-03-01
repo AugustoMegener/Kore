@@ -14,3 +14,5 @@ plugins {
 include("testmod")
 include("ksp")
 include("plugin")
+
+include("scripts")

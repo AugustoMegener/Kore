@@ -1,5 +1,7 @@
-package io.kito.kore.client.gui.kanvas.obj
+package io.kito.kore.client.gui.kanvas.node
 
+import io.kito.kore.client.gui.kanvas.node.root.Root
+import io.kito.kore.client.gui.kanvas.theme.ThemeProvider
 import io.kito.kore.client.gui.kanvas.transform.KvsVec
 import io.kito.kore.util.minecraft.minecraftClient
 import net.minecraft.client.gui.Font
@@ -26,6 +28,9 @@ interface KvsNode {
 
         val KvsNode.width  get() = scale.x(this)
         val KvsNode.height get() = scale.y(this)
+
+        tailrec fun KvsNode.root(): Root = (this as? Root) ?: parent.root()
+        tailrec fun KvsNode.theme(): ThemeProvider = (this as? ThemeProvider) ?: parent.theme()
 
         operator fun KvsNode.plus(block: KvsNode.() -> Unit) = block()
     }

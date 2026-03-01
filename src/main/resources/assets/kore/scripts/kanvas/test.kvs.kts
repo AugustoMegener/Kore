@@ -1,20 +1,21 @@
 @file:Suppress("UnusedLambdaExpressionBody")
 
-package data.kore.scripts.kanvas
+package assets.kore.scripts.kanvas
 
 import io.kito.kore.client.gui.kanvas.Colors.rgb
-import io.kito.kore.client.gui.kanvas.Theme.guiBackground
-import io.kito.kore.client.gui.kanvas.Theme.koreLogo
-import io.kito.kore.client.gui.kanvas.Theme.secondaryGuiBackground
-import io.kito.kore.client.gui.kanvas.Theme.textArea
-import io.kito.kore.client.gui.kanvas.Theme.textFrame
+
+import io.kito.kore.client.gui.kanvas.kvs
 import io.kito.kore.client.gui.kanvas.lorem
-import io.kito.kore.client.gui.kanvas.obj.Box.Companion.box
-import io.kito.kore.client.gui.kanvas.obj.Box.Companion.marginBox
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.plus
-import io.kito.kore.client.gui.kanvas.obj.Root.Companion.root
-import io.kito.kore.client.gui.kanvas.obj.Text.Companion.string
-import io.kito.kore.client.gui.kanvas.obj.Text.Companion.text
+import io.kito.kore.client.gui.kanvas.node.Box.Companion.box
+import io.kito.kore.client.gui.kanvas.node.Box.Companion.marginBox
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.plus
+import io.kito.kore.client.gui.kanvas.node.Text.Companion.string
+import io.kito.kore.client.gui.kanvas.node.Text.Companion.text
+import io.kito.kore.client.gui.kanvas.theme.Theme.guiBackground
+import io.kito.kore.client.gui.kanvas.theme.Theme.koreLogo
+import io.kito.kore.client.gui.kanvas.theme.Theme.guiForeground
+import io.kito.kore.client.gui.kanvas.theme.Theme.textArea
+import io.kito.kore.client.gui.kanvas.theme.Theme.textFrame
 import io.kito.kore.client.gui.kanvas.transform.KvsTransform.Companion.margin
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.*
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Absolute.Companion.cw
@@ -27,10 +28,10 @@ import io.kito.kore.client.gui.kanvas.transform.KvsVec.Relative.Companion.pt
 import io.kito.kore.util.minecraft.literal
 import io.kito.kore.util.minecraft.toBold
 
-root {
+kvs {
     guiBackground(Centered, xy(px(300), pt(0.75f))) + {
         box(start, xy(fill, px(48))) + {
-            secondaryGuiBackground(margin(px(5))) + {
+            guiForeground(margin(px(5))) + {
                 marginBox(px(3)) + {
                     koreLogo(start, px(32))
                     text("Kore".literal.toBold(), xy(AfterLast, Centered), xy(cw(5), lh(1)))

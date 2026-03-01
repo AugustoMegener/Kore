@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import kotlin.reflect.KProperty
 
-abstract class KMenu(val playerInv: Inventory, menuType: MenuType<*>, containerId: Int) :
+abstract class KMenu(menuType: MenuType<*>, containerId: Int, val playerInv: Inventory) :
     AbstractContainerMenu(menuType, containerId)
 {
     open val hotbarX = 8

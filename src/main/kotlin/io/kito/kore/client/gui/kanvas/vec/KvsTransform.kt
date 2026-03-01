@@ -1,7 +1,7 @@
 package io.kito.kore.client.gui.kanvas.transform
 
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.height
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.width
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.height
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.width
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.FitChildren
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Function.Companion.fn
 

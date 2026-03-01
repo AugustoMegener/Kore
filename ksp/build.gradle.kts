@@ -36,6 +36,8 @@ dependencies {
 
     implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")
 
+    implementation("com.google.guava:guava:32.1.2-jre")
+
     implementation("org.apache.logging.log4j:log4j-core:2.22.0")
     implementation("org.apache.logging.log4j:log4j-api:2.22.0")
 }

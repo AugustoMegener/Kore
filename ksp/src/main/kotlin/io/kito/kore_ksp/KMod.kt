@@ -50,7 +50,8 @@ class KModProcessor(private val logger: KSPLogger, private val codeGenerator: Co
             .addProperty(PropertySpec.builder(LOGGER, Logger::class).initializer("%T.getLogger(%N)", logger, ID).build())
             .addType(TypeSpec.objectBuilder(objName)
                 .superclass(ModUtil::class).addSuperclassConstructorParameter("%N", "ID")
-                .addAnnotation(AnnotationSpec.builder(ClassName.bestGuess("net.neoforged.fml.common.Mod")).addMember("%N", "ID").build())
+                .addAnnotation(AnnotationSpec.builder(ClassName.bestGuess("net.neoforged.fml.common.Mod"))
+                    .addMember("%N", "ID").build())
                 .addInitializerBlock(CodeBlock.of("%M()\n", MemberName(fn.packageName.asString(),
                                                                        fn.simpleName.asString()))).build())
             .build()

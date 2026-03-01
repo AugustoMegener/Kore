@@ -1,4 +1,4 @@
-package io.kito.kore.client.gui.kanvas.obj
+package io.kito.kore.client.gui.kanvas.node
 
 import io.kito.kore.util.UNCHECKED_CAST
 

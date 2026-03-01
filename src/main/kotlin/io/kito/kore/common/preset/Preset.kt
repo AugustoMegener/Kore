@@ -1,4 +1,4 @@
-package com.cosmic_jewelry.common.core.preset
+package io.kito.kore.common.preset
 
 open class Preset<V, T>(val parents: Array<out Preset<V, T>>) {
 

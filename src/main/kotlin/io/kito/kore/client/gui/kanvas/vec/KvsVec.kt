@@ -1,10 +1,10 @@
 package io.kito.kore.client.gui.kanvas.transform
 
-import io.kito.kore.client.gui.kanvas.obj.KvsNode
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.height
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.width
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.x
-import io.kito.kore.client.gui.kanvas.obj.KvsNode.Companion.y
+import io.kito.kore.client.gui.kanvas.node.KvsNode
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.height
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.width
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.x
+import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.y
 
 interface KvsVec {
 
@@ -19,6 +19,7 @@ interface KvsVec {
 
         companion object {
             val start = Absolute(0, 0)
+            val slotSize = Absolute(16, 16)
 
             fun px(value: Int) = Absolute(value, value)
             fun px(x: Int, y: Int) = Absolute(x, y)
