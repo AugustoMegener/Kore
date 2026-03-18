@@ -1,12 +1,5 @@
 package io.kito.kore.client.gui.kanvas
 
-import io.kito.kore.client.gui.kanvas.theme.colors.Colors.red
-import io.kito.kore.client.gui.kanvas.theme.colors.Colors.rgb
-import io.kito.kore.client.gui.kanvas.theme.Theme.guiBackground
-import io.kito.kore.client.gui.kanvas.theme.Theme.koreLogo
-import io.kito.kore.client.gui.kanvas.theme.Theme.guiForeground
-import io.kito.kore.client.gui.kanvas.theme.Theme.textArea
-import io.kito.kore.client.gui.kanvas.theme.Theme.textFrame
 import io.kito.kore.client.gui.kanvas.node.Box.Companion.box
 import io.kito.kore.client.gui.kanvas.node.Box.Companion.marginBox
 import io.kito.kore.client.gui.kanvas.node.KvsNode
@@ -14,6 +7,13 @@ import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.plus
 import io.kito.kore.client.gui.kanvas.node.Text.Companion.string
 import io.kito.kore.client.gui.kanvas.node.Text.Companion.text
 import io.kito.kore.client.gui.kanvas.node.root.FlexRoot
+import io.kito.kore.client.gui.kanvas.theme.Theme.guiBackground
+import io.kito.kore.client.gui.kanvas.theme.Theme.guiForeground
+import io.kito.kore.client.gui.kanvas.theme.Theme.koreLogo
+import io.kito.kore.client.gui.kanvas.theme.Theme.textArea
+import io.kito.kore.client.gui.kanvas.theme.Theme.textFrame
+import io.kito.kore.client.gui.kanvas.theme.colors.Colors.purple1
+import io.kito.kore.client.gui.kanvas.theme.colors.Colors.red1
 import io.kito.kore.client.gui.kanvas.transform.KvsTransform.Companion.margin
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.*
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Absolute.Companion.cw
@@ -47,10 +47,10 @@ val errorScreen: (ResourceLocation, ResultWithDiagnostics.Failure) -> KvsBuilder
                         koreLogo(start, px(32))
                         box(xy(AfterLast, start), Expand) + {
                             text("Kore".literal.withStyle(Style.EMPTY.withBold(true)), start, xy(cw(4), lh(1)))
-                                .color(rgb(146, 52, 235))
+                                .color(purple1)
                             string("Unable to load $loc script!",
                                 xy(start, lh(1)), xy(cw(50), lh(1)))
-                                .color(red)
+                                .color(red1)
                         }
                     }
                 }
@@ -62,7 +62,7 @@ val errorScreen: (ResourceLocation, ResultWithDiagnostics.Failure) -> KvsBuilder
                             .filter { it.severity == FATAL || it.severity == ERROR }
                             .joinToString("\n") { it.render() },
                             start, fill
-                        ).color(red)
+                        ).color(red1)
                     }
                 }
                 textFrame(margin(px(5)))

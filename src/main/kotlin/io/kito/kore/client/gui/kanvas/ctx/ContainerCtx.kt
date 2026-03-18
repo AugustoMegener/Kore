@@ -5,6 +5,7 @@ import io.kito.kore.client.gui.kanvas.node.Box.Companion.box
 import io.kito.kore.client.gui.kanvas.node.KvsNode
 import io.kito.kore.client.gui.kanvas.node.Texture.Companion.texture
 import io.kito.kore.client.gui.kanvas.resolveAbsolutePosition
+import io.kito.kore.client.gui.kanvas.theme.KvsTexture
 import io.kito.kore.client.gui.kanvas.transform.KvsVec
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Centered
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Absolute.Companion.px
@@ -42,7 +43,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         slot(containerId, idx, slotBack(pos, px(18)).box(Centered, slotSize))
     }
 
-    protected fun KvsNode.slot(containerId: String, idx: Int, texture: ResourceLocation, pos: KvsVec, size: KvsVec = slotSize) {
+    protected fun KvsNode.slot(containerId: String, idx: Int, texture: KvsTexture, pos: KvsVec, size: KvsVec = slotSize) {
         slot(containerId, idx, texture(texture, pos, size).box(Centered, slotSize))
     }
 
@@ -59,7 +60,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotLine(containerId: String, pos: KvsVec, texture: ResourceLocation, firstIdx: Int, slotAmount: Int) {
+    protected fun KvsNode.slotLine(containerId: String, pos: KvsVec, texture: KvsTexture, firstIdx: Int, slotAmount: Int) {
         repeat(slotAmount) {
             slot(containerId, firstIdx + it,
                 texture(texture, pos + px(18 * it, 0), px(18)).box(Centered, slotSize)
@@ -67,7 +68,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotLine(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: ResourceLocation,
+    protected fun KvsNode.slotLine(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: KvsTexture,
                                    firstIdx: Int, slotAmount: Int)
     {
         repeat(slotAmount) {
@@ -92,7 +93,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotColumn(containerId: String, pos: KvsVec, texture: ResourceLocation, firstIdx: Int, slotAmount: Int) {
+    protected fun KvsNode.slotColumn(containerId: String, pos: KvsVec, texture: KvsTexture, firstIdx: Int, slotAmount: Int) {
         repeat(slotAmount) {
             slot(containerId, firstIdx + it,
                 texture(texture, pos + px(0, 18 * it), px(18)).box(Centered, slotSize)
@@ -100,7 +101,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotColumn(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: ResourceLocation,
+    protected fun KvsNode.slotColumn(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: KvsTexture,
                                      firstIdx: Int, slotAmount: Int)
     {
         repeat(slotAmount) {
@@ -123,7 +124,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotGrid(containerId: String, pos: KvsVec, texture: ResourceLocation, firstIdx: Int,
+    protected fun KvsNode.slotGrid(containerId: String, pos: KvsVec, texture: KvsTexture, firstIdx: Int,
                                    lineSlotAmount: Int, linesAmount: Int)
     {
         repeat(linesAmount) {
@@ -131,7 +132,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotGrid(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: ResourceLocation,
+    protected fun KvsNode.slotGrid(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: KvsTexture,
                                    firstIdx: Int, lineSlotAmount: Int, linesAmount: Int)
     {
         repeat(linesAmount) {
@@ -152,7 +153,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotColumnGrid(containerId: String, pos: KvsVec, texture: ResourceLocation, firstIdx: Int,
+    protected fun KvsNode.slotColumnGrid(containerId: String, pos: KvsVec, texture: KvsTexture, firstIdx: Int,
                                          columnSlotAmount: Int, columnsAmount: Int)
     {
         repeat(columnsAmount) {
@@ -160,7 +161,7 @@ abstract class ContainerCtx<T, M>(val menu: M, val screen: T? = null)
         }
     }
 
-    protected fun KvsNode.slotColumnGrid(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: ResourceLocation,
+    protected fun KvsNode.slotColumnGrid(containerId: String, pos: KvsVec, sizeSlot: KvsVec.Absolute, texture: KvsTexture,
                                          firstIdx: Int, columnSlotAmount: Int, columnsAmount: Int)
     {
         repeat(columnsAmount) {

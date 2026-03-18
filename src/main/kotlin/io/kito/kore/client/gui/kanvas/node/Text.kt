@@ -5,6 +5,9 @@ import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.width
 import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.x
 import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.y
 import io.kito.kore.client.gui.kanvas.node.Text.OverflowType.*
+import io.kito.kore.client.gui.kanvas.theme.colors.Colors.lightTextColor
+import io.kito.kore.client.gui.kanvas.theme.colors.KvsColor
+import io.kito.kore.client.gui.kanvas.theme.colors.KvsColor.Companion.hexOf
 import io.kito.kore.client.gui.kanvas.transform.KvsTransform
 import io.kito.kore.client.gui.kanvas.transform.KvsVec
 import io.kito.kore.util.minecraft.literal
@@ -22,16 +25,16 @@ class Text private constructor(parent: KvsNode,
     enum class OverflowType { WRAP_POP, WRAP_CUT, POP, CUT, SCROLL, }
 
     private var overflowType = WRAP_POP
-    private var color = -1
+    private var color: KvsColor = lightTextColor
     private var dropShadow = true
 
     override fun render(guiGraphics: GuiGraphics, pX: Int, pY: Int, partialTick: Float) {
         when(overflowType) {
             WRAP_POP    -> drawWordWrap(guiGraphics, pX + x, pY + y, false)
             WRAP_CUT    -> drawWordWrap(guiGraphics, pX + x, pY + y)
-            SCROLL      -> guiGraphics.drawScrollingString(font, text, pX + x, pX + x + width, pY + y, color)
-            POP         -> guiGraphics.drawString(font, text, pX + x, pY + y, color, dropShadow)
-            CUT         -> guiGraphics.drawString(font, font.split(text, width)[0], pX + x, pY + y, color, dropShadow)
+            SCROLL      -> guiGraphics.drawScrollingString(font, text, pX + x, pX + x + width, pY + y, hexOf(color))
+            POP         -> guiGraphics.drawString(font, text, pX + x, pY + y, hexOf(color), dropShadow)
+            CUT         -> guiGraphics.drawString(font, font.split(text, width)[0], pX + x, pY + y, hexOf(color), dropShadow)
 
         }
     }
@@ -41,14 +44,14 @@ class Text private constructor(parent: KvsNode,
     fun hiddenOverflow() = also { overflowType = CUT }
     fun scrollingOverflow() = also { overflowType = SCROLL }
 
-    fun color(hex: Int) = also { color = hex }
+    fun color(clr: KvsColor) = also { color = clr }
 
     fun noShadow() = also { dropShadow = false }
 
     private fun drawWordWrap(guiGraphics: GuiGraphics, x: Int, y: Int, respectHeight: Boolean = true) {
         var yPos = y
         for (line in font.split(text, width)) {
-            guiGraphics.drawString(font, line, x, yPos, color, dropShadow)
+            guiGraphics.drawString(font, line, x, yPos, hexOf(color), dropShadow)
             yPos += font.lineHeight
             if ((yPos - y) >= height && respectHeight) break
         }

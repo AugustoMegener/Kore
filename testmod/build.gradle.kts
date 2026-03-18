@@ -75,6 +75,8 @@ dependencies {
     implementation(project(":"))
     ksp(project(":ksp"))
 
+    jarJar(implementation(project(":scripts"))!!)
+
     (implementation(kotlin("compiler-embeddable"))!!)
     (implementation(kotlin("daemon-embeddable"))!!)
     (implementation(kotlin("scripting-common"))!!)
@@ -83,6 +85,10 @@ dependencies {
     (implementation(kotlin("scripting-jvm"))!!)
     (implementation(kotlin("scripting-jvm-host"))!!)
     (implementation(kotlin("script-runtime"))!!)
+}
+
+ksp {
+    arg("projectDir", project.projectDir.path)
 }
 
 tasks.withType<ProcessResources>().configureEach {

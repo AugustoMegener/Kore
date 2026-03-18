@@ -26,6 +26,8 @@ interface KvsNode {
         val KvsNode.x get() = pos.x(this)
         val KvsNode.y get() = pos.y(this)
 
+        val KvsNode.index get() = parent.children.indexOf(this)
+
         val KvsNode.width  get() = scale.x(this)
         val KvsNode.height get() = scale.y(this)
 

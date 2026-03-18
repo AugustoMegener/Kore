@@ -4,6 +4,16 @@ import io.kito.kore.client.gui.kanvas.theme.colors.Colors.colors
 import io.kito.kore.client.gui.kanvas.theme.colors.Colors.rgb
 
 colors {
+
+    "black" { rgb(0, 0, 0) }
+    "white" { rgb(255, 255, 255) }
+
+    "gray1" { rgb(57, 57, 57) }
+    "gray2" { rgb(74, 74, 74) }
+    "gray3" { rgb(92, 92, 92) }
+    "gray4" { rgb(110, 110, 110) }
+    "gray5" { rgb(129, 129, 129) }
+
     "red1" { rgb(255, 100, 100) }
     "red2" { rgb(214, 76, 74) }
     "red3" { rgb(175, 52, 49) }
@@ -39,4 +49,8 @@ colors {
     "orange3" { rgb(218, 106, 53) }
     "orange4" { rgb(237, 128, 76) }
     "orange5" { rgb(255, 150, 100) }
+
+    "lightTextColor" of { "white" }
+    "darkTextColor" of { "gray5" }
+    "errorTextColor" of { "red1" }
 }

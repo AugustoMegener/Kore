@@ -107,6 +107,10 @@ dependencies {
     (implementation(kotlin("script-runtime"))!!)
 }
 
+ksp {
+    arg("projectDir", project.projectDir.path)
+}
+
 tasks.withType<ProcessResources>().configureEach {
     val replaceProperties = listOf("minecraft_version", "minecraft_version_range", "neo_version", "neo_version_range",
                                    "loader_version_range", "mod_id", "mod_name", "mod_license", "mod_version",

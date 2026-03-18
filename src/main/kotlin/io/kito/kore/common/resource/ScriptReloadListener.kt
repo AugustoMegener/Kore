@@ -43,5 +43,5 @@ abstract class ScriptReloadListener(val script: KotlinType) :
             }
 
     open fun ScriptCompilationConfiguration.Builder.compilationConfig(id: ResourceLocation) {}
-    open fun ScriptEvaluationConfiguration.Builder.evaluationConfig(id: ResourceLocation) {}
+    open fun ScriptEvaluationConfiguration.Builder. evaluationConfig(id: ResourceLocation) {}
 }

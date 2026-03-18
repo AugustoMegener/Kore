@@ -12,9 +12,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
-import org.jetbrains.kotlin.com.intellij.util.containers.with
-import kotlin.collections.associateWith
-import kotlin.to
 
 abstract class KvsMenuBase<T, M>(menuType: MenuType<*>,
                                  containerId: Int,
@@ -30,7 +27,7 @@ abstract class KvsMenuBase<T, M>(menuType: MenuType<*>,
         playerInventory to (0..36).associateWith { { x, y -> Slot(playerInv, it, x, y) } }
     )
 
-    constructor(menuType: MenuType<*>, containerId: Int, playerInv: Inventory) : this()
+    //constructor(menuType: MenuType<*>, containerId: Int, playerInv: Inventory) : this()
 
     init {
         initSlots(ctx.slotsPos)
@@ -43,7 +40,6 @@ abstract class KvsMenuBase<T, M>(menuType: MenuType<*>,
         throw KanvasException(NullPointerException("$id[$idx] slot not found!"))
     )
 
-    @Suppress("UnstableApiUsage")
     inner class MenuSlot(val id: ContainerId, val idx: Int, slot: (idx: Int, x: Int, y: Int) -> Slot) {
 
         constructor(id: ContainerId, slot: (Int, Int, Int) -> Slot) : this(id, slotBuilders[id]?.size ?: 0, slot)
@@ -51,7 +47,7 @@ abstract class KvsMenuBase<T, M>(menuType: MenuType<*>,
         init {
             if (id == playerInventory) throw IllegalArgumentException("${id.value} is reserved.")
 
-            slotBuilders[id] = slotBuilders.getOrElse(id) { mapOf() }.with(idx) { x, y -> slot(idx, x, y)}
+            slotBuilders[id] = (slotBuilders.getOrElse(id) { mapOf() } + (idx to { x, y -> slot(idx, x, y) }))
         }
     }
 

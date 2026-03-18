@@ -10,7 +10,6 @@ import io.kito.kore.client.gui.kanvas.transform.KvsTransform
 import io.kito.kore.client.gui.kanvas.transform.KvsVec
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
 
 open class Sprite private constructor(parent: KvsNode, pos: KvsVec, scale: KvsVec, val sprite: KvsSprite) :
     Box(parent, pos, scale)
@@ -35,14 +34,10 @@ open class Sprite private constructor(parent: KvsNode, pos: KvsVec, scale: KvsVe
 
     companion object {
 
-
-
         fun KvsNode.sprite(sprite: KvsSprite, pos: KvsVec, scale: KvsVec) =
             Sprite(this, pos, scale, sprite).also { addChild(it) }
 
         fun KvsNode.sprite(sprite: KvsSprite, transform: KvsTransform) =
             sprite(sprite, transform.pos, transform.scale)
-
-
     }
 }

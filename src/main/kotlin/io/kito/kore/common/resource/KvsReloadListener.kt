@@ -1,11 +1,11 @@
 package io.kito.kore.common.resource
 
 import io.kito.kore.Kore.ID
-import io.kito.kore.client.gui.kanvas.KvsScript
-import io.kito.kore.client.gui.kanvas.errorScreen
 import io.kito.kore.client.gui.kanvas.KvsBuilder
+import io.kito.kore.client.gui.kanvas.errorScreen
 import io.kito.kore.client.renderer.RegisterClientReloadListener
 import io.kito.kore.util.UNCHECKED_CAST
+import io.kito.kore_scripts.KvsScript
 import net.minecraft.resources.ResourceLocation
 import kotlin.script.experimental.api.KotlinType
 import kotlin.script.experimental.api.ResultWithDiagnostics

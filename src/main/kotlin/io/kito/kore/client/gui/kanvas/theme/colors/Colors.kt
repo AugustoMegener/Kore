@@ -1,8 +1,8 @@
 package io.kito.kore.client.gui.kanvas.theme.colors
 
+import io.kito.kore.client.gui.kanvas.KanvasException
 import io.kito.kore.client.gui.kanvas.node.KvsNode
 import io.kito.kore.client.gui.kanvas.node.KvsNode.Companion.theme
-import io.kito.kore.client.gui.kanvas.theme.KvsSprite
 import io.kito.kore.common.resource.ClrReloadListener.getColors
 import kotlin.math.abs
 import kotlin.reflect.KProperty
@@ -10,9 +10,23 @@ import kotlin.reflect.KProperty
 typealias ColorScheme = Map<String, (KvsNode) -> Int>
 
 object Colors {
-    val white = -1
-    val black = 0x000000ff
-    val red = rgb(255, 0, 0)
+
+    val red1 by ColorToken()
+    val purple1 by ColorToken()
+
+
+    val lightTextColor by ColorToken()
+    val errorTextColor by ColorToken()
+
+    class ColorToken(val name: String? = null) {
+
+        operator fun getValue(obj: Any, prop: KProperty<*>) = KvsColor {
+            colors()[name ?: prop.name]?.invoke(this)
+                ?: throw KanvasException(
+                    IllegalStateException("No ${name ?: prop.name} color on ${theme().themeLocation} theme!")
+                )
+        }
+    }
 
     fun rgb(r: Int, g: Int, b: Int, a: Int = 255) = (a shl 24) or (r shl 16) or (g shl 8) or b
 
@@ -48,15 +62,11 @@ object Colors {
     class ColorsBuilder internal constructor() {
         internal var values: ColorScheme = mapOf()
 
-        operator fun String.invoke(getter: (KvsNode) -> Int) {  }
+        operator fun String.invoke(getter: (KvsNode) -> Int) { values += this to getter  }
+        infix fun String.of(getter: (KvsNode) -> String) {
+            values += this to { it.colors()[getter(it)]!!.invoke(it) }
+        }
     }
 
     fun colors(builder: ColorsBuilder.() -> Unit): ColorScheme = ColorsBuilder().apply(builder).values
-
-    class ColorToken(val name: String? = null) {
-
-        operator fun getValue(obj: KvsNode, prop: KProperty<*>) = obj.colors()[name ?: prop.name]
-    }
-
-    val KvsNode.red1 by ColorToken()
 }
