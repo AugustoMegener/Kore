@@ -12,18 +12,22 @@ import kotlin.script.experimental.api.ResultWithDiagnostics
 import kotlin.script.experimental.api.ScriptDiagnostic.Severity.ERROR
 import kotlin.script.experimental.api.ScriptDiagnostic.Severity.FATAL
 
-@RegisterClientReloadListener("$ID:theme_colors")
+@RegisterClientReloadListener("theme_colors")
 object ClrReloadListener : ScriptValueReloadListener<ColorScheme>(KotlinType(ClrScript::class)) {
-
     private lateinit var colors: Map<ResourceLocation, ColorScheme>
 
-    override fun applyResult(obj: Map<ResourceLocation, ColorScheme>) { colors = obj }
+    override fun applyResult(obj: Map<ResourceLocation, ColorScheme>) {
+        colors = obj
+    }
 
     override fun onFail(loc: ResourceLocation, res: ResultWithDiagnostics.Failure): ColorScheme? {
-        logger.error(res.reports
-            .filter { it.severity == FATAL || it.severity == ERROR }
-            .joinToString("\n") { it.render() }
+        
+        logger.error(
+            res.reports
+                .filter { it.severity == FATAL || it.severity == ERROR }
+                .joinToString("\n") { it.render() }
         )
+
         return null
     }
 

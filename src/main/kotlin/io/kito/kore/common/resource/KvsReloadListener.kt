@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation
 import kotlin.script.experimental.api.KotlinType
 import kotlin.script.experimental.api.ResultWithDiagnostics
 
-@RegisterClientReloadListener("$ID:kanvas")
+@RegisterClientReloadListener("kanvas")
 object KvsReloadListener : ScriptValueReloadListener<KvsBuilder<Any>>(KotlinType(KvsScript::class)) {
 
     private lateinit var kanvas: Map<ResourceLocation, KvsBuilder<Any>>
