@@ -18,8 +18,7 @@ fun init() {
 /**
  * DataGenerator object for handling data generation within the Kore Tests mod.
  * Annotated with `@Scan`, indicating that Kore should scan this object for data generation providers.
- * It extends `DataGenHelper` and uses the mod's ID for data generation.
+ * It extens `DataGenHelper` and uses the mod's ID for data generation.
  */
 @Scan
 object DataGenerator : DataGenHelper(ID)
-

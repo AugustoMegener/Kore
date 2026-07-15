@@ -1,5 +1,6 @@
 package io.kito.kore.client.gui.kanvas
 
+import io.kito.kore.Kore.logger
 import io.kito.kore.client.gui.kanvas.node.Box.Companion.box
 import io.kito.kore.client.gui.kanvas.node.Box.Companion.marginBox
 import io.kito.kore.client.gui.kanvas.node.KvsNode
@@ -97,7 +98,13 @@ tailrec fun KvsNode.resolveAbsolutePosition(acc: Vector2i = Vector2i()): Vector2
 
 
 fun KvsNode.renderTree(gui: GuiGraphics, partialTick: Float) {
+
+try {
+
     forEachScreenObject { x, y, obj -> obj.render(gui, x, y, partialTick) }
+} catch (error: KanvasException) {
+    logger.error(("[Kanvas Exception] ${error.msg}" + (error.error?.let { "-> $it" } ?: "")))
+}
 }
 
 fun guiRoot(gui: GuiGraphics, builder: KvsBuilder<Unit>) =

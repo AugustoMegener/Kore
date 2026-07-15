@@ -2,11 +2,12 @@ package io.kito.kore.client.gui.kanvas.node.root
 
 import io.kito.kore.client.gui.kanvas.KvsBuilder
 import io.kito.kore.client.gui.kanvas.node.KvsNodeBase
+import io.kito.kore.client.gui.kanvas.theme.ThemeProvider
 import io.kito.kore.client.gui.kanvas.transform.KvsVec
 import io.kito.kore.client.gui.kanvas.transform.KvsVec.Absolute.Companion.start
 import net.minecraft.client.gui.GuiGraphics
 
-abstract class Root : KvsNodeBase() {
+abstract class Root : KvsNodeBase(), ThemeProvider {
 
     override val parent = this
     override var pos: KvsVec = start

@@ -32,7 +32,10 @@ interface KvsNode {
         val KvsNode.height get() = scale.y(this)
 
         tailrec fun KvsNode.root(): Root = (this as? Root) ?: parent.root()
-        tailrec fun KvsNode.theme(): ThemeProvider = (this as? ThemeProvider) ?: parent.theme()
+        tailrec fun KvsNode.theme(): ThemeProvider =
+            (this as? ThemeProvider) ?:
+            if (parent === this) error("No ThemeProvider found in ancestor chain")
+            else parent.theme()
 
         operator fun KvsNode.plus(block: KvsNode.() -> Unit) = block()
     }

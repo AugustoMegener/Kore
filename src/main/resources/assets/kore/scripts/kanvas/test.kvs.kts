@@ -29,11 +29,8 @@ import io.kito.kore.util.minecraft.toBold
 
 kvs {
     
-    guiBackground(px(10), px(10)) + {
 
-    }
 
-    /*
     guiBackground(Centered, xy(px(300), pt(0.75f))) + {
         box(start, xy(fill, px(48))) + {
             guiForeground(margin(px(5))) + {
@@ -50,5 +47,5 @@ kvs {
             }
             textFrame(margin(px(5)))
         }
-    }*/
+    }
 }

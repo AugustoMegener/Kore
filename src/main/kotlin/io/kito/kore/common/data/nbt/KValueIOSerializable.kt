@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty1
 interface KValueIOSerializable : ValueIOSerializable{
 
     val serializableProperties: List<Pair<String, KProperty1<KValueIOSerializable, Any>>>
-        get() = saveFields
+        
 
     val strategy: SerializationStrategy<ValueOutput, ValueInput>
 

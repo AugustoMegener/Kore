@@ -22,13 +22,13 @@ private constructor(parent: KvsNode, pos: KvsVec, scale: KvsVec, val sprite: Kvs
   override fun render(guiGraphics: GuiGraphics, pX: Int, pY: Int, partialTick: Float) {
     
 
-    /*guiGraphics.blitSprite(
+    guiGraphics.blitSprite(
       RenderPipelines.GUI_TEXTURED, sprite.locationFor(theme()),
       width, height,
       xOffset, yOffset,
       pX + x, pY + y,
       width, height
-    )*/
+    )
   }
 
   fun offset(x: Int, y: Int) = also {

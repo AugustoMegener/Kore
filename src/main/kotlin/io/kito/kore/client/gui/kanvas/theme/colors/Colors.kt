@@ -21,10 +21,12 @@ object Colors {
     class ColorToken(val name: String? = null) {
 
         operator fun getValue(obj: Any, prop: KProperty<*>) = KvsColor {
-            colors()[name ?: prop.name]?.invoke(this)
-                ?: throw KanvasException(
-                    IllegalStateException("No ${name ?: prop.name} color on ${theme().themeLocation} theme!")
-                )
+            val colorName = name ?: prop.name
+
+            val clr = colors()
+
+            clr[colorName]?.invoke(this) ?:
+                throw KanvasException(NullPointerException("No $colorName color on ${theme().themeLocation} theme!"))
         }
     }
 

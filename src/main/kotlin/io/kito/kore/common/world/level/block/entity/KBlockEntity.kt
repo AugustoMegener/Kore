@@ -1,6 +1,7 @@
 package io.kito.kore.common.world.level.block.entity
 
 
+import io.kito.kore.common.data.Save.Companion.saveFields
 import io.kito.kore.common.data.nbt.KValueIOSerializable
 import io.kito.kore.common.registry.BlockEntityTypeRegister.Companion.bet
 import io.kito.kore.util.minecraft.nbtOps
@@ -24,11 +25,14 @@ import net.minecraft.world.level.storage.TagValueOutput
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import kotlin.jvm.optionals.getOrNull
+import kotlin.reflect.KProperty1
 
 abstract class KBlockEntity(pos: BlockPos, blockState: BlockState, type: BlockEntityType<*>? = null)
     : BlockEntity(type ?: bet(blockState.block::class), pos, blockState), KValueIOSerializable
 {
     open val itemDrops = NonNullList.create<ItemStack>()
+
+    override val serializableProperties: List<Pair<String, KProperty1<KValueIOSerializable, Any>>> = saveFields
 
     override fun saveAdditional(output: ValueOutput)
         { serialize(output.child("data"))
