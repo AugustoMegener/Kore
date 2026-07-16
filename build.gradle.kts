@@ -95,6 +95,7 @@ modrinth {
     uploadFile.set(tasks.jar)
     gameVersions.addAll("1.21.1")
     loaders.add("neoforge")
+    syncBodyFrom.set(rootProject.file("README.md").readText())
     dependencies {
         required.version("kotlin-for-forge", "5.12.0")
     }
