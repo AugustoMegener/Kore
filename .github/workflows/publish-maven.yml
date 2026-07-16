@@ -48,3 +48,7 @@ jobs:
           git config user.email "76854495+AugustoMegener@users.noreply.github.com"
           git add .
           git diff --staged --quiet || (git commit -m "Update site" && git push)
+
+      - name: Update modrinth
+        run: |
+          ./gradlew modrinthSyncBody modrinth
