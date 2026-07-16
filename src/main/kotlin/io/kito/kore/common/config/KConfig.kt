@@ -8,15 +8,6 @@ import net.neoforged.neoforge.common.ModConfigSpec
 import net.neoforged.neoforgespi.language.IModInfo
 import kotlin.reflect.KProperty
 
-/**
- * Abstract base class for defining mod configurations in Kore.
- * This class simplifies the creation and registration of configuration specifications
- * for NeoForged mods, allowing for type-safe and organized configuration values.
- *
- * Subclasses should define their configuration properties using the [Value] inner class.
- *
- * @property type The [net.neoforged.fml.config.ModConfig.Type] of this configuration (e.g., CLIENT, SERVER, COMMON).
- */
 abstract class KConfig(val type: ModConfig.Type) {
     
     private val values = arrayListOf<Value<*>>()

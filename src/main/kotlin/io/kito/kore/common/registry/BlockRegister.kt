@@ -18,13 +18,12 @@ import kotlin.reflect.jvm.isAccessible
 import net.minecraft.world.item.Item.Properties as ItemProp
 import io.kito.kore.common.registry.BlockEntityTypeRegister.BETBuilder
 import io.kito.kore.common.registry.early.EarlyRegistry
-import io.kito.kore.common.registry.early.EarlyRegistryGoup
+import io.kito.kore.common.registry.early.EarlyRegistryGroup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.BlockProp
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.core.BlockPos
-import net.minecraft.core.registries.Registries
 import net.minecraft.core.registries.Registries.BLOCK
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -352,13 +351,13 @@ open class BlockRegister(final override val id: String) : AutoRegister {
         override fun get(idx: T): B? = registeredEntries[idx]?.blockRegistry?.get()
 
         override val indexesIds = arrayListOf<ResourceLocation>()
-        val groups = arrayListOf<EarlyRegistryGoup>()
+        val groups = arrayListOf<EarlyRegistryGroup>()
 
         override fun putAllIndexes() { indexesIds += registry.idxs }
 
         override fun putIndex(id: ResourceLocation) { indexesIds += id }
 
-        override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+        override fun putIndex(group: EarlyRegistryGroup) { groups += group }
 
         override fun register() {
             indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }

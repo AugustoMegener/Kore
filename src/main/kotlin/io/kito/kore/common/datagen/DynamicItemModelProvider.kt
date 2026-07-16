@@ -16,18 +16,6 @@ import java.util.stream.Stream
 import kotlin.collections.map
 import kotlin.jvm.optionals.getOrNull
 
-/**
- * A dynamic [ItemModelProvider] that allows for registering item models
- * using a list of lambda functions. This provides flexibility in defining item models
- * programmatically during data generation.
- *
- * @param output The [PackOutput] for writing generated data.
- * @param modid The mod ID for which data is being generated.
- * @param existingFileHelper An [ExistingFileHelper] to check for existing files.
- * @param entries A list of lambda functions, each taking an [ItemModelProvider] instance
- *                and applying item model definitions to it. These lambdas encapsulate
- *                the logic for generating specific item models.
- */
 class DynamicItemModelProvider(
     modId: String,
     output: PackOutput,

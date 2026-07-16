@@ -1,15 +1,14 @@
 package io.kito.kore.common.registry.early
 
-import io.kito.kore.common.reflect.Scan
 import net.minecraft.resources.ResourceLocation
 
 class EarlyRegistry<T> {
 
     val entries = hashMapOf<ResourceLocation, () -> T>()
-    val groupEntries = arrayListOf<Pair<ResourceLocation, EarlyRegistryGoup>>()
+    val groupEntries = arrayListOf<Pair<ResourceLocation, EarlyRegistryGroup>>()
 
     lateinit var values: Map<ResourceLocation, T> private set
-    val groups = hashMapOf<EarlyRegistryGoup, ArrayList<T>>()
+    val groups = hashMapOf<EarlyRegistryGroup, ArrayList<T>>()
 
     val all by lazy { values.values }
     val idxs by lazy { values.keys }
@@ -25,5 +24,5 @@ class EarlyRegistry<T> {
 
     fun locationOf(value: T) = values.entries.find { it.value == value }?.key
 
-    fun isInGroup(value: T, group: EarlyRegistryGoup) = groups[group]?.contains(value) == true
+    fun isInGroup(value: T, group: EarlyRegistryGroup) = groups[group]?.contains(value) == true
 }

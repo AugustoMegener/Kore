@@ -8,21 +8,17 @@ import io.kito.kore.common.template.Template.Companion.include
 import io.kito.kore.util.minecraft.EN_US
 import io.kito.kore.util.minecraft.PT_BR
 import io.kito.kore.util.minecraft.ResourceLocationExt.block
-import io.kito.kore.util.minecraft.ResourceLocationExt.item
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import io.kito.kore.util.toTitle
 import io.kito.kore_tests.DataGenerator.cubeAllModel
 import io.kito.kore_tests.DataGenerator.defaultModel
 import io.kito.kore_tests.DataGenerator.flatModel
-import io.kito.kore_tests.DataGenerator.model
 import io.kito.kore_tests.DataGenerator.named
 import io.kito.kore_tests.ID
 import io.kito.kore_tests.KoreTests.local
 import io.kito.kore_tests.common.registry.early.Registries.stringRegistry
 import io.kito.kore_tests.common.registry.early.Strings.myGroup
-import net.minecraft.client.data.models.model.ModelTemplates
 import net.minecraft.world.item.Items.BUCKET
-import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder
 import net.neoforged.neoforge.fluids.FluidType
 
 
@@ -94,5 +90,6 @@ object FluidTypes : FluidTypeRegister(ID) {
                 flowingTexturePath = loc("water_flow").block
             }
         }
-    }.include(myGroup)}
+    }.include(myGroup)
 
+}

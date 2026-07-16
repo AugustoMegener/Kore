@@ -74,15 +74,6 @@ import net.minecraft.world.item.CreativeModeTab.Builder as TabBuilder
 
 typealias TranslationBuilder = LanguageProvider.() -> Unit
 
-/**
- * Abstract base class for mod-specific data generation helpers in Kore.
- * Subclasses of this helper are responsible for collecting and registering various data providers
- * such as block states, item models, recipes, and language entries for their respective mods.
- * This class integrates with Kore's scanning system to automatically addEntry data providers
- * with NeoForge's data generation event.
- *
- * @property modId The unique identifier of the mod this data generation helper belongs to.
- */
 abstract class DataGenHelper(private val modId: String) {
 
     private val tagRegistries = hashMapOf<KClass<*>, Registry<Any>>()
@@ -106,15 +97,8 @@ abstract class DataGenHelper(private val modId: String) {
 
     private val translationEntries = hashMapOf<String, ArrayList<TranslationBuilder>>()
 
-    /**
-     * A list of custom data providers to be registered, along with their distribution target (client or server).
-     */
     val providers = arrayListOf<(PackOutput) -> DataProvider>()
 
-    /**
-     * Internal list of data generation blocks (lambdas) collected from functions annotated with [DataGen].
-     * These blocks are executed before registering data providers.
-     */
     internal val blocks = arrayListOf<() -> Unit>()
 
 
@@ -459,12 +443,6 @@ abstract class DataGenHelper(private val modId: String) {
             tags.map { { FLUID_TYPES[fluidTypeId].get().value() to it() } }
     }
 
-    /**
-     * Registers all collected data providers with the [GatherDataEvent].
-     * This method is typically called by NeoForge during the data generation phase.
-     *
-     * @param event The [GatherDataEvent] provided by NeoForge.
-     */
     fun registerClient(event: GatherDataEvent.Client) {
 
         event.createProvider { DynamicItemModelProvider(modId, it, blockGenerators, itemGenerators) }
@@ -569,29 +547,13 @@ abstract class DataGenHelper(private val modId: String) {
 
     }
 
-    /**
-     * Companion object responsible for scanning and attaching [DataGenHelper] instances to the [GatherDataEvent].
-     * Annotated with `@Scan` to be automatically discovered by Kore's reflection system.
-     */
     @Scan
     companion object {
 
-        /**
-         * Scans for objects that extend [DataGenHelper] and attaches their `addEntry` method
-         * to the [GatherDataEvent] for the corresponding mod.
-         *
-         * This function is invoked by Kore's [ObjectScanner] during mod initialization.
-         *
-         * @param info The [IModInfo] of the mod being processed.
-         * @param container The [ModContainer] of the mod.
-         * @param data The [DataGenHelper] instance to be attached.
-         */
         @ObjectScanner(DataGenHelper::class)
         fun attachDataGenHelperToEvent(info: IModInfo, container: ModContainer, data: DataGenHelper) {
-            // Only attach if the mod ID matches the DataGenHelper's mod ID.
             if (info.modId != data.modId) return
 
-            // Add a listener to the mod's event bus for the GatherDataEvent.
             container.eventBus?.addListener(data::registerClient)
             container.eventBus?.addListener(data::registerServer)
         }

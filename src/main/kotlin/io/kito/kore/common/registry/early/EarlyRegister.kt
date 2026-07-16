@@ -4,7 +4,6 @@ import io.kito.kore.util.UNCHECKED_CAST
 import io.kito.kore.util.minecraft.ResourceLocationExt.loc
 import net.minecraft.resources.ResourceLocation
 import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty1
 
 abstract class EarlyRegister<T>(val id: String, val registry: EarlyRegistry<T>) {
 
@@ -22,8 +21,8 @@ abstract class EarlyRegister<T>(val id: String, val registry: EarlyRegistry<T>) 
 
         operator fun getValue(obj: Any?, prop: KProperty<*>) = supplier()
 
-        infix fun onGroup(group: EarlyRegistryGoup) = also { registry.groupEntries += location to group }
-        infix fun onGroups(groups: Array<EarlyRegistryGoup>) =
+        infix fun onGroup(group: EarlyRegistryGroup) = also { registry.groupEntries += location to group }
+        infix fun onGroups(groups: Array<EarlyRegistryGroup>) =
             also { groups.forEach { registry.groupEntries += location to it }  }
     }
 }

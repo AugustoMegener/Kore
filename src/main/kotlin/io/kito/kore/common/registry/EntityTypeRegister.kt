@@ -6,7 +6,7 @@ import io.kito.kore.common.capabilities.EntityCapRegister.EntityCapRegistry
 import io.kito.kore.common.event.KSubscribe
 import io.kito.kore.common.reflect.Scan
 import io.kito.kore.common.registry.early.EarlyRegistry
-import io.kito.kore.common.registry.early.EarlyRegistryGoup
+import io.kito.kore.common.registry.early.EarlyRegistryGroup
 import io.kito.kore.common.template.Template
 import io.kito.kore.util.Indexable
 import io.kito.kore.util.minecraft.ItemProp
@@ -353,13 +353,13 @@ open class EntityTypeRegister(final override val id: String) : AutoRegister {
         override fun get(idx: T): EntityType<E>? = registeredEntries[idx]?.entityRegistry?.get()
 
         override val indexesIds = arrayListOf<ResourceLocation>()
-        val groups = arrayListOf<EarlyRegistryGoup>()
+        val groups = arrayListOf<EarlyRegistryGroup>()
 
         override fun putAllIndexes() { indexesIds += registry.idxs }
 
         override fun putIndex(id: ResourceLocation) { indexesIds += id }
 
-        override fun putIndex(group: EarlyRegistryGoup) { groups += group }
+        override fun putIndex(group: EarlyRegistryGroup) { groups += group }
 
         override fun register() {
             indexesIds += groups.flatMap { registry.groups[it]!!.map { i -> registry.locationOf(i)!! } }
