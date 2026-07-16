@@ -39,10 +39,10 @@
           "name": "Kore-1.21.10-0.1.1.jar",
           "url": "Kore-1.21.10-0.1.1.jar",
           "size": 595380,
-          "sha512": "5413ffe9cc9a10186c30e55f9e85ab1868c0c57874555f87ff057702a90174207a0bcf080e02dbdaf56ce5dd9c50f42e5ef4c6b1aab17d5c24f8b7342ba4ec16",
-          "sha256": "9cbd4a9fbd7175f048e07fadf36abc72b395de82ee15209f2089f64adfe1ff16",
-          "sha1": "94ffd73976d192d760a9fa1ed322ca4c9a304e50",
-          "md5": "8bc650831e4df213af64995b6389cd86"
+          "sha512": "95113fb85ce2626974ec8cb2b692b3490f2ac389567d08d0f9eb7defddc471da4acae5aeaadc0769e8331e2f90568cc2114fadc0812153f88889830b64a1c318",
+          "sha256": "eba1c4c96d835a05a18cc2a11253cdc0736edf5e07d2bc1671d9e9776de9816a",
+          "sha1": "f9d00831fc3ffce9d9b81d5310c6dcc1a52493c8",
+          "md5": "1da484af19541f8bf5ce1602c6473745"
         }
       ]
     },
@@ -91,10 +91,10 @@
           "name": "Kore-1.21.10-0.1.1-all.jar",
           "url": "Kore-1.21.10-0.1.1-all.jar",
           "size": 595380,
-          "sha512": "9dd4bb67d1b00738ab9d3f1a2945c729b94852cccdbc9b5d47a0d08b530d565cd7da5f2b60ff0201f34978ede4592167ad4653a678449b39d7ca98f19fe92612",
-          "sha256": "1641d33ee6a66b88f7e862410b2a28685b6b3e9e1c20051a4bb0f1ea4b3c541e",
-          "sha1": "a23d2bb6472d9476e6981ce325645ead3a7488cb",
-          "md5": "459bfa89bcc190a158b3de6822cf0373"
+          "sha512": "c1ffd12aa7961e6ee57ad0780e1f5ffc79dc6936c712804f655b7638b946661d45f849784b50bb27b70a7622cbedb6dd5ba17d7480ceb0e9c9bd839f915c4732",
+          "sha256": "ce948560d1bd22cc7c434d9283022e2a4fa3e1d5a067e017d2c58fde0f229996",
+          "sha1": "deba9c54e22a94eebf8f48bd03d5975ded311244",
+          "md5": "80e78e832ffa3025f45067719864966c"
         }
       ]
     }
