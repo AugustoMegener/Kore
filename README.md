@@ -1,19 +1,33 @@
+<div align="center">
+    <img height="250" src="https://github.com/AugustoMegener/Kore/blob/NF-1.21.10-0.1.x/kore-logo.png?raw=true">
+</div>
+
 # Kore: Kotlin Minecraft Modding Framework for NeoForge
+
+<a href="https://github.com/AugustoMegener/Kore">
+  <img alt="github" height="45" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github_vector.svg">
+</a>
+
+<a href="https://modrinth.com/projects/kore">
+  <img alt="modrinth" height="45" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg">
+</a>
+
+<a href="https://neoforged.net/">
+  <img alt="neoforge" height="45" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/neoforge_vector.svg">
+</a>
+
+---
 
 Kore is a comprehensive Minecraft modding framework designed to optimize and simplify the development of new content for the game. It provides a set of auxiliary utilities, abstractions, and functions to simplify common modification tasks, allowing developers to focus on the effective creation of their mod.
 
 ## Features
 
 - **Tweaked Registration**: Kore offers a streamlined process for registering various game elements, including blocks, items, entities, and more, reducing boilerplate code.
-- **Event Handling**: A plug-and-play event system allows for easy subscription of events anyway and anywhere.
-- **Data Generation**: Datagen together with registers, helping to reduce manual effort.
+- **Event Handling**: A plug-and-play event subscription system for easy subscription of events anyway and anywhere.
+- **Data Generation**: Datagen together with registers with minimal setup, helping to reduce manual effort.
 - **Tweaked serialization:** Automatic generation of codecs and ValueIOSerializables.
 - **Helpers:** Several helpers, making modding more kotlinsh!
 - **And More!**
-
-<img alt="app-store" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github.svg">
-<img alt="app-store" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth.svg">
-<img alt="forge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/neoforge_vector.svg">
 
 <!-- modrinth_exclude.start -->
 ## Depending on Kore
