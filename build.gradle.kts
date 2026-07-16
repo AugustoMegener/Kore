@@ -88,7 +88,6 @@ runs {
     }
 }
 
-// build.gradle.kts
 modrinth {
     token.set(System.getenv("MODRINTH_TOKEN"))
     projectId.set("kore")
