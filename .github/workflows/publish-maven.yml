@@ -50,5 +50,6 @@ jobs:
           git diff --staged --quiet || (git commit -m "Update site" && git push)
 
       - name: Update modrinth
-        run: |
-          ./gradlew modrinthSyncBody modrinth
+        run: ./gradlew modrinthSyncBody modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
