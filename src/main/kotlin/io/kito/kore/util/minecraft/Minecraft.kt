@@ -10,6 +10,7 @@ import com.mojang.serialization.JsonOps
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.client.Minecraft
+import net.minecraft.core.HolderSet
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
@@ -20,11 +21,13 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.item.crafting.ShapedRecipePattern
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.neoforge.client.settings.KeyConflictContext
@@ -32,6 +35,7 @@ import net.neoforged.neoforge.fluids.BaseFlowingFluid
 import net.neoforged.neoforge.fluids.FluidType
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
 import thedarkcolour.kotlinforforge.neoforge.forge.runWhenOn
+import java.util.stream.Stream
 
 /**
  * Type alias for [BlockBehaviour.Properties], used for defining block properties.
@@ -375,3 +379,9 @@ fun AbstractContainerMenu.smartQuickMoveStack(player: Player,
 
     return copyFromStack
 }
+
+fun ingredientOf(item: ItemLike) = Ingredient.of(item)
+fun ingredientOf(item: () -> Item) = Ingredient.of(item)
+fun ingredientOf(items: HolderSet<Item>) = Ingredient.of(items)
+fun ingredientOf(items: Stream<Item>) = Ingredient.of(items)
+fun ingredientOf(vararg items: Item) = Ingredient.of(*items)

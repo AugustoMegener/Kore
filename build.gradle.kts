@@ -8,6 +8,7 @@ plugins {
     signing
     idea
     id("net.neoforged.gradle.userdev") version "7.0.+"
+    id("com.modrinth.minotaur") version "2.+"
 
     kotlin("jvm") version "2.2.0"
     kotlin("plugin.serialization") version "2.2.0"
@@ -87,24 +88,26 @@ runs {
     }
 }
 
+// build.gradle.kts
+modrinth {
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("kore")
+    versionType.set("alpha")
+    uploadFile.set(tasks.jar)
+    gameVersions.addAll("1.21.1")
+    loaders.add("neoforge")
+    dependencies {
+        required.version("kotlin-for-forge", "5.12.0")
+    }
+}
+
 sourceSets["main"].resources.srcDir("src/generated/resources")
 
 dependencies {
     implementation(kotlin("reflect"))
 
-    jarJar(implementation(project(":scripts"))!!)
-
     implementation("net.neoforged:neoforge:${"neo_version".prop}")
     implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
-
-    (implementation(kotlin("compiler-embeddable"))!!)
-    (implementation(kotlin("daemon-embeddable"))!!)
-    (implementation(kotlin("scripting-common"))!!)
-    (implementation(kotlin("scripting-compiler-embeddable"))!!)
-    (implementation(kotlin("scripting-compiler-impl-embeddable"))!!)
-    (implementation(kotlin("scripting-jvm"))!!)
-    (implementation(kotlin("scripting-jvm-host"))!!)
-    (implementation(kotlin("script-runtime"))!!)
 }
 
 ksp {
@@ -113,8 +116,8 @@ ksp {
 
 tasks.withType<ProcessResources>().configureEach {
     val replaceProperties = listOf("minecraft_version", "minecraft_version_range", "neo_version", "neo_version_range",
-                                   "loader_version_range", "mod_id", "mod_name", "mod_license", "mod_version",
-                                   "mod_authors", "mod_description").associateWith { it.prop }
+        "loader_version_range", "mod_id", "mod_name", "mod_license", "mod_version",
+        "mod_authors", "mod_description").associateWith { it.prop }
 
     inputs.properties(replaceProperties)
 

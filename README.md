@@ -1,16 +1,21 @@
-# Kore: Kotlin Minecraft Modding Framework for neoforge
+# Kore: Kotlin Minecraft Modding Framework for NeoForge
 
 Kore is a comprehensive Minecraft modding framework designed to optimize and simplify the development of new content for the game. It provides a set of auxiliary utilities, abstractions, and functions to simplify common modification tasks, allowing developers to focus on the effective creation of their mod.
 
 ## Features
 
 - **Tweaked Registration**: Kore offers a streamlined process for registering various game elements, including blocks, items, entities, and more, reducing boilerplate code.
-- **Event Handling**: A robust event system allows for easy subscription of events anyway and anywhere.
-- **Data Generation**: Tools for automated data generation (e.g., recipes, block states, item models and custom data) help  reduce manual effort.
-- **Capability Integration**: Tweaked integration with NeoForge capabilities for handling inventories, energy, fluids, and other interactions.
-- **Tweaked serialization:** Automatic generation of codecs and INBTSerializables.
+- **Event Handling**: A plug-and-play event system allows for easy subscription of events anyway and anywhere.
+- **Data Generation**: Datagen together with registers, helping to reduce manual effort.
+- **Tweaked serialization:** Automatic generation of codecs and ValueIOSerializables.
+- **Helpers:** Several helpers, making modding more kotlinsh!
 - **And More!**
 
+<img alt="app-store" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github.svg">
+<img alt="app-store" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth.svg">
+<img alt="forge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/neoforge_vector.svg">
+
+<!-- modrinth_exclude.start -->
 ## Depending on Kore
 
 Add the following to your `build.gradle.kts` file
@@ -33,7 +38,7 @@ Add the following to your `build.gradle.kts` file
 2. Add the dependencies.
    ```kotlin
    dependencies {
-       implementation("thedarkcolour:kotlinforforge-neoforge:5.3.0")
+       implementation("thedarkcolour:kotlinforforge-neoforge:6.0.0")
    
        implementation("augustomegener:Kore:<Lastest Version>")
        ksp("augustomegener.kore:ksp:<Lastest Version>")
@@ -44,26 +49,28 @@ Add the following to your `build.gradle.kts` file
 
 ### Entrypoint
 
+`src/main/kotlin/namespace/kore_tests/KoreTests.kt`
 ```kotlin
 @KMod
 fun init() {
     
 }
 
-// generated code
-const val ID: String = "kore_tests" 
-
-val logger: Logger = LogManager.getLogger(ID)
-
-@Mod(ID)
-object KoreTests : ModUtil(ID) {
-   init {
-      `init`()
-   }
-}
+/** generated code
+* const val ID: String = "kore_tests"  // taken from the package name (can be something else using @Kmod("another_id"))
+* 
+* val logger: Logger = LogManager.getLogger(ID)
+*
+* @Mod(ID)
+* object KoreTests : ModUtil(ID) {
+*    init {
+*       `init`()
+*    }
+* }
+*/
 ```
 
-### Registering 
+### Registering + Datagen
 
 ```kotlin
 @Scan
@@ -85,7 +92,7 @@ object Items : ItemRegister(ID) {
           ShapedRecipe(ID, CraftingBookCategory.MISC,
              shaped("##", 
                     "##")
-                .by('#' to Ingredient.of(STICK)),
+                .by('#' to ingredientOf(STICK)),
              exampleItem.defaultInstance
           )
        }
@@ -94,6 +101,8 @@ object Items : ItemRegister(ID) {
 ```
 
 ## Templates
+
+Bulk registering based on passed parameters.
 
 ```kotlin
 @Scan
@@ -133,7 +142,7 @@ val bazItem: Item? = itemTemplate["baz"] // kore_tests:baz
 ### Handling Events
 
 ```kotlin
-@Scan
+@Scan 
 object Foo {
     
     @KSubscribe
@@ -157,7 +166,4 @@ val data = MyData.decode(jsonOps, json) // MyData("foo", 123)
 ```
 
 And much more!
-
-## License
-
-Kore is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+<!-- modrinth_exclude.end --> 

@@ -25,6 +25,7 @@ run-data
 
 repo
 .env
+.envrc
 .gradle/secrets.properties
 setup_secrets.sh
 private_key.txt
