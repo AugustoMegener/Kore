@@ -93,7 +93,7 @@ modrinth {
     projectId.set("kore")
     versionType.set("alpha")
     uploadFile.set(tasks.jar)
-    gameVersions.addAll("1.21.1")
+    gameVersions.addAll(property("minecraft_version")!! as String)
     loaders.add("neoforge")
     syncBodyFrom.set(rootProject.file("README.md").readText())
 
