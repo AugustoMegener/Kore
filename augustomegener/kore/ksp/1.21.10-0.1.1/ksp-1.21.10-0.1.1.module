@@ -39,10 +39,10 @@
           "name": "ksp-1.21.10-0.1.1.jar",
           "url": "ksp-1.21.10-0.1.1.jar",
           "size": 8661,
-          "sha512": "802c266d017b17e6e220997e801933c439da08dfc6964f96ef725777f608d8f98a225e60efd7f50912b1f422c19daa375dc0cbae4fc8cbff737d94594b1e8a97",
-          "sha256": "15069c16405c8b7bfeb269ea79b5e92210e927a9ebeb1454b8f965a01390e207",
-          "sha1": "21087d131d0f1924f99ad9a54e05ec694855cc41",
-          "md5": "633423b269dbd7a8d5c187369b590ebf"
+          "sha512": "18dbf0b7fba773324e8efaac85b007e75bab4d8c6704533e7911b75f17768c823eaf6f9f87cd0422a6acf854dfe6cc0e80e4808a457515c71805058cf2367c2b",
+          "sha256": "b257f43305210a9939b0ed76c83624afec80c31bf5d1cd4794137b90642bcab0",
+          "sha1": "d712f8ec12f9f2dbc714a3743b8032991bf5a85e",
+          "md5": "2308d30538587dce5e3942893a8debf6"
         }
       ]
     },
@@ -217,10 +217,10 @@
           "name": "ksp-1.21.10-0.1.1.jar",
           "url": "ksp-1.21.10-0.1.1.jar",
           "size": 8661,
-          "sha512": "802c266d017b17e6e220997e801933c439da08dfc6964f96ef725777f608d8f98a225e60efd7f50912b1f422c19daa375dc0cbae4fc8cbff737d94594b1e8a97",
-          "sha256": "15069c16405c8b7bfeb269ea79b5e92210e927a9ebeb1454b8f965a01390e207",
-          "sha1": "21087d131d0f1924f99ad9a54e05ec694855cc41",
-          "md5": "633423b269dbd7a8d5c187369b590ebf"
+          "sha512": "18dbf0b7fba773324e8efaac85b007e75bab4d8c6704533e7911b75f17768c823eaf6f9f87cd0422a6acf854dfe6cc0e80e4808a457515c71805058cf2367c2b",
+          "sha256": "b257f43305210a9939b0ed76c83624afec80c31bf5d1cd4794137b90642bcab0",
+          "sha1": "d712f8ec12f9f2dbc714a3743b8032991bf5a85e",
+          "md5": "2308d30538587dce5e3942893a8debf6"
         }
       ]
     }
